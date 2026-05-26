@@ -81,30 +81,30 @@
             </td>
           </tr>
 
-          <!-- Логотип + Навигация в одну линию с увеличенными отступами -->
+<!-- Логотип + Навигация в одну линию без переносов -->
           <tr>
             <td style="padding: 15px 30px 25px;">
-              <table width="100%" border="0" cellpadding="0" cellspacing="0">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
                 <tr>
                   <!-- Логотип -->
-                  <td class="logo-cell" width="180" valign="middle">
+                  <td width="160" valign="middle" style="line-height: 1;">
                     <a href="https://stalmetural.ru/" target="_blank">
-                      <img src="https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=63anqerxqnyjsrauf9n3p3mtxkdb834knwaazru6i7eng4knmg4uukqkcxuj8aoex7f7phufcfh3sgx9bbczfbt3nfwsonff3gn7zkpy" width="160" border="0">
+                      <img src="https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=63anqerxqnyjsrauf9n3p3mtxkdb834knwaazru6i7eng4knmg4uukqkcxuj8aoex7f7phufcfh3sgx9bbczfbt3nfwsonff3gn7zkpy" width="160" border="0" style="display: block;">
                     </a>
                   </td>
-                  
-                  <!-- Навигация (nested table для точных отступов) -->
+
+                  <!-- Навигация -->
                   <td class="mobile-hide" align="left" valign="middle" style="padding-left: 35px;">
-                    <table class="nav-table" border="0" cellpadding="0" cellspacing="0">
+                    <table border="0" cellpadding="0" cellspacing="0" role="presentation">
                       <tr>
-                        <td style="padding-right: 50px;">
-                          <a href="{{LINK_CATALOG}}" class="nav-link">Каталог</a>
+                        <td style="padding-right: 40px; white-space: nowrap;">
+                          <a href="{{LINK_CATALOG}}" style="font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; color: #ffffff; text-decoration: none;">Каталог</a>
                         </td>
-                        <td style="padding-right: 50px;">
-                          <a href="{{LINK_COMPANY}}" class="nav-link">О компании</a>
+                        <td style="padding-right: 40px; white-space: nowrap;">
+                          <a href="{{LINK_COMPANY}}" style="font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; color: #ffffff; text-decoration: none;">О компании</a>
                         </td>
-                        <td>
-                          <a href="{{LINK_DELIVERY}}" class="nav-link">Доставка и оплата</a>
+                        <td style="white-space: nowrap;">
+                          <a href="{{LINK_DELIVERY}}" style="font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; color: #ffffff; text-decoration: none;">Доставка и оплата</a>
                         </td>
                       </tr>
                     </table>
