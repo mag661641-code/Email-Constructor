@@ -302,49 +302,78 @@ else:
                     data[f'SVC_D_{i}'] = st.text_input(f"Описание услуги {i}", key=f"cs_svcd{i}")
                     data[f'SVC_L_{i}'] = st.text_input(f"Ссылка {i}", data['LINK_CATALOG'], key=f"cs_svcl{i}")
 
-elif mode == "stock":
+with tabs[3]:
+        # --- ВСЕ НАСТРОЙКИ БЛОКОВ ---
+        if mode == "cases":
+            st.subheader("⚙️ Настройка кейса отгрузки")
+            with st.expander("1. Описание истории", expanded=True):
+                data['CASE_MAIN_TITLE'] = st.text_input("Заголовок кейса", "Как мы укомплектовали 12 позиций...")
+                data['CASE_TASK'] = st.text_area("Задача", "Снабженцу требовалось...")
+                data['CASE_STEPS'] = st.text_area("Реализация", "- Сборный груз...")
+                data['CASE_RESULT'] = st.text_input("Результат", "Машина прибыла на объект...")
+
+            with st.expander("2. Статистика (иконки)"):
+                data['CASE_STAT_1'] = st.text_input("Срок", "24 часа")
+                data['CASE_STAT_2'] = st.text_input("Объем", "12 типов изделий")
+                data['CASE_STAT_3'] = st.text_input("Выгода", "Одна машина вместо трех")
+
+            with st.expander("3. Товары (2 шт.)"):
+                for i in range(1, 3):
+                    st.markdown(f"**Товар №{i}**")
+                    data[f'T_{i}'] = st.text_input("Название", key=f"cs_t{i}")
+                    data[f'D_{i}'] = st.text_input("Описание", key=f"cs_d{i}")
+                    data[f'I_{i}'] = st.text_input("URL картинки", key=f"cs_img{i}")
+                    data[f'L_{i}'] = st.text_input("Ссылка", data['LINK_CATALOG'], key=f"cs_l{i}")
+
+        elif mode == "stock":
             st.subheader("📦 Настройка контента Поступления")
             with st.expander("1. Блок бесплатного аудита", expanded=True):
                 data['AUDIT_TITLE'] = st.text_input("Заголовок", "Бесплатный аудит сметы и чертежей*")
                 data['AUDIT_SUB'] = st.text_input("Подзаголовок", "Индивидуальный расчет условий под ваш объем")
                 data['AUDIT_LINK'] = st.text_input("Ссылка кнопки", data['LINK_CATALOG'])
 
-            with st.expander("2. Буллиты (синие квадраты)"):
+            with st.expander("2. Описание и Буллиты"):
+                data['TEXT_TITLE'] = st.text_input("Заголовок текста", "Труба всех типоразмеров")
+                data['TEXT_BODY'] = st.text_area("Вводный текст", "Обновили складской запас...")
                 for i in range(1, 4):
-                    data[f'BULLET_{i}'] = st.text_area(f"Текст буллита {i}", key=f"st_btx{i}")
+                    data[f'BULLET_{i}'] = st.text_input(f"Пункт списка {i}", key=f"st_blt{i}")
 
             with st.expander("3. Технический блок (ГОСТы и Размеры)"):
-                data['GOST_BLOCK'] = st.text_area("ГОСТы (через пробел)", "ГОСТ 8639-82 ГОСТ 8645-68", key="st_gost")
-                data['SIZE_BLOCK'] = st.text_area("Размеры (через пробел)", "20х20 40x40 60x60", key="st_size")
+                data['GOST_BLOCK'] = st.text_area("ГОСТы (через пробел)", "ГОСТ 8639-82", key="st_gst")
+                data['SIZE_BLOCK'] = st.text_area("Размеры (через пробел)", "20х20 40x40", key="st_sz")
 
-            with st.expander("4. Блок 'Также в наличии' (3 товара)"):
+            with st.expander("4. Также в наличии (3 товара)"):
                 for i in range(1, 4):
                     st.markdown(f"**Товар №{i}**")
-                    data[f'T_{i}'] = st.text_input("Название", key=f"st_ext_t{i}")
-                    data[f'D_{i}'] = st.text_input("Описание", key=f"st_ext_d{i}")
-                    data[f'P_{i}'] = st.text_input("Цена", key=f"st_ext_p{i}")
-                    data[f'OLD_P_{i}'] = st.text_input("Старая цена (если есть)", key=f"st_ext_op{i}")
-                    data[f'I_{i}'] = st.text_input("URL Картинки", key=f"st_ext_img{i}")
-                    data[f'L_{i}'] = st.text_input("Ссылка", data['LINK_CATALOG'], key=f"st_ext_l{i}")
+                    data[f'T_{i}'] = st.text_input("Название", key=f"st_t{i}")
+                    data[f'D_{i}'] = st.text_input("Описание", key=f"st_d{i}")
+                    data[f'P_{i}'] = st.text_input("Цена", key=f"st_p{i}")
+                    data[f'OLD_P_{i}'] = st.text_input("Старая цена (для зачеркивания)", key=f"st_op{i}")
+                    data[f'I_{i}'] = st.text_input("URL картинки", key=f"st_i{i}")
+                    data[f'L_{i}'] = st.text_input("Ссылка", data['LINK_CATALOG'], key=f"st_l{i}")
 
             with st.expander("5. Наши отгрузки (2 кейса)"):
                 for i in range(1, 3):
-                    st.markdown(f"**Отгрузка №{i}**")
-                    data[f'CASE_TITLE_{i}'] = st.text_input("Заголовок кейса", key=f"st_cas_t{i}")
-                    data[f'CASE_DESC_{i}'] = st.text_input("Описание кейса", key=f"st_cas_d{i}")
-                    data[f'CASE_DATE_{i}'] = st.text_input("Дата отгрузки", key=f"st_cas_dt{i}")
-                    data[f'CASE_IMG_{i}'] = st.text_input("URL Картинки кейса", key=f"st_cas_i{i}")
+                    st.markdown(f"**Кейс №{i}**")
+                    data[f'CASE_TITLE_{i}'] = st.text_input("Заголовок кейса", key=f"st_ct{i}")
+                    data[f'CASE_DESC_{i}'] = st.text_input("Описание кейса", key=f"st_cd{i}")
+                    data[f'CASE_DATE_{i}'] = st.text_input("Дата", key=f"st_cdt{i}")
+                    data[f'CASE_IMG_{i}'] = st.text_input("URL картинки кейса", key=f"st_ci{i}")
+
         elif mode == "promo":
             st.subheader("🔥 Персональные цены и товары")
+            data['TEXT_TITLE'] = st.text_input("Заголовок текста", "Снижаем стоимость на партию")
+            data['TEXT_BODY'] = st.text_area("Текст акции", "Мы открываем спецпредложение...")
+            data['PS_BLOCK'] = st.text_input("Текст P.S.", "P.S. Также в наличии круги и втулки.")
+            
             for i in range(1, 5):
                 with st.expander(f"Товар №{i}"):
-                    c1, c2 = st.columns([2,1])
-                    data[f'T_{i}'] = c1.text_input(f"Название {i}", key=f"p_t{i}")
-                    data[f'P_{i}'] = st.text_input(f"Цена {i}", key=f"p_p{i}")
-                    data[f'OLD_P_{i}'] = st.text_input(f"Старая цена {i}", key=f"p_op{i}")
-                    data[f'I_{i}'] = c2.text_input(f"URL картинки {i}", key=f"p_i{i}")
-                    data[f'D_{i}'] = st.text_input(f"Описание {i}", key=f"p_d{i}")
-                    data[f'L_{i}'] = st.text_input(f"Ссылка {i}", data['LINK_CATALOG'], key=f"p_l{i}")
+                    data[f'T_{i}'] = st.text_input("Название", key=f"p_t{i}")
+                    data[f'P_{i}'] = st.text_input("Цена", key=f"p_p{i}")
+                    data[f'OLD_P_{i}'] = st.text_input("Старая цена", key=f"p_op{i}")
+                    data[f'I_{i}'] = st.text_input("URL картинки", key=f"p_i{i}")
+                    data[f'D_{i}'] = st.text_input("Описание", key=f"p_d{i}")
+                    data[f'L_{i}'] = st.text_input("Ссылка", data['LINK_CATALOG'], key=f"p_l{i}")
 
         else:
             st.subheader("📝 Универсальные блоки")
