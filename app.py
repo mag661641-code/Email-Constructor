@@ -302,8 +302,8 @@ else:
                     data[f'SVC_D_{i}'] = st.text_input(f"Описание услуги {i}", key=f"cs_svcd{i}")
                     data[f'SVC_L_{i}'] = st.text_input(f"Ссылка {i}", data['LINK_CATALOG'], key=f"cs_svcl{i}")
 
-        elif mode == "stock":
-            st.subheader("Настройка контента Поступления")
+elif mode == "stock":
+            st.subheader("📦 Настройка контента Поступления")
             with st.expander("1. Блок бесплатного аудита", expanded=True):
                 data['AUDIT_TITLE'] = st.text_input("Заголовок", "Бесплатный аудит сметы и чертежей*")
                 data['AUDIT_SUB'] = st.text_input("Подзаголовок", "Индивидуальный расчет условий под ваш объем")
@@ -311,21 +311,29 @@ else:
 
             with st.expander("2. Буллиты (синие квадраты)"):
                 for i in range(1, 4):
-                    data[f'B_TITLE_{i}'] = st.text_input(f"Заголовок буллита {i}", key=f"st_bt{i}")
-                    data[f'B_TEXT_{i}'] = st.text_area(f"Текст буллита {i}", key=f"st_btx{i}")
+                    data[f'BULLET_{i}'] = st.text_area(f"Текст буллита {i}", key=f"st_btx{i}")
 
             with st.expander("3. Технический блок (ГОСТы и Размеры)"):
-                data['GOST_LIST'] = st.text_area("ГОСТы (через пробел)", key="st_gost")
-                data['SIZE_LIST'] = st.text_area("Размеры (через пробел)", key="st_size")
+                data['GOST_BLOCK'] = st.text_area("ГОСТы (через пробел)", "ГОСТ 8639-82 ГОСТ 8645-68", key="st_gost")
+                data['SIZE_BLOCK'] = st.text_area("Размеры (через пробел)", "20х20 40x40 60x60", key="st_size")
 
             with st.expander("4. Блок 'Также в наличии' (3 товара)"):
                 for i in range(1, 4):
                     st.markdown(f"**Товар №{i}**")
-                    data[f'EXTRA_T_{i}'] = st.text_input("Название", key=f"st_ext_t{i}")
-                    data[f'EXTRA_D_{i}'] = st.text_input("Описание", key=f"st_ext_d{i}")
-                    data[f'EXTRA_P_{i}'] = st.text_input("Цена", key=f"st_ext_p{i}")
-                    data[f'EXTRA_L_{i}'] = st.text_input("Ссылка", data['LINK_CATALOG'], key=f"st_ext_l{i}")
+                    data[f'T_{i}'] = st.text_input("Название", key=f"st_ext_t{i}")
+                    data[f'D_{i}'] = st.text_input("Описание", key=f"st_ext_d{i}")
+                    data[f'P_{i}'] = st.text_input("Цена", key=f"st_ext_p{i}")
+                    data[f'OLD_P_{i}'] = st.text_input("Старая цена (если есть)", key=f"st_ext_op{i}")
+                    data[f'I_{i}'] = st.text_input("URL Картинки", key=f"st_ext_img{i}")
+                    data[f'L_{i}'] = st.text_input("Ссылка", data['LINK_CATALOG'], key=f"st_ext_l{i}")
 
+            with st.expander("5. Наши отгрузки (2 кейса)"):
+                for i in range(1, 3):
+                    st.markdown(f"**Отгрузка №{i}**")
+                    data[f'CASE_TITLE_{i}'] = st.text_input("Заголовок кейса", key=f"st_cas_t{i}")
+                    data[f'CASE_DESC_{i}'] = st.text_input("Описание кейса", key=f"st_cas_d{i}")
+                    data[f'CASE_DATE_{i}'] = st.text_input("Дата отгрузки", key=f"st_cas_dt{i}")
+                    data[f'CASE_IMG_{i}'] = st.text_input("URL Картинки кейса", key=f"st_cas_i{i}")
         elif mode == "promo":
             st.subheader("🔥 Персональные цены и товары")
             for i in range(1, 5):
