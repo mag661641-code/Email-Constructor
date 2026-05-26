@@ -276,33 +276,6 @@ else:
             data['CASE_REALIZATION'] = process_text_to_html(case_real_raw)
 
     with tabs[3]:
-        # --- ВСЕ НАСТРОЙКИ БЛОКОВ ТЕПЕРЬ ТУТ (БЕЗ ПОВТОРОВ with tabs) ---
-        if mode == "cases":
-            st.subheader("⚙️ Настройка кейса отгрузки")
-            with st.expander("1. Описание истории", expanded=True):
-                data['CASE_HEADER'] = st.text_input("Малый заголовок", "Кейс отгрузки 12 позиций...")
-                data['CASE_RESULT'] = st.text_input("РЕЗУЛЬТАТ (финальная плашка)", "Машина прибыла на объект...")
-                c1, c2, c3 = st.columns(3)
-                data['CASE_STAT_1'] = c1.text_input("Иконка 1: Срок", "Срок: 24 часа")
-                data['CASE_STAT_2'] = c2.text_input("Иконка 2: Ассортимент", "12 типов изделий")
-                data['CASE_STAT_3'] = c3.text_input("Иконка 3: Выгода", "Одна машина вместо трех")
-
-            with st.expander("2. Товары, участвовавшие в отгрузке (4 шт.)"):
-                for i in range(1, 5):
-                    st.markdown(f"**Товар №{i}**")
-                    col1, col2 = st.columns([2, 1])
-                    data[f'T_{i}'] = col1.text_input("Название", key=f"cs_t{i}")
-                    data[f'P_{i}'] = col2.text_input("Цена", key=f"cs_p{i}")
-                    data[f'D_{i}'] = st.text_input("Описание", key=f"cs_d{i}")
-                    data[f'L_{i}'] = st.text_input("Ссылка", data['LINK_CATALOG'], key=f"cs_l{i}")
-
-            with st.expander("3. Доп. услуги"):
-                for i in range(1, 4):
-                    data[f'SVC_T_{i}'] = st.text_input(f"Название услуги {i}", key=f"cs_svct{i}")
-                    data[f'SVC_D_{i}'] = st.text_input(f"Описание услуги {i}", key=f"cs_svcd{i}")
-                    data[f'SVC_L_{i}'] = st.text_input(f"Ссылка {i}", data['LINK_CATALOG'], key=f"cs_svcl{i}")
-
-with tabs[3]:
         # --- ВСЕ НАСТРОЙКИ БЛОКОВ ---
         if mode == "cases":
             st.subheader("⚙️ Настройка кейса отгрузки")
