@@ -303,7 +303,7 @@ else:
                     data[f'SVC_L_{i}'] = st.text_input(f"Ссылка {i}", data['LINK_CATALOG'], key=f"cs_svcl{i}")
 
         elif mode == "stock":
-            st.subheader("📦 Настройка контента Поступления")
+            st.subheader("Настройка контента Поступления")
             with st.expander("1. Блок бесплатного аудита", expanded=True):
                 data['AUDIT_TITLE'] = st.text_input("Заголовок", "Бесплатный аудит сметы и чертежей*")
                 data['AUDIT_SUB'] = st.text_input("Подзаголовок", "Индивидуальный расчет условий под ваш объем")
@@ -351,13 +351,18 @@ else:
 
     st.write("---")
     if st.button("СОБРАТЬ ФИНАЛЬНЫЙ HTML", type="primary", use_container_width=True):
-        file_path = os.path.join("templates", f"template_{mode}.html")
+# Умный поиск файла (в папке templates или в корне)
+        file_name = f"template_{mode}.html"
+        file_path = os.path.join("templates", file_name)
+        
+        if not os.path.exists(file_path):
+            file_path = file_name # Если в папке нет, ищем в корне
         try:
             with open(file_path, "r", encoding="utf-8") as f: html = f.read()
             for key, val in data.items():
                 if val: html = html.replace(f"{{{{{key}}}}}", str(val))
             
-            st.success("✅ Готово!")
+            st.success("Готово!")
             
             # Логика разделения кода для шаблона ПРОМО
             if mode == "promo" and "<!-- TIMER_SPLIT -->" in html:
