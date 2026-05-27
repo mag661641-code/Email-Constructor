@@ -361,6 +361,7 @@ else:
                     col1, col2 = st.columns([2, 1])
                     data[f'SMALL_T_{i}'] = col1.text_input("Название", key=f"sm_t{i}")
                     data[f'SMALL_P_{i}'] = col2.text_input("Цена", key=f"sm_p{i}")
+                    data[f'SMALL_D_{i}'] = st.text_input("Описание (ГОСТ, сталь)", key=f"sm_d{i}")
                     
                     col_i1, col_i2 = st.columns(2)
                     data[f'SMALL_I_{i}'] = col_i1.text_input("URL картинки", key=f"sm_img{i}")
