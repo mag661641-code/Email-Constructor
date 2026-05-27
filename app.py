@@ -239,7 +239,7 @@ else:
         """, unsafe_allow_html=True)
 
         if mode == "promo":
-            st.subheader("Текст акции с кнопкой-ссылкой")
+            st.subheader("📝 Главная статья")
             data['TEXT_TITLE'] = st.text_input("Заголовок статьи", "Снижаем стоимость на партию")
             
             t_pre_raw = st.text_area("Текст ДО ссылки", "Мы открываем **спецпредложение**...")
@@ -248,18 +248,19 @@ else:
             a_link = col_a2.text_input("Куда ведет", "https://stalmetural.ru/catalog/")
             t_post_raw = st.text_area("Текст ПОСЛЕ ссылки", "из наличия.")
             
+            # Собираем основной текст (обрабатываем только части до и после ссылки)
             data['TEXT_BODY'] = f'{process_text_to_html(t_pre_raw)} <a href="{a_link}" style="text-decoration:none; color:#1e69da; font-weight:bold;">{a_word}</a> {process_text_to_html(t_post_raw)}'
 
-            # --- БЛОК P.S. (ТЕПЕРЬ СТРОГО ВНУТРИ PROMO) ---
             st.markdown("---")
-            st.subheader("Нижняя подпись (P.S.)")
+            st.subheader("📎 Блок P.S. (под статьей)")
             ps_c = st.columns(3)
             with ps_c[0]: n1 = st.text_input("Доп. товар 1", "чугунные круги")
             with ps_c[1]: n2 = st.text_input("Доп. товар 2", "втулки")
             with ps_c[2]: n3 = st.text_input("Доп. товар 3", "услуги металлообработки")
             
+            # Формируем финальный PS_BLOCK
             data['PS_BLOCK'] = f'P.S. Также в наличии <a href="{data["LINK_CATALOG"]}" style="color:#1e69da; font-weight:bold; text-decoration:none;">{n1}</a>, <a href="{data["LINK_CATALOG"]}" style="color:#1e69da; font-weight:bold; text-decoration:none;">{n2}</a> и <a href="{data["LINK_CATALOG"]}" style="color:#1e69da; font-weight:bold; text-decoration:none;">{n3}</a>. Напишите нам.'
-
+       
         elif mode == "stock":
             st.subheader("Текст для статьи 'Поступление'")
             data['STOCK_MAIN_TITLE'] = st.text_input("Заголовок статьи", "Склад пополнен: Профильная труба всех типоразмеров")
@@ -334,27 +335,63 @@ else:
                     data[f'CASE_IMG_{i}'] = st.text_input("URL картинки кейса", key=f"st_ci{i}")
 
         elif mode == "promo":
-            st.subheader("🔥 Персональные цены и товары")
-            data['TEXT_TITLE'] = st.text_input("Заголовок текста", "Снижаем стоимость на партию")
-            data['TEXT_BODY'] = st.text_area("Текст акции", "Мы открываем спецпредложение...")
-            data['PS_BLOCK'] = st.text_input("Текст P.S.", "P.S. Также в наличии круги и втулки.")
+            st.subheader("📦 Товарные и структурные блоки")
             
-            for i in range(1, 5):
-                with st.expander(f"Товар №{i}"):
-                    data[f'T_{i}'] = st.text_input("Название", key=f"p_t{i}")
-                    data[f'P_{i}'] = st.text_input("Цена", key=f"p_p{i}")
-                    data[f'OLD_P_{i}'] = st.text_input("Старая цена", key=f"p_op{i}")
-                    data[f'I_{i}'] = st.text_input("URL картинки", key=f"p_i{i}")
-                    data[f'D_{i}'] = st.text_input("Описание", key=f"p_d{i}")
+            # --- 1. ПЕРСОНАЛЬНЫЕ ЦЕНЫ (Сетка 2х2) ---
+            with st.expander("1. Ваши персональные цены (Сетка 2x2)", expanded=True):
+                data['PERSONAL_SECTION_TITLE'] = st.text_input("Заголовок раздела", "Ваши персональные цены")
+                for i in range(1, 5):
+                    st.markdown(f"**Товар №{i}**")
+                    col1, col2, col3 = st.columns([2, 1, 1])
+                    data[f'T_{i}'] = col1.text_input("Название", key=f"p_t{i}")
+                    data[f'P_{i}'] = col2.text_input("Цена (со скидкой)", key=f"p_p{i}")
+                    data[f'OLD_P_{i}'] = col3.text_input("Старая цена", key=f"p_op{i}")
+                    
+                    col_d1, col_d2 = st.columns(2)
+                    data[f'D_{i}'] = col_d1.text_input("Описание (кратко)", key=f"p_d{i}")
+                    data[f'I_{i}'] = col_d2.text_input("URL картинки", key=f"p_i{i}")
                     data[f'L_{i}'] = st.text_input("Ссылка", data['LINK_CATALOG'], key=f"p_l{i}")
+                    st.markdown("---")
 
-        else:
-            st.subheader("📝 Универсальные блоки")
-            for i in range(1, 4):
-                with st.expander(f"Блок №{i}"):
-                    data[f'T_{i}'] = st.text_input("Заголовок", key=f"gen_t{i}")
-                    data[f'D_{i}'] = st.text_input("Описание", key=f"gen_d{i}")
-                    data[f'L_{i}'] = st.text_input("Ссылка", data['LINK_CATALOG'], key=f"gen_l{i}")
+            # --- 2. ФИКСИРОВАННЫЕ ЦЕНЫ (Сетка 1х3 - малые) ---
+            with st.expander("2. Также зафиксировали цены (Малые блоки 1x3)"):
+                data['FIXED_SECTION_TITLE'] = st.text_input("Заголовок раздела", "Также зафиксировали цены на эти позиции")
+                for i in range(1, 4):
+                    st.markdown(f"**Малый товар №{i}**")
+                    col1, col2 = st.columns([2, 1])
+                    data[f'SMALL_T_{i}'] = col1.text_input("Название", key=f"sm_t{i}")
+                    data[f'SMALL_P_{i}'] = col2.text_input("Цена", key=f"sm_p{i}")
+                    
+                    col_i1, col_i2 = st.columns(2)
+                    data[f'SMALL_I_{i}'] = col_i1.text_input("URL картинки", key=f"sm_img{i}")
+                    data[f'SMALL_L_{i}'] = col_i2.text_input("Ссылка", data['LINK_CATALOG'], key=f"sm_link{i}")
+                    st.markdown("---")
+
+            # --- 3. КАТЕГОРИИ (1х2) ---
+            with st.expander("3. Категории товаров"):
+                data['CAT_SECTION_TITLE'] = st.text_input("Заголовок раздела", "Категории товаров")
+                for i in range(1, 3):
+                    st.markdown(f"**Категория №{i}**")
+                    data[f'CAT_TITLE_{i}'] = st.text_input("Заголовок категории", key=f"ct_t{i}")
+                    data[f'CAT_DESC_{i}'] = st.text_area("Описание категории", key=f"ct_d{i}")
+                    
+                    col_c1, col_c2 = st.columns(2)
+                    data[f'CAT_IMG_{i}'] = col_c1.text_input("URL картинки категории", key=f"ct_i{i}")
+                    data[f'CAT_LINK_{i}'] = col_c2.text_input("Ссылка категории", data['LINK_CATALOG'], key=f"ct_l{i}")
+                    st.markdown("---")
+
+            # --- 4. ОТГРУЗКИ (1х2) ---
+            with st.expander("4. Наши отгрузки за неделю"):
+                data['CASE_SECTION_TITLE'] = st.text_input("Заголовок раздела", "Наши отгрузки")
+                for i in range(1, 3):
+                    st.markdown(f"**Кейс №{i}**")
+                    col_k1, col_k2 = st.columns([2, 1])
+                    data[f'CASE_TITLE_{i}'] = col_k1.text_input("Заголовок отгрузки", key=f"cs_t{i}")
+                    data[f'CASE_DATE_{i}'] = col_k2.text_input("Дата", key=f"cs_dt{i}")
+                    
+                    data[f'CASE_DESC_{i}'] = st.text_input("Описание (что отгрузили)", key=f"cs_d{i}")
+                    data[f'CASE_IMG_{i}'] = st.text_input("URL фото отгрузки", key=f"cs_i{i}")
+                    st.markdown("---")
     with tabs[4]:
         st.info("Имя и фото эксперта зафиксированы в HTML-шаблоне. Здесь меняется только ссылка при клике.")
         data['EXPERT_LINK'] = st.text_input("Ссылка для кнопки", "https://stalmetural.ru/contacts/")
