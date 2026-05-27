@@ -339,7 +339,7 @@ else:
             
             # --- 1. ПЕРСОНАЛЬНЫЕ ЦЕНЫ (Сетка 2х2) ---
             with st.expander("1. Ваши персональные цены (Сетка 2x2)", expanded=True):
-                data['PERSONAL_SECTION_TITLE'] = st.text_input("Заголовок раздела", "Ваши персональные цены")
+                
                 for i in range(1, 5):
                     st.markdown(f"**Товар №{i}**")
                     col1, col2, col3 = st.columns([2, 1, 1])
