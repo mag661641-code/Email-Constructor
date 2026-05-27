@@ -5,56 +5,90 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <!--[if mso]>
-  <xml>
-    <w:WordDocument xmlns:w="urn:schemas-microsoft-com:office:word"><w:DontUseAdvancedTypographyReadingMail/></w:WordDocument>
-    <o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch><o:AllowPNG/></o:OfficeDocumentSettings>
-  </xml>
+  <xml><w:WordDocument><w:DontUseAdvancedTypographyReadingMail/></w:WordDocument>
+  <o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch><o:AllowPNG/></o:OfficeDocumentSettings></xml>
   <![endif]-->
   <style>
     * { box-sizing: border-box; }
-    body { margin: 0; padding: 0; -webkit-text-size-adjust: none; text-size-adjust: none; background-color: #ffffff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    body { margin: 0; padding: 0; background-color: #ffffff; -webkit-text-size-adjust: none; text-size-adjust: none; }
     table { border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-    img { border: 0; outline: none; text-decoration: none; display: block; -ms-interpolation-mode: bicubic; }
-    a { text-decoration: none; }
-    p { margin: 0; }
+    img { border: 0; outline: none; text-decoration: none; display: block; }
+    p { line-height: inherit; margin: 0; }
     .row-content { width: 640px !important; margin: 0 auto; background-color: #ffffff; }
+    .nav-link { font-family: Arial, sans-serif; font-size: 14px; color: #ffffff !important; text-decoration: none !important; font-weight: bold; }
     
     @media (max-width:660px) {
       .row-content { width: 100% !important; }
-      .stack-column { width: 100% !important; display: block !important; text-align: center !important; }
+      .stack-column, .column { width: 100% !important; display: block !important; }
       .mobile_hide { display: none !important; }
-      .full-width { width: 100% !important; }
+      .gap { display: none !important; }
     }
   </style>
 </head>
-<body style="margin:0;padding:0;background-color:#ffffff;">
+<body style="margin: 0; padding: 0; background-color: #ffffff;">
 
-  <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+  <!-- 1. СКРЫТЫЙ ПРЕХЕДЕР -->
+  <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; color: #ffffff; opacity: 0;">
+    {{PREHEADER_TEXT}}
+    &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+  </div>
+
+  <!-- 2. СЛУЖЕБНЫЙ БЛОК (ВЫ ПОЛУЧИЛИ ЭТО ПИСЬМО...) -->
+  <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+      <td>
+        <table class="row-content" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#ffffff; width:640px; margin:0 auto" width="640">
+          <tr>
+            <td style="padding: 10px 10px 5px;">
+              <div style="font-family: Arial, sans-serif; font-size: 12px; color: #555555; line-height: 1.2; text-align: center;">
+                <p style="margin:0;">
+                  Вы получили это письмо как клиент «Стальметурал» или по запросу цены. Не актуально? 
+                  <a href="{{UnsubscribeUrl}}" target="_blank" style="text-decoration: underline; color: #1e69da;">Отписаться здесь</a>
+                </p>
+                <p style="margin:5px 0 0;">
+                  Письмо отображается некорректно? 
+                  <a href="{{webversion}}" target="_blank" style="text-decoration: underline; color: #1e69da;">Открыть веб-версию</a>
+                </p>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <!-- 3. ШАПКА (КОНТАКТЫ И ЛОГОТИП) -->
+  <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
     <tr>
       <td align="center">
-
-        <!-- ПРЕХЕДЕР -->
-        <table class="row-content" width="640" border="0" cellpadding="0" cellspacing="0">
+        <table class="row-content" width="640" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto; background-image: url('https://cp.unisender.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6kip764p3macd4auf9n3p3mtxknxg8nybhipm1ezu37biyuptcxb3wsjkggzb5mnjnwboji3kbbrooyzmx636djy5k8h7ago9ese3p587nt3zh7zjpj7mkp89548fouuf'); background-size: cover; background-position: center; border-radius: 5px 5px 0 0;">
+          
+          <!-- Ряд 1: Почта и Телефон (Смещено влево на 5px относительно лого) -->
           <tr>
-            <td align="center" style="padding: 10px; font-family: Arial, sans-serif; font-size: 12px; color: #555555;">
-              {{PREHEADER_TEXT}} | <a href="{{webversion}}" style="color: #1e69da; text-decoration: underline;">Веб-версия</a>
+            <td style="padding: 15px 25px 5px 25px;">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="left" style="font-family: Arial, sans-serif; font-size: 14px; color: #ffffff;"><strong>{{EMAIL}}</strong></td>
+                  <td align="right" style="font-family: Arial, sans-serif; font-size: 14px; color: #ffffff; font-weight: bold;">{{PHONE}}</td>
+                </tr>
+              </table>
             </td>
           </tr>
-        </table>
 
-        <!-- ШАПКА: КОНТАКТЫ + ЛОГО -->
-        <table class="row-content" width="640" border="0" cellpadding="0" cellspacing="0" role="presentation">
+          <!-- Ряд 2: Логотип и Меню -->
           <tr>
-            <td background="https://cp.unisender.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=67tdeq158sjbanauf9n3p3mtxknxg8nybhipm1ezu37biyuptcxb3wsjkggzb5mnjnwboji3kbbrooyzmx636djy5k8h7ago9ese3p5yutr5qznfe4tudkikz1rfnwjje" bgcolor="#0a1222" align="center" valign="top" style="background-image: url('https://cp.unisender.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=67tdeq158sjbanauf9n3p3mtxknxg8nybhipm1ezu37biyuptcxb3wsjkggzb5mnjnwboji3kbbrooyzmx636djy5k8h7ago9ese3p5yutr5qznfe4tudkikz1rfnwjje'); background-size: cover; background-position: center top; border-radius: 5px 5px 0 0;">
-              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: rgba(0,0,0,0.4);">
+            <td style="padding: 10px 30px 25px 30px;">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
                 <tr>
-                  <td style="padding: 15px 35px 25px 25px;">
-                    <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td align="left" style="font-family: Arial, sans-serif; font-size: 14px; color: #ffffff;"><strong>{{EMAIL}}</strong></td>
-                        <td align="right" style="font-family: Arial, sans-serif; font-size: 14px; color: #ffffff;"><strong>{{PHONE}}</strong></td>
-                      </tr>
-                    </table>
+                  <td width="160" valign="middle">
+                    <a href="https://stalmetural.ru/" target="_blank">
+                      <img src="https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=63anqerxqnyjsrauf9n3p3mtxkdb834knwaazru6i7eng4knmg4uukqkcxuj8aoex7f7phufcfh3sgx9bbczfbt3nfwsonff3gn7zkpy" width="160" border="0" style="display: block;">
+                    </a>
+                  </td>
+                  <td align="right" valign="middle" class="mobile_hide">
+                    <a href="{{LINK_CATALOG}}" class="nav-link" style="margin-left: 20px;">Каталог</a>
+                    <a href="{{LINK_COMPANY}}" class="nav-link" style="margin-left: 20px;">О компании</a>
+                    <a href="{{LINK_DELIVERY}}" class="nav-link" style="margin-left: 20px;">Доставка</a>
                   </td>
                 </tr>
               </table>
@@ -62,107 +96,97 @@
           </tr>
         </table>
 
-        <!-- БАННЕР HERO -->
-        <table class="row-content" width="640" border="0" cellpadding="0" cellspacing="0" role="presentation">
+        <!-- 4. ГЛАВНЫЙ БАННЕР -->
+        <table class="row-content" width="640" border="0" cellpadding="0" cellspacing="0" style="background-image: url('https://cp.unisender.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6nxy1fb8dkrfuoauf9n3p3mtxknxg8nybhipm1ezu37biyuptcxb3wsjkggzb5mnjtrqttqyejjip7pg68sdjuok48agjf49fm333srarezbs5sez6mkwqyonxqesxhoyqpxbzfrio9hqdn4c7jdkb9finy'); background-size: cover; background-position: center bottom;">
           <tr>
-            <td background="https://cp.unisender.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6t1r9qu9f77uirauf9n3p3mtxkb98nhpzugtp36yr4smm1mnuid9xzaqh6qaw8wyyxn6ircwydoatz4yhkeno9cb5u3mum5c3c8j5f9pxcd4q95izr51ecpifdwzh6n19mfuwb3diuh7njhhuc353yc7518day1eic86yr9y" bgcolor="#0a1222" align="center" valign="top" style="background-image: url('https://cp.unisender.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6t1r9qu9f77uirauf9n3p3mtxkb98nhpzugtp36yr4smm1mnuid9xzaqh6qaw8wyyxn6ircwydoatz4yhkeno9cb5u3mum5c3c8j5f9pxcd4q95izr51ecpifdwzh6n19mfuwb3diuh7njhhuc353yc7518day1eic86yr9y'); background-size: cover; background-position: center bottom;">
-              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: rgba(0,0,0,0.5);">
-                <tr>
-                  <td style="padding: 40px 40px 60px;">
-                    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 40px;">
-                      <tr>
-                        <td width="180" class="stack-column"><img src="https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=63anqerxqnyjsrauf9n3p3mtxkdb834knwaazru6i7eng4knmg4uukqkcxuj8aoex7f7phufcfh3sgx9bbczfbt3nfwsonff3gn7zkpy" width="180"></td>
-                        <td align="right" class="mobile_hide">
-                          <a href="{{LINK_CATALOG}}" style="color: #ffffff; font-family: Arial; font-size: 14px; font-weight: bold; margin-left: 20px;">Каталог</a>
-                          <a href="#" style="color: #ffffff; font-family: Arial; font-size: 14px; font-weight: bold; margin-left: 20px;">Услуги</a>
-                        </td>
-                      </tr>
-                    </table>
-                    <h1 style="font-family: Arial, sans-serif; font-size: 34px; font-weight: 800; color: #ffffff; line-height: 1.2; text-transform: uppercase; margin-bottom: 25px;">{{HERO_TITLE}}</h1>
-                    <a href="{{LINK_CATALOG}}" style="background-color: #1e69da; color: #ffffff; font-family: Arial; font-size: 14px; font-weight: bold; padding: 15px 35px; border-radius: 6px; display: inline-block; text-transform: uppercase;">Перейти в каталог услуг</a>
-                  </td>
-                </tr>
-              </table>
+            <td align="center" style="padding: 40px 40px 50px;">
+              <h1 style="font-family: Arial, sans-serif; font-size: 34px; font-weight: 800; color: #ffffff; line-height: 1.2; text-transform: uppercase; margin-bottom: 25px;">{{HERO_TITLE}}</h1>
+              <a href="{{LINK_CATALOG}}" style="background-color: #1e69da; color: #ffffff; padding: 12px 40px; border-radius: 6px; font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; display: inline-block; text-decoration: none; text-transform: uppercase;">Заказать услугу</a>
             </td>
           </tr>
         </table>
 
-        <!-- ПЛАШКА АУДИТА -->
-        <table class="row-content" width="640" border="0" cellpadding="0" cellspacing="0">
+        <!-- РАЗДЕЛИТЕЛЬ -->
+        <table width="640" border="0" cellpadding="0" cellspacing="0" class="row-content" style="margin: 0 auto;">
+          <tr><td height="30" style="font-size:1px; line-height:30px;">&nbsp;</td></tr>
+        </table>
+
+        <!-- 5. ПЛАШКА АУДИТА -->
+        <table class="row-content" width="640" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color: #e9edf6; border-radius: 5px;">
           <tr>
-            <td style="padding: 20px 25px;">
-              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; border-radius: 5px;">
-                <tr>
-                  <td style="padding: 15px 20px;">
-                    <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td width="40"><img src="https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6hj6ma5woqmqfkauf9n3p3mtxknbeubrfc74ginyb3q7mfzyf38aowbzfufrenaf9cuyh83uydho6w4e4eguii333mw" width="32"></td>
-                        <td style="font-family: Arial, sans-serif; font-size: 13px; color: #555555; padding-left: 10px;">
-                          <strong>Бесплатный аудит сметы и чертежей*</strong><br>индивидуальный расчет условий под ваш объем
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
+            <td width="60" style="padding: 15px 0 15px 25px;"><img src="https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6hj6ma5woqmqfkauf9n3p3mtxknbeubrfc74ginyb3q7mfzyf38aowbzfufrenaf9cuyh83uydho6w4e4eguii333mw" width="32"></td>
+            <td style="padding: 15px 25px; font-family: Arial, sans-serif; font-size: 14px; color: #555555; text-align: left;">
+              <strong>Бесплатный аудит сметы и чертежей*</strong><br>индивидуальный расчет условий под ваш объем
             </td>
           </tr>
         </table>
 
-        <!-- ОСНОВНОЙ ТЕКСТ -->
+        <!-- РАЗДЕЛИТЕЛЬ -->
+        <table width="640" border="0" cellpadding="0" cellspacing="0" class="row-content" style="margin: 0 auto;">
+          <tr><td height="30" style="font-size:1px; line-height:30px;">&nbsp;</td></tr>
+        </table>
+
+        <!-- 6. ОСНОВНОЙ ТЕКСТ -->
         <table class="row-content" width="640" border="0" cellpadding="0" cellspacing="0">
           <tr>
-            <td style="padding: 20px 30px 30px;">
-              <h2 style="font-size: 24px; font-weight: bold; color: #282824; text-align: center; margin-bottom: 20px;">{{TEXT_TITLE}}</h2>
-              <div style="font-size: 14px; line-height: 1.6; color: #555555;">{{TEXT_BODY}}</div>
+            <td style="padding: 0 25px;">
+              <h2 style="font-family: Arial, sans-serif; font-size: 24px; color: #282824; text-align: center; margin-bottom: 20px;">{{TEXT_TITLE}}</h2>
+              <div style="font-family: Arial, sans-serif; font-size: 15px; line-height: 1.5; color: #555555; text-align: left;">
+                {{TEXT_BODY}}
+              </div>
             </td>
           </tr>
         </table>
 
-        <!-- СЕТКА УСЛУГ (3 КАРТОЧКИ) -->
+        <!-- РАЗДЕЛИТЕЛЬ -->
+        <table width="640" border="0" cellpadding="0" cellspacing="0" class="row-content" style="margin: 0 auto;">
+          <tr><td height="30" style="font-size:1px; line-height:30px;">&nbsp;</td></tr>
+        </table>
+
+        <!-- 7. СЕТКА УСЛУГ (3 КАРТОЧКИ) -->
         <table class="row-content" width="640" border="0" cellpadding="0" cellspacing="0">
-          <tr><td style="padding: 0 30px 20px; font-size: 22px; font-weight: bold; color: #282824;">Наши возможности</td></tr>
+          <tr><td style="padding: 0 25px 15px; font-family: Arial, sans-serif; font-size: 22px; font-weight: bold; color: #282824;">Наши возможности</td></tr>
           <tr>
             <td style="padding: 0 25px 40px;">
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
                   <!-- Услуга 1 -->
-                  <td class="stack-column" valign="top" width="190">
-                    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; border-radius: 15px;">
-                      <tr><td><img src="{{I_1}}" width="100%" style="display:block; border-radius: 15px 15px 0 0;"></td></tr>
+                  <td class="stack-column" valign="top" width="190" style="background-color: #e9edf6; border-radius: 15px; overflow: hidden;">
+                    <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                      <tr><td style="padding: 0; line-height: 0;"><img src="{{I_1}}" width="100%" style="border-radius: 15px 15px 0 0;"></td></tr>
                       <tr>
                         <td style="padding: 15px;">
-                          <div style="font-size: 16px; font-weight: bold; color: #1e69da; margin-bottom: 8px;">{{T_1}}</div>
-                          <p style="font-size: 12px; color: #555555; margin-bottom: 15px; height: 60px; overflow:hidden;">{{D_1}}</p>
-                          <a href="{{L_1}}" style="background-color: #1e69da; color: #ffffff; font-size: 13px; font-weight: bold; padding: 10px; border-radius: 4px; display: block; text-align: center;">Заказать</a>
+                          <div style="font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; color: #1e69da; margin-bottom: 8px;">{{T_1}}</div>
+                          <p style="font-family: Arial, sans-serif; font-size: 12px; color: #555555; margin-bottom: 15px; height: 50px; overflow:hidden;">{{D_1}}</p>
+                          <div align="center"><a href="{{L_1}}" style="background-color: #1e69da; color: #ffffff; padding: 10px 20px; border-radius: 4px; display: inline-block; font-weight: bold; font-size: 13px;">Заказать</a></div>
                         </td>
                       </tr>
                     </table>
                   </td>
-                  <td width="15" class="mobile_hide"></td>
+                  <td width="15" class="gap">&nbsp;</td>
                   <!-- Услуга 2 -->
-                  <td class="stack-column" valign="top" width="190">
-                    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; border-radius: 15px;">
-                      <tr><td><img src="{{I_2}}" width="100%" style="display:block; border-radius: 15px 15px 0 0;"></td></tr>
+                  <td class="stack-column" valign="top" width="190" style="background-color: #e9edf6; border-radius: 15px; overflow: hidden;">
+                    <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                      <tr><td style="padding: 0; line-height: 0;"><img src="{{I_2}}" width="100%" style="border-radius: 15px 15px 0 0;"></td></tr>
                       <tr>
                         <td style="padding: 15px;">
-                          <div style="font-size: 16px; font-weight: bold; color: #1e69da; margin-bottom: 8px;">{{T_2}}</div>
-                          <p style="font-size: 12px; color: #555555; margin-bottom: 15px; height: 60px; overflow:hidden;">{{D_2}}</p>
-                          <a href="{{L_2}}" style="background-color: #1e69da; color: #ffffff; font-size: 13px; font-weight: bold; padding: 10px; border-radius: 4px; display: block; text-align: center;">Заказать</a>
+                          <div style="font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; color: #1e69da; margin-bottom: 8px;">{{T_2}}</div>
+                          <p style="font-family: Arial, sans-serif; font-size: 12px; color: #555555; margin-bottom: 15px; height: 50px; overflow:hidden;">{{D_2}}</p>
+                          <div align="center"><a href="{{L_2}}" style="background-color: #1e69da; color: #ffffff; padding: 10px 20px; border-radius: 4px; display: inline-block; font-weight: bold; font-size: 13px;">Заказать</a></div>
                         </td>
                       </tr>
                     </table>
                   </td>
-                  <td width="15" class="mobile_hide"></td>
+                  <td width="15" class="gap">&nbsp;</td>
                   <!-- Услуга 3 -->
-                  <td class="stack-column" valign="top" width="190">
-                    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; border-radius: 15px;">
-                      <tr><td><img src="{{I_3}}" width="100%" style="display:block; border-radius: 15px 15px 0 0;"></td></tr>
+                  <td class="stack-column" valign="top" width="190" style="background-color: #e9edf6; border-radius: 15px; overflow: hidden;">
+                    <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                      <tr><td style="padding: 0; line-height: 0;"><img src="{{I_3}}" width="100%" style="border-radius: 15px 15px 0 0;"></td></tr>
                       <tr>
                         <td style="padding: 15px;">
-                          <div style="font-size: 16px; font-weight: bold; color: #1e69da; margin-bottom: 8px;">{{T_3}}</div>
-                          <p style="font-size: 12px; color: #555555; margin-bottom: 15px; height: 60px; overflow:hidden;">{{D_3}}</p>
-                          <a href="{{L_3}}" style="background-color: #1e69da; color: #ffffff; font-size: 13px; font-weight: bold; padding: 10px; border-radius: 4px; display: block; text-align: center;">Заказать</a>
+                          <div style="font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; color: #1e69da; margin-bottom: 8px;">{{T_3}}</div>
+                          <p style="font-family: Arial, sans-serif; font-size: 12px; color: #555555; margin-bottom: 15px; height: 50px; overflow:hidden;">{{D_3}}</p>
+                          <div align="center"><a href="{{L_3}}" style="background-color: #1e69da; color: #ffffff; padding: 10px 20px; border-radius: 4px; display: inline-block; font-weight: bold; font-size: 13px;">Заказать</a></div>
                         </td>
                       </tr>
                     </table>
@@ -173,40 +197,72 @@
           </tr>
         </table>
 
-        <!-- ПОДВАЛ (СТРОГО ПО СКРИНШОТУ) -->
-        <table class="row-content" width="640" border="0" cellpadding="0" cellspacing="0" role="presentation">
+        <!-- 8. ЭКСПЕРТ АЛИНА -->
+        <table class="row-content" width="640" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto; background-color: #e9edf6; border-radius: 6px;">
           <tr>
-            <td background="https://cp.unisender.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6rqcha7swj1cfsauf9n3p3mtxkdtd81fum4q3qtqruaq4jixjcwthco1a3x4qgzs6ynwgf5ffgosu48dhhmgximud5xhq3d7m7zenszsiwjutxmwy9q6o" bgcolor="#060606" align="center" style="background-size: cover; background-position: center bottom;">
-              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: rgba(0,0,0,0.6);">
+            <td style="padding: 30px 30px 10px;">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="padding: 30px 40px 25px;">
-                    <!-- Ряд 1: Лого и Меню -->
-                    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 15px;">
-                      <tr>
-                        <td align="left" class="stack-column"><img src="https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=63anqerxqnyjsrauf9n3p3mtxkdb834knwaazru6i7eng4knmg4uukqkcxuj8aoex7f7phufcfh3sgx9bbczfbt3nfwsonff3gn7zkpy" width="160"></td>
-                        <td align="right" class="stack-column" style="padding-top: 10px;">
-                          <a href="{{LINK_CATALOG}}" style="color: #ffffff; font-family: Arial; font-size: 14px; font-weight: bold; margin-left: 15px;">Каталог</a>
-                          <a href="#" style="color: #ffffff; font-family: Arial; font-size: 14px; font-weight: bold; margin-left: 15px;">О компании</a>
-                          <a href="#" style="color: #ffffff; font-family: Arial; font-size: 14px; font-weight: bold; margin-left: 15px;">Доставка и оплата</a>
-                        </td>
-                      </tr>
-                    </table>
-                    <!-- Ряд 2: Почта и Телефон -->
-                    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 20px;">
-                      <tr>
-                        <td align="left" style="font-family: Arial; font-size: 14px; color: #ffffff;">{{EMAIL}}</td>
-                        <td align="right" style="font-family: Arial; font-size: 14px; color: #ffffff; font-weight: bold;">{{PHONE}}</td>
-                      </tr>
-                    </table>
-                    <!-- Ряд 3-5: Тексты -->
-                    <p style="font-family: Arial; font-size: 13px; color: #ffffff; text-align: center; margin-bottom: 10px;">Вы получили это письмо на {{email}}, так как запрашивали цены.</p>
-                    <p style="text-align: center; font-family: Arial; font-size: 12px;">
-                      <a href="{{UnsubscribeUrl}}" style="color: #ffffff; text-decoration: underline;">Отписаться здесь</a> | <a href="{{webversion}}" style="color: #ffffff; text-decoration: underline;">Веб-версия</a>
-                    </p>
-                    <p style="font-family: Arial; font-size: 13px; color: #f8f9fa; text-align: center; margin-top: 15px;">{{FOOTER_ADDRESS}}</p>
+                  <td width="110" valign="top" class="stack-column" align="center">
+                    <img src="https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6bz9xxggqft4ewauf9n3p3mtxkdb834knwaazru6i7eng4knmg4uukqkcxuj8aoexfkq9puxxce6s8zzh4m87x5i7m3os3cb6p9f7ck335aeth9iwiuiy" width="114" alt="Специалист">
+                  </td>
+                  <td style="padding-left:25px;" class="stack-column" align="left">
+                    <div style="font-family: Arial, sans-serif; font-size: 18px; font-weight: 900; color: #1e69da; line-height: 1.2;">Остались вопросы?<br>Рассчитаю ваши услуги за 15 минут</div>
+                    <div style="font-family: Arial, sans-serif; font-size: 18px; font-weight: 800; color: #282824; margin-top: 10px;">Черненко Алина</div>
+                    <div style="font-family: Arial, sans-serif; font-size: 14px; color: #727070; margin-bottom: 15px;">Ведущий специалист</div>
+                    <a href="{{LINK_COMPANY}}" style="display: inline-block; background-color: #1e69da; color: #ffffff; font-family: Arial, sans-serif; font-size: 15px; font-weight: 700; text-decoration: none; padding: 12px 30px; border-radius: 5px;">Оставить заявку</a>
                   </td>
                 </tr>
               </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 20px 20px 15px; font-family: Arial, sans-serif; font-size: 12px; color: #727070; line-height: 1.2; text-align: center;">
+              *Стоимость услуг рассчитывается индивидуально в зависимости от сложности чертежей, объема партии и типа металла. Окончательную смету подтверждает менеджер.
+            </td>
+          </tr>
+        </table>
+
+        <!-- РАЗДЕЛИТЕЛЬ -->
+        <table width="640" border="0" cellpadding="0" cellspacing="0" class="row-content" style="margin: 0 auto;">
+          <tr><td height="30" style="font-size:1px; line-height:30px;">&nbsp;</td></tr>
+        </table>
+
+        <!-- 9. ФУТЕР -->
+        <table class="row-content" width="640" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin: 0 auto; background-image: url('https://cp.unisender.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6thqaewsq9e1eaauf9n3p3mtxkb98nhpzugtp36yr4smm1mnuid9xzaqh6qaw8wyyxn6ircwydoatz4yhkeno9cb5u3mum5c3c8j5f9pxcd4q95izr51m9x8rdsspio37wia4yg3heswih414j63f999z4a'); background-size: cover; background-position: center; border-radius: 0 0 5px 5px;">
+          <tr>
+            <td style="padding: 20px 30px 10px 30px;">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td align="left"><img src="https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=63anqerxqnyjsrauf9n3p3mtxkdb834knwaazru6i7eng4knmg4uukqkcxuj8aoex7f7phufcfh3sgx9bbczfbt3nfwsonff3gn7zkpy" width="160"></td>
+                  <td align="right" class="mobile_hide">
+                    <a href="{{LINK_CATALOG}}" class="nav-link" style="margin-left: 15px;">Каталог</a>
+                    <a href="{{LINK_COMPANY}}" class="nav-link" style="margin-left: 15px;">О компании</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 25px 15px 25px;">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="left" style="font-family: Arial, sans-serif; font-size: 14px; color: #ffffff;"><strong>{{EMAIL}}</strong></td>
+                  <td align="right" style="font-family: Arial, sans-serif; font-size: 14px; color: #ffffff; font-weight: bold;">{{PHONE}}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 15px 10px 20px;">
+              <div style="font-family: Arial, sans-serif; font-size: 13px; color: #ffffff; text-align: center; line-height: 1.4;">
+                <p>Вы получили это письмо на {{email}}, так как запрашивали цены.</p>
+                <p style="margin-top: 5px;">
+                  <a href="{{UnsubscribeUrl}}" style="color: #ffffff; text-decoration: underline;">Отписаться</a> | 
+                  <a href="{{webversion}}" style="color: #ffffff; text-decoration: underline;">Веб-версия</a>
+                </p>
+                <p style="margin-top: 10px; font-size: 12px; color: #cccccc;">{{FOOTER_ADDRESS}}</p>
+              </div>
             </td>
           </tr>
         </table>
@@ -214,6 +270,5 @@
       </td>
     </tr>
   </table>
-
 </body>
 </html>
