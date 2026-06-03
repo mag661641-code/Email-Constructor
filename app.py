@@ -416,6 +416,56 @@ else:
                     data[f'CASE_DESC_{i}'] = st.text_input("Описание (что отгрузили)", key=f"cs_d{i}")
                     data[f'CASE_IMG_{i}'] = st.text_input("URL фото отгрузки", key=f"cs_i{i}")
                     st.markdown("---")
+
+        elif mode == "services":
+            st.subheader("⚙️ Настройка блоков шаблона Услуги")
+
+            # --- БЛОК 1: ТЕХНОЛОГИИ (3 карточки) ---
+            with st.expander("1. Технологии, которые сэкономят ваше время", expanded=True):
+                data['TECH_SECTION_TITLE'] = st.text_input("Заголовок раздела", "Технологии, которые сэкономят ваше время")
+                for i in range(1, 4):
+                    st.markdown(f"**Услуга №{i}**")
+                    col1, col2 = st.columns(2)
+                    data[f'T_{i}'] = col1.text_input("Название", key=f"sv_t{i}")
+                    data[f'I_{i}'] = col2.text_input("URL картинки", key=f"sv_i{i}")
+                    data[f'D_{i}'] = st.text_input("Описание", key=f"sv_d{i}")
+                    data[f'L_{i}'] = st.text_input("Ссылка кнопки 'Заказать'", data.get('LINK_CATALOG', ''), key=f"sv_l{i}")
+                    st.markdown("---")
+
+            # --- БЛОК 2: СОРТАМЕНТ (2 товара) ---
+            with st.expander("2. Сортамент под ваши чертежи"):
+                data['SORT_SECTION_TITLE'] = st.text_input("Заголовок раздела", "Сортамент под ваши чертежи")
+                sort_intro_raw = st.text_area(
+                    "Вводный текст",
+                    "Поставляем прокат напрямую с заводов и сразу передаём в заготовительный цех. "
+                    "Выбирайте качественную основу, которую наши мастера превратят в идеальные детали по вашим размерам"
+                )
+                data['SORT_INTRO'] = process_text_to_html(sort_intro_raw)
+                data['SORT_BTN_LINK'] = st.text_input("Ссылка кнопки 'Смотреть все категории'", data.get('LINK_CATALOG', ''))
+
+                for i in range(1, 3):
+                    st.markdown(f"**Товар №{i}**")
+                    col1, col2 = st.columns(2)
+                    data[f'SORT_T_{i}'] = col1.text_input("Название", key=f"sr_t{i}")
+                    data[f'SORT_I_{i}'] = col2.text_input("URL картинки", key=f"sr_i{i}")
+                    data[f'SORT_D_{i}'] = st.text_area("Описание", key=f"sr_d{i}", height=80)
+                    col3, col4 = st.columns(2)
+                    data[f'SORT_SPEC_{i}'] = col3.text_input("Характеристика (Размер / Сечение)", key=f"sr_sp{i}")
+                    data[f'SORT_L_{i}'] = col4.text_input("Ссылка кнопки 'Узнать цену'", data.get('LINK_CATALOG', ''), key=f"sr_l{i}")
+                    st.markdown("---")
+
+            # --- БЛОК 3: ОТГРУЗКИ (2 кейса) ---
+            with st.expander("3. Монтаж без задержек: отгружаем точно в срок"):
+                data['SHIP_SECTION_TITLE'] = st.text_input("Заголовок раздела", "Монтаж без задержек: отгружаем точно в срок")
+                for i in range(1, 3):
+                    st.markdown(f"**Отгрузка №{i}**")
+                    col1, col2 = st.columns(2)
+                    data[f'SHIP_T_{i}'] = col1.text_input("Название товара", key=f"sh_t{i}")
+                    data[f'SHIP_DATE_{i}'] = col2.text_input("Дата", key=f"sh_dt{i}")
+                    data[f'SHIP_D_{i}'] = st.text_input("Описание", key=f"sh_d{i}")
+                    data[f'SHIP_I_{i}'] = st.text_input("URL фото отгрузки", key=f"sh_i{i}")
+                    st.markdown("---")
+                    
     with tabs[4]:
         st.info("Имя и фото эксперта зафиксированы в HTML-шаблоне. Здесь меняется только ссылка при клике.")
         data['EXPERT_LINK'] = st.text_input("Ссылка для кнопки", "https://stalmetural.ru/contacts/")
