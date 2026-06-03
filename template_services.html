@@ -219,61 +219,158 @@
 </table>
 
 <!-- БЛОК: СОРТАМЕНТ -->
-<table class="row-content" width="640" border="0" cellpadding="0" cellspacing="0">
-  <tr><td style="padding: 0 25px 10px; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 22px; font-weight: bold; color: #282824;">{{SORT_SECTION_TITLE}}</td></tr>
-  <tr><td style="padding: 0 25px 20px; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 14px; color: #555555; line-height: 1.5;">{{SORT_INTRO}}</td></tr>
-
-  <!-- Товар 1: фото слева, текст справа -->
-  <tr>
-    <td style="padding: 0 25px 15px;">
-      <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f6f7fc; border-radius: 10px; overflow: hidden;">
-        <tr>
-          <td width="260" valign="middle" style="padding: 0; line-height: 0; position: relative;">
-            <img src="{{SORT_I_1}}" width="260" style="display:block; border-radius: 10px 0 0 10px;">
-            <div style="position: absolute; bottom: 10px; left: 0; width: 100%; text-align: center;">
-              <span style="background-color: rgba(0,0,0,0.45); color: #ffffff; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: bold; padding: 4px 12px; border-radius: 4px;">{{SORT_T_1}}</span>
-            </div>
-          </td>
-          <td valign="middle" style="padding: 20px;">
-            <div style="font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: bold; color: #282824; margin-bottom: 8px;">{{SORT_T_1}}</div>
-            <div style="font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 13px; color: #555555; line-height: 1.5; margin-bottom: 12px;">{{SORT_D_1}}</div>
-            <div style="font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 13px; color: #282824; margin-bottom: 15px;"><strong>{{SORT_SPEC_1}}</strong></div>
-            <a href="{{SORT_L_1}}" style="background-color: #1e69da; color: #ffffff; padding: 10px 25px; border-radius: 4px; display: inline-block; font-weight: bold; font-size: 14px; text-decoration: none; font-family: Helvetica Neue, Helvetica, Arial, sans-serif;">Узнать цену</a>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-
-  <!-- Товар 2: текст слева, фото справа -->
-  <tr>
-    <td style="padding: 0 25px 20px;">
-      <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f6f7fc; border-radius: 10px; overflow: hidden;">
-        <tr>
-          <td valign="middle" style="padding: 20px;">
-            <div style="font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: bold; color: #282824; margin-bottom: 8px;">{{SORT_T_2}}</div>
-            <div style="font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 13px; color: #555555; line-height: 1.5; margin-bottom: 12px;">{{SORT_D_2}}</div>
-            <div style="font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 13px; color: #282824; margin-bottom: 15px;"><strong>{{SORT_SPEC_2}}</strong></div>
-            <a href="{{SORT_L_2}}" style="background-color: #1e69da; color: #ffffff; padding: 10px 25px; border-radius: 4px; display: inline-block; font-weight: bold; font-size: 14px; text-decoration: none; font-family: Helvetica Neue, Helvetica, Arial, sans-serif;">Узнать цену</a>
-          </td>
-          <td width="260" valign="middle" style="padding: 0; line-height: 0; position: relative;">
-            <img src="{{SORT_I_2}}" width="260" style="display:block; border-radius: 0 10px 10px 0;">
-            <div style="position: absolute; bottom: 10px; left: 0; width: 100%; text-align: center;">
-              <span style="background-color: rgba(0,0,0,0.45); color: #ffffff; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: bold; padding: 4px 12px; border-radius: 4px;">{{SORT_T_2}}</span>
-            </div>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-
-  <!-- Кнопка "Смотреть все категории" -->
-  <tr>
-    <td style="padding: 0 25px 30px;" align="center">
-      <a href="{{SORT_BTN_LINK}}" style="background-color: #1e69da; color: #ffffff; padding: 14px 40px; border-radius: 4px; display: inline-block; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-weight: bold; font-size: 15px; text-decoration: none;">Смотреть все категории</a>
-    </td>
-  </tr>
+<table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+  <tbody>
+    <tr>
+      <td>
+        <table class="row-content stack" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#fff;width:640px;margin:0 auto;padding-left:25px;padding-right:25px;" width="640">
+          <tbody>
+            <tr>
+              <td style="padding-bottom:10px;padding-top:20px;">
+                <div style="font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:24px;font-weight:bold;color:#282824;">
+                  {{SORT_SECTION_TITLE}}
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding-bottom:25px;">
+                <div style="font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:14px;color:#555;line-height:1.5;">
+                  {{SORT_INTRO}}
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
 </table>
+
+<!-- Товар 1: Картинка СЛЕВА, Текст СПРАВА -->
+<table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+  <tbody>
+    <tr>
+      <td>
+        <table class="row-content stack" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#fff;width:640px;margin:0 auto;padding-bottom:25px;padding-left:25px;padding-right:25px;" width="640">
+          <tbody>
+            <tr>
+              <td>
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                  <tbody>
+                    <tr>
+                      <!-- Картинка -->
+                      <td class="column" width="48%" style="font-weight:400;text-align:left;vertical-align:top;border-radius:10px;overflow:hidden;">
+                        <a href="{{SORT_L_1}}" target="_blank">
+                          <img src="{{SORT_I_1}}" style="display:block;height:auto;border:0;width:100%;border-radius:10px;" alt="{{SORT_T_1}}">
+                        </a>
+                      </td>
+                      <!-- Отступ -->
+                      <td class="column gap" style="width:4%;" width="4%"></td>
+                      <!-- Текст -->
+                      <td class="column" width="48%" style="font-weight:400;text-align:left;background-color:#e9edf6;vertical-align:top;border-radius:10px;">
+                        <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                          <tr>
+                            <td style="padding:20px;">
+                              <div style="font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:14px;color:#555;line-height:1.4;">
+                                <p style="margin:0;margin-bottom:10px;font-size:16px;color:#282824;"><strong>{{SORT_T_1}}</strong></p>
+                                <div style="margin:0;margin-bottom:15px;">{{SORT_D_1}}</div>
+                                <div style="margin:0;margin-bottom:20px;">{{SORT_SPEC_1}}</div>
+                              </div>
+                              <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                <tr>
+                                  <td align="center">
+                                    <a href="{{SORT_L_1}}" target="_blank" style="background-color:#1e69da;border-radius:6px;color:#ffffff;display:block;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:16px;font-weight:bold;text-align:center;text-decoration:none;padding:12px 20px;">Узнать цену</a>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Товар 2: Текст СЛЕВА, Картинка СПРАВА -->
+<table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+  <tbody>
+    <tr>
+      <td>
+        <table class="row-content stack" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#fff;width:640px;margin:0 auto;padding-bottom:25px;padding-left:25px;padding-right:25px;" width="640">
+          <tbody>
+            <tr>
+              <td>
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                  <tbody>
+                    <tr>
+                      <!-- Текст -->
+                      <td class="column" width="48%" style="font-weight:400;text-align:left;background-color:#e9edf6;vertical-align:top;border-radius:10px;">
+                        <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                          <tr>
+                            <td style="padding:20px;">
+                              <div style="font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:14px;color:#555;line-height:1.4;">
+                                <p style="margin:0;margin-bottom:10px;font-size:16px;color:#282824;"><strong>{{SORT_T_2}}</strong></p>
+                                <div style="margin:0;margin-bottom:15px;">{{SORT_D_2}}</div>
+                                <div style="margin:0;margin-bottom:20px;">{{SORT_SPEC_2}}</div>
+                              </div>
+                              <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                <tr>
+                                  <td align="center">
+                                    <a href="{{SORT_L_2}}" target="_blank" style="background-color:#1e69da;border-radius:6px;color:#ffffff;display:block;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:16px;font-weight:bold;text-align:center;text-decoration:none;padding:12px 20px;">Узнать цену</a>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                      <!-- Отступ -->
+                      <td class="column gap" style="width:4%;" width="4%"></td>
+                      <!-- Картинка -->
+                      <td class="column" width="48%" style="font-weight:400;text-align:left;vertical-align:top;border-radius:10px;overflow:hidden;">
+                        <a href="{{SORT_L_2}}" target="_blank">
+                          <img src="{{SORT_I_2}}" style="display:block;height:auto;border:0;width:100%;border-radius:10px;" alt="{{SORT_T_2}}">
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Кнопка "Смотреть все категории" -->
+<table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+  <tbody>
+    <tr>
+      <td>
+        <table class="row-content stack" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#fff;width:640px;margin:0 auto;padding-bottom:30px;" width="640">
+          <tbody>
+            <tr>
+              <td style="text-align:center;">
+                <a href="{{SORT_BTN_LINK}}" target="_blank" style="background-color:#1e69da;border-radius:6px;color:#ffffff;display:inline-block;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:16px;font-weight:bold;text-align:center;text-decoration:none;padding:14px 40px;">Смотреть все категории</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<!-- КОНЕЦ БЛОКА: СОРТАМЕНТ -->
 
 <!-- РАЗДЕЛИТЕЛЬ -->
 <table width="640" border="0" cellpadding="0" cellspacing="0" class="row-content" style="margin: 0 auto;">
