@@ -280,13 +280,6 @@ else:
             st.subheader("📝 Основной текстовый блок")
             data['TEXT_TITLE'] = st.text_input("Заголовок раздела", "Больше, чем просто продажа металла")
 
-            st.markdown("""
-            <div style="background-color: #1e69da33; padding: 10px; border-radius: 5px; border: 1px solid #1e69da; margin-bottom: 15px;">
-                <strong>Как оформлять текст:</strong><br>
-                • <b>**текст**</b> — жирный &nbsp;|&nbsp; <b>- пункт</b> — список &nbsp;|&nbsp; <b>Enter</b> — новая строка
-            </div>
-            """, unsafe_allow_html=True)
-
             text_body_raw = st.text_area(
                 "Основной текст письма",
                 height=300,
