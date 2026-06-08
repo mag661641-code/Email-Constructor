@@ -291,7 +291,7 @@ else:
                     data[f'SERV_{i}_LINK'] = col4.text_input("Ссылка 'Заказать'", data.get('LINK_CATALOG', ''), key=f"srv_l{i}")
                     st.markdown("---")
 
-           elif mode == "expert":
+        elif mode == "expert":
             st.subheader("Настройка блоков (Трубы, Наличие, Отгрузки)")
             
             with st.expander("1. Какой товар подходит под ваши задачи? (2 колонки)", expanded=True):
