@@ -219,10 +219,10 @@ else:
 
     with tabs[3]:
         if mode == "expert":
-            st.subheader("⚙️ Настройка блоков (Трубы, Наличие, Отгрузки)")
+            st.subheader("Настройка блоков (Трубы, Наличие, Отгрузки)")
             
-            with st.expander("1. Какая труба подходит под ваши задачи? (2 колонки)", expanded=True):
-                data['PIPE_SECTION_TITLE'] = st.text_input("Заголовок раздела труб", "Какая труба подходит под ваши задачи?")
+            with st.expander("1. Какой товар подходит под ваши задачи? (2 колонки)", expanded=True):
+                data['PIPE_SECTION_TITLE'] = st.text_input("Заголовок", "Какой товар подходит под ваши задачи?")
                 for i in range(1, 3):
                     st.markdown(f"**Труба №{i}**")
                     col1, col2 = st.columns(2)
