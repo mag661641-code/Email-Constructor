@@ -210,6 +210,49 @@ else:
             )
             data['TEXT_BODY'] = process_text_to_html(text_body_raw)
             data['TEXT_BTN_LINK'] = st.text_input("Ссылка для кнопки 'Связаться с нами'", "https://stalmetural.ru/contacts/")
+
+        elif mode == "stock":
+            st.subheader("Текст для статьи 'Поступление'")
+            data['STOCK_MAIN_TITLE'] = st.text_input("Заголовок статьи", "Склад пополнен: Профильная труба всех типоразмеров")
+            stock_intro_raw = st.text_area("Вводный абзац", "Обновили складской запас профильного проката. В наличии все позиции...")
+            data['STOCK_INTRO'] = process_text_to_html(stock_intro_raw)
+
+        elif mode == "cases":
+            st.subheader("Текст кейса (История успеха)")
+            data['CASE_MAIN_TITLE'] = st.text_input("Главный заголовок статьи", "Металл с гарантией: проверка по ГОСТ и полный пакет документов при отгрузке")
+            
+            task_raw = st.text_area("Задача / Вводный текст", "Недостаточная толщина стенки, отсутствие сертификатов или дефекты поверхности могут остановить стройку на недели. В «Стальметурал» мы внедрили трехступенчатый контроль отгрузки, чтобы вы спали спокойно.", height=100)
+            data['CASE_TASK'] = process_text_to_html(task_raw)
+            
+            steps_raw = st.text_area("Что мы сделали (Список / Буллиты)", 
+                "- **Замеры перед погрузкой:** Проверяем толщину стенки и параметры металла на соответствие ГОСТу.\n"
+                "- **Полная документация:** Пакет оригинальных сертификатов передается водителю сразу – никаких «дошлем почтой».\n"
+                "- **Точность до миллиметра:** Собственный цех резки на ЧПУ гарантирует, что детали встанут как влитые.", height=150)
+            data['CASE_STEPS'] = process_text_to_html(steps_raw)
+            
+            data['CASE_RESULT'] = st.text_input("Результат (выводится в рамке снизу)", "Ваш объект не будет простаивать из-за брака.")
+
+        elif mode == "services":
+            st.subheader("📝 Основной текстовый блок")
+            data['TEXT_TITLE'] = st.text_input("Заголовок раздела", "Больше, чем просто продажа металла")
+
+            text_body_raw = st.text_area(
+                "Основной текст письма",
+                height=300,
+                value=(
+                    "Закупка металла «с запасом» и ручная подрезка на объекте — это **скрытые убытки вашего проекта**. "
+                    "Вы переплачиваете за лишний вес при доставке и тратите оплачиваемое время рабочих на подгонку деталей.\n\n"
+                    "Мы предлагаем перейти на **готовую компонентную базу**. Вы получаете детали, нарезанные точно в размер.\n\n"
+                    "**Как изменится ваша смета и процесс:**\n\n"
+                    "- **Оплата за результат:** вы платите только за готовые детали, а не за обрезки и стружку.\n"
+                    "- **Оптимизация логистики:** машина везет только готовые к монтажу изделия.\n"
+                    "- **Монтаж с колес:** никакой ручной работы — сборка начинается сразу после разгрузки.\n"
+                    "- **Заводская точность:** лазерная и плазменная резка исключают брак.\n\n"
+                    "Из-за высокого спроса производственные мощности цеха **ограничены**. Свяжитесь с нами сегодня."
+                )
+            )
+            data['TEXT_BODY'] = process_text_to_html(text_body_raw)
+
         
         else:
             data['TEXT_TITLE'] = st.text_input("Заголовок статьи", "Заголовок")
@@ -218,7 +261,37 @@ else:
             data['TEXT_BTN_LINK'] = st.text_input("Ссылка для кнопки", "https://stalmetural.ru/contacts/")
 
     with tabs[3]:
-        if mode == "expert":
+                # --- ВСЕ НАСТРОЙКИ БЛОКОВ ---
+        if mode == "cases":
+            st.subheader("Настройка блоков (Товары, Услуги, Статистика)")
+            with st.expander("1. Участвовали в отгрузке (4 товара)"):
+                for i in range(1, 5):
+                    st.markdown(f"**Товар №{i}**")
+                    col1, col2 = st.columns(2)
+                    data[f'PROD_{i}_TITLE'] = col1.text_input("Название", key=f"pr_t{i}")
+                    data[f'PROD_{i}_PRICE'] = col2.text_input("Цена (Например: 39 500₽/т)", key=f"pr_p{i}")
+                    data[f'PROD_{i}_DESC'] = st.text_area("Описание (ГОСТ, марка)", key=f"pr_d{i}", height=70)
+                    col3, col4 = st.columns(2)
+                    data[f'PROD_{i}_IMG'] = col3.text_input("URL картинки товара", key=f"pr_i{i}")
+                    data[f'PROD_{i}_LINK'] = col4.text_input("Ссылка на каталог", data.get('LINK_CATALOG', ''), key=f"pr_l{i}")
+                    st.markdown("---")
+                
+                data['PROD_EXTRA_TEXT'] = st.text_input("Текст под товарами", "+ еще 8 позиций сопутствующего проката и метизов укомплектованы в эту же машину")
+                data['ALL_PROD_LINK'] = st.text_input("Ссылка кнопки 'Посмотреть весь сортамент'", data.get('LINK_CATALOG', ''))
+
+            with st.expander("2. Не тратьте время на подгонку (3 Услуги)"):
+                data['SERVICES_TITLE'] = st.text_input("Главный заголовок услуг", "Не тратьте время на подгонку на объекте")
+                for i in range(1, 4):
+                    st.markdown(f"**Услуга №{i}**")
+                    col1, col2 = st.columns(2)
+                    data[f'SERV_{i}_TITLE'] = col1.text_input("Название услуги", key=f"srv_t{i}")
+                    data[f'SERV_{i}_DESC'] = col2.text_input("Краткое описание", key=f"srv_d{i}")
+                    col3, col4 = st.columns(2)
+                    data[f'SERV_{i}_IMG'] = col3.text_input("URL картинки услуги", key=f"srv_i{i}")
+                    data[f'SERV_{i}_LINK'] = col4.text_input("Ссылка 'Заказать'", data.get('LINK_CATALOG', ''), key=f"srv_l{i}")
+                    st.markdown("---")
+
+       elif mode == "expert":
             st.subheader("Настройка блоков (Трубы, Наличие, Отгрузки)")
             
             with st.expander("1. Какой товар подходит под ваши задачи? (2 колонки)", expanded=True):
@@ -260,6 +333,158 @@ else:
                     data[f'SHIP_{i}_IMG'] = col3.text_input("URL картинки отгрузки", key=f"exsh_i{i}")
                     data[f'SHIP_{i}_LINK'] = col4.text_input("Ссылка", data.get('LINK_CATALOG', ''), key=f"exsh_l{i}")
                     st.markdown("---")
+
+        elif mode == "stock":
+            st.subheader("📦 Настройка контента Поступления")
+            with st.expander("1. Блок бесплатного аудита", expanded=True):
+                data['AUDIT_TITLE'] = st.text_input("Заголовок", "Бесплатный аудит сметы и чертежей*")
+                data['AUDIT_SUB'] = st.text_input("Подзаголовок", "Индивидуальный расчет условий под ваш объем")
+                data['AUDIT_LINK'] = st.text_input("Ссылка кнопки", data['LINK_CATALOG'])
+
+            with st.expander("2. Описание и Буллиты"):
+                data['TEXT_TITLE'] = st.text_input("Заголовок текста", "Труба всех типоразмеров")
+                data['TEXT_BODY'] = st.text_area("Вводный текст", "Обновили складской запас...")
+                for i in range(1, 4):
+                    data[f'BULLET_{i}'] = st.text_input(f"Пункт списка {i}", key=f"st_blt{i}")
+
+            with st.expander("3. Технический блок (ГОСТы и Размеры)"):
+                data['GOST_BLOCK'] = st.text_area("ГОСТы (через пробел)", "ГОСТ 8639-82", key="st_gst")
+                data['SIZE_BLOCK'] = st.text_area("Размеры (через пробел)", "20х20 40x40", key="st_sz")
+
+            with st.expander("4. Также в наличии (3 товара)"):
+                for i in range(1, 4):
+                    st.markdown(f"**Товар №{i}**")
+                    data[f'T_{i}'] = st.text_input("Название", key=f"st_t{i}")
+                    data[f'D_{i}'] = st.text_input("Описание", key=f"st_d{i}")
+                    data[f'P_{i}'] = st.text_input("Цена", key=f"st_p{i}")
+                    data[f'OLD_P_{i}'] = st.text_input("Старая цена (для зачеркивания)", key=f"st_op{i}")
+                    data[f'I_{i}'] = st.text_input("URL картинки", key=f"st_i{i}")
+                    data[f'L_{i}'] = st.text_input("Ссылка", data['LINK_CATALOG'], key=f"st_l{i}")
+
+            with st.expander("5. Наши отгрузки (2 кейса)"):
+                for i in range(1, 3):
+                    st.markdown(f"**Кейс №{i}**")
+                    data[f'CASE_TITLE_{i}'] = st.text_input("Заголовок кейса", key=f"st_ct{i}")
+                    data[f'CASE_DESC_{i}'] = st.text_input("Описание кейса", key=f"st_cd{i}")
+                    data[f'CASE_DATE_{i}'] = st.text_input("Дата", key=f"st_cdt{i}")
+                    data[f'CASE_IMG_{i}'] = st.text_input("URL картинки кейса", key=f"st_ci{i}")
+
+        elif mode == "promo":
+            st.subheader("📦 Товарные и структурные блоки")
+            
+            # --- 1. ПЕРСОНАЛЬНЫЕ ЦЕНЫ (Сетка 2х2) ---
+            with st.expander("1. Ваши персональные цены (Сетка 2x2)", expanded=True):
+                
+                for i in range(1, 5):
+                    st.markdown(f"**Товар №{i}**")
+                    col1, col2, col3 = st.columns([2, 1, 1])
+                    data[f'T_{i}'] = col1.text_input("Название", key=f"p_t{i}")
+                    data[f'P_{i}'] = col2.text_input("Цена (со скидкой)", key=f"p_p{i}")
+                    data[f'OLD_P_{i}'] = col3.text_input("Старая цена", key=f"p_op{i}")
+                    
+                    col_d1, col_d2 = st.columns(2)
+                    data[f'D_{i}'] = col_d1.text_input("Описание (кратко)", key=f"p_d{i}")
+                    data[f'I_{i}'] = col_d2.text_input("URL картинки", key=f"p_i{i}")
+                    data[f'L_{i}'] = st.text_input("Ссылка", data['LINK_CATALOG'], key=f"p_l{i}")
+                    st.markdown("---")
+
+            # --- 2. ФИКСИРОВАННЫЕ ЦЕНЫ (Сетка 1х3 - малые) ---
+            with st.expander("2. Также зафиксировали цены (Малые блоки 1x3)"):
+                
+                for i in range(1, 4):
+                    st.markdown(f"**Малый товар №{i}**")
+                    col1, col2 = st.columns([2, 1])
+                    data[f'SMALL_T_{i}'] = col1.text_input("Название", key=f"sm_t{i}")
+                    data[f'SMALL_P_{i}'] = col2.text_input("Цена", key=f"sm_p{i}")
+                    data[f'SMALL_D_{i}'] = st.text_input("Описание (ГОСТ, сталь)", key=f"sm_d{i}")
+                    
+                    col_i1, col_i2 = st.columns(2)
+                    data[f'SMALL_I_{i}'] = col_i1.text_input("URL картинки", key=f"sm_img{i}")
+                    data[f'SMALL_L_{i}'] = col_i2.text_input("Ссылка", data['LINK_CATALOG'], key=f"sm_link{i}")
+                    st.markdown("---")
+
+            # --- 3. КАТЕГОРИИ (1х2) ---
+            with st.expander("3. Категории товаров"):
+                data['CAT_SECTION_TITLE'] = st.text_input("Заголовок раздела", "Категории товаров")
+                for i in range(1, 3):
+                    st.markdown(f"**Категория №{i}**")
+                    data[f'CAT_TITLE_{i}'] = st.text_input("Заголовок категории", key=f"ct_t{i}")
+                    data[f'CAT_DESC_{i}'] = st.text_area("Описание категории", key=f"ct_d{i}")
+                    
+                    col_c1, col_c2 = st.columns(2)
+                    data[f'CAT_IMG_{i}'] = col_c1.text_input("URL картинки категории", key=f"ct_i{i}")
+                    data[f'CAT_LINK_{i}'] = col_c2.text_input("Ссылка категории", data['LINK_CATALOG'], key=f"ct_l{i}")
+                    st.markdown("---")
+
+            # --- 4. ОТГРУЗКИ (1х2) ---
+            with st.expander("4. Наши отгрузки за неделю"):
+                data['CASE_SECTION_TITLE'] = st.text_input("Заголовок раздела", "Наши отгрузки")
+                for i in range(1, 3):
+                    st.markdown(f"**Кейс №{i}**")
+                    col_k1, col_k2 = st.columns([2, 1])
+                    data[f'CASE_TITLE_{i}'] = col_k1.text_input("Заголовок отгрузки", key=f"cs_t{i}")
+                    data[f'CASE_DATE_{i}'] = col_k2.text_input("Дата", key=f"cs_dt{i}")
+                    
+                    data[f'CASE_DESC_{i}'] = st.text_input("Описание (что отгрузили)", key=f"cs_d{i}")
+                    data[f'CASE_IMG_{i}'] = st.text_input("URL фото отгрузки", key=f"cs_i{i}")
+                    st.markdown("---")
+
+        elif mode == "services":
+            st.subheader("⚙️ Настройка блоков шаблона Услуги")
+
+            # --- БЛОК 1: ТЕХНОЛОГИИ (3 карточки) ---
+            with st.expander("1. Технологии, которые сэкономят ваше время", expanded=True):
+                data['TECH_SECTION_TITLE'] = st.text_input("Заголовок раздела", "Технологии, которые сэкономят ваше время")
+                for i in range(1, 4):
+                    st.markdown(f"**Услуга №{i}**")
+                    col1, col2 = st.columns(2)
+                    data[f'T_{i}'] = col1.text_input("Название", key=f"sv_t{i}")
+                    data[f'I_{i}'] = col2.text_input("URL картинки", key=f"sv_i{i}")
+                    data[f'D_{i}'] = st.text_input("Описание", key=f"sv_d{i}")
+                    data[f'L_{i}'] = st.text_input("Ссылка кнопки 'Заказать'", data.get('LINK_CATALOG', ''), key=f"sv_l{i}")
+                    st.markdown("---")
+
+# --- БЛОК 2: СОРТАМЕНТ (2 товара) ---
+            with st.expander("2. Сортамент под ваши чертежи"):
+                data['SORT_SECTION_TITLE'] = st.text_input("Заголовок раздела", "Сортамент под ваши чертежи")
+                sort_intro_raw = st.text_area(
+                    "Вводный текст",
+                    "Поставляем прокат напрямую с заводов и сразу передаём в заготовительный цех. "
+                    "Выбирайте качественную основу, которую наши мастера превратят в идеальные детали по вашим размерам"
+                )
+                data['SORT_INTRO'] = process_text_to_html(sort_intro_raw)
+                data['SORT_BTN_LINK'] = st.text_input("Ссылка кнопки 'Смотреть все категории'", data.get('LINK_CATALOG', ''))
+
+                for i in range(1, 3):
+                    st.markdown(f"**Товар №{i}**")
+                    col1, col2 = st.columns(2)
+                    data[f'SORT_T_{i}'] = col1.text_input("Название", key=f"sr_t{i}")
+                    data[f'SORT_I_{i}'] = col2.text_input("URL картинки", key=f"sr_i{i}")
+                    
+                    # === ДОБАВИЛИ УМНЫЙ ТЕКСТ СЮДА ===
+                    desc_raw = st.text_area("Описание (можно списком через - )", key=f"sr_d{i}", height=120)
+                    data[f'SORT_D_{i}'] = process_text_to_html(desc_raw)
+                    # ==================================
+                    
+                    col3, col4 = st.columns(2)
+                    data[f'SORT_SPEC_{i}'] = col3.text_input("Характеристика (Размер / Сечение)", key=f"sr_sp{i}")
+                    data[f'SORT_L_{i}'] = col4.text_input("Ссылка кнопки 'Узнать цену'", data.get('LINK_CATALOG', ''), key=f"sr_l{i}")
+                    st.markdown("---")
+
+            # --- БЛОК 3: ОТГРУЗКИ (2 кейса) ---
+            with st.expander("3. Монтаж без задержек: отгружаем точно в срок"):
+                data['SHIP_SECTION_TITLE'] = st.text_input("Заголовок раздела", "Монтаж без задержек: отгружаем точно в срок")
+                for i in range(1, 3):
+                    st.markdown(f"**Отгрузка №{i}**")
+                    col1, col2 = st.columns(2)
+                    data[f'SHIP_T_{i}'] = col1.text_input("Название товара", key=f"sh_t{i}")
+                    data[f'SHIP_DATE_{i}'] = col2.text_input("Дата", key=f"sh_dt{i}")
+                    data[f'SHIP_D_{i}'] = st.text_input("Описание", key=f"sh_d{i}")
+                    data[f'SHIP_I_{i}'] = st.text_input("URL фото отгрузки", key=f"sh_i{i}")
+                    st.markdown("---")
+
+
+
         else:
             st.info("Блоки для данного шаблона настраиваются индивидуально. Перейдите в другой шаблон.")
 
