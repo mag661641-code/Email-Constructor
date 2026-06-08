@@ -308,17 +308,7 @@ else:
         # --- ВСЕ НАСТРОЙКИ БЛОКОВ ---
         if mode == "cases":
             st.subheader("Настройка блоков (Товары, Услуги, Статистика)")
-            
-            with st.expander("1. Статистика (3 иконки под текстом)", expanded=True):
-                for i in range(1, 4):
-                    st.markdown(f"**Характеристика №{i}**")
-                    col1, col2 = st.columns(2)
-                    data[f'STAT_{i}_TITLE'] = col1.text_input("Название (Например: Срок)", key=f"s_t{i}")
-                    data[f'STAT_{i}_DESC'] = col2.text_input("Значение (Например: 24 часа)", key=f"s_d{i}")
-                    data[f'STAT_{i}_IMG'] = st.text_input("URL иконки", key=f"s_i{i}")
-                    st.markdown("---")
-
-            with st.expander("2. Участвовали в отгрузке (4 товара)"):
+            with st.expander("1. Участвовали в отгрузке (4 товара)"):
                 for i in range(1, 5):
                     st.markdown(f"**Товар №{i}**")
                     col1, col2 = st.columns(2)
@@ -333,7 +323,7 @@ else:
                 data['PROD_EXTRA_TEXT'] = st.text_input("Текст под товарами", "+ еще 8 позиций сопутствующего проката и метизов укомплектованы в эту же машину")
                 data['ALL_PROD_LINK'] = st.text_input("Ссылка кнопки 'Посмотреть весь сортамент'", data.get('LINK_CATALOG', ''))
 
-            with st.expander("3. Не тратьте время на подгонку (3 Услуги)"):
+            with st.expander("2. Не тратьте время на подгонку (3 Услуги)"):
                 data['SERVICES_TITLE'] = st.text_input("Главный заголовок услуг", "Не тратьте время на подгонку на объекте")
                 for i in range(1, 4):
                     st.markdown(f"**Услуга №{i}**")
