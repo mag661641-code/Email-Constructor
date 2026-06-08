@@ -551,75 +551,51 @@ src="{{HERO_IMG}}" style="display:block;height:auto;border:0;width:100%;border-r
               </tr>
             </tbody>
           </table>
+<!-- ТОВАР 1: КАРТИНКА СЛЕВА, ТЕКСТ СПРАВА -->
           <table class="row row-9" align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0">
             <tbody>
               <tr>
                 <td>
-                  <table class="row-content stack" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;background-color:#f8f9fa;border-radius:15px;color:#000;padding:10px 30px 20px 25px;width:640px;margin:0 auto"
-                    width="640">
+                  <table class="row-content stack" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;background-color:#fff;border-radius:0;color:#000;padding-bottom:20px;padding-left:25px;padding-right:25px;width:640px;margin:0 auto" width="640">
                     <tbody>
                       <tr>
                         <td>
                           <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0">
                             <tbody>
                               <tr>
-                                <td class="column column-1" width="50%" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;vertical-align:top;border-radius:10px">
-                                  <table class="image_block block-1" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0">
-                                    <tr>
-                                      <td class="pad" style="width:100%" align="center">
-                                        <div style="max-width:282.5px"><a href="{{PIPE_1_LINK}}" target="_blank"><img 
-src="{{PIPE_1_IMG}}" style="display:block;height:auto;border:0;width:100%;border-radius:10px" width="282.5" alt="{{SHIP_2_TITLE}}" title="{{SHIP_2_TITLE}}" height="auto"></a></div>
-                                      </td>
-                                    </tr>
-                                  </table>
+                                <!-- Левая колонка: Картинка без фона -->
+                                <td class="column column-1" width="285" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;vertical-align:top;border-radius:10px; overflow:hidden; line-height:0;">
+                                  <a href="{{PIPE_1_LINK}}" target="_blank">
+                                    <img src="{{PIPE_1_IMG}}" style="display:block;height:auto;border:0;width:100%;border-radius:10px;" width="285" alt="{{PIPE_1_TITLE}}" title="{{PIPE_1_TITLE}}">
+                                  </a>
                                 </td>
-                                <td class="column gap" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;vertical-align:top">
-                                  <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;width:20px;height:20px" width="20" height="20"></table>
-                                </td>
-                                <td class="column column-2" width="50%" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;background-color:#f8f9fa;vertical-align:top;border-radius:10px">
+                                
+                                <!-- Отступ между колонками -->
+                                <td class="column gap" width="20" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;vertical-align:top">&nbsp;</td>
+                                
+                                <!-- Правая колонка: Текст с фоном -->
+                                <td class="column column-2" width="285" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;background-color:#e9edf6;vertical-align:top;border-radius:10px;">
                                   <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0">
                                     <tr>
-                                      <td class="col-pad" style="padding-bottom:20px;padding-left:20px;padding-right:20px;padding-top:20px">
-                                        <table class="text_block block-1" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;word-break:break-word">
+                                      <td class="col-pad" style="padding:20px;">
+                                        <!-- Заголовок -->
+                                        <div style="font-family:Helvetica Neue,Helvetica,Arial,sans-serif; font-size:16px; font-weight:bold; color:#1e69da; margin-bottom:10px; line-height:1.2;">
+                                          <a href="{{PIPE_1_LINK}}" target="_blank" style="text-decoration:none; color:#1e69da;">{{PIPE_1_TITLE}}</a>
+                                        </div>
+                                        <!-- Описание (Умный текст со списками) -->
+                                        <div style="font-family:Helvetica Neue,Helvetica,Arial,sans-serif; font-size:13px; color:#555555; line-height:1.5; margin-bottom:15px;">
+                                          {{PIPE_1_DESC}}
+                                        </div>
+                                        <!-- Цена -->
+                                        <div style="font-family:Helvetica Neue,Helvetica,Arial,sans-serif; font-size:14px; color:#282824; margin-bottom:15px;">
+                                          От <strong style="font-size:20px;">{{PIPE_1_PRICE}}</strong>
+                                        </div>
+                                        <!-- Кнопка -->
+                                        <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
                                           <tr>
-                                            <td class="pad" style="padding-bottom:15px;padding-left:5px;padding-right:5px">
-                                              <div style="font-family:sans-serif">
-                                                <div class style="font-size:14px;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;mso-line-height-alt:16.8px;color:#555;line-height:1.2">
-                                                  <p style="margin:0;mso-line-height-alt:16.8px"><span style="word-break: break-word; font-size: 18px;"><strong><a href="{{PIPE_1_LINK}}" target="_blank" style="text-decoration: none; color: #1e69da;" rel="noopener">{{PIPE_1_TITLE}}</a></strong></span></p>
-                                                  <p
-                                                    style="margin:0;mso-line-height-alt:16.8px">&nbsp;</p>
-                                                    <p style="margin:0;mso-line-height-alt:21.599999999999998px">{{PIPE_1_DESC}}</p>
-                                                </div>
-                                              </div>
+                                            <td align="center" bgcolor="#1e69da" style="border-radius:6px;">
+                                              <a href="{{PIPE_1_LINK}}" target="_blank" style="display:block; padding:12px 20px; font-family:Helvetica Neue,Helvetica,Arial,sans-serif; font-size:15px; font-weight:bold; color:#ffffff; text-decoration:none;">Купить</a>
                                             </td>
-                                          </tr>
-                                        </table>
-                                        <table class="text_block block-2" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;word-break:break-word">
-                                          <tr>
-                                            <td class="pad" style="padding-top:10px;padding-bottom:15px;padding-left:15px;padding-right:5px">
-                                              <div style="font-family:sans-serif">
-                                                <div class style="font-size:14px;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;mso-line-height-alt:16.8px;color:#282824;line-height:1.2">
-                                                  <p style="margin:0;font-size:14px;text-align:left;mso-line-height-alt:16.8px">
-                                                    <span style="word-break: break-word; font-size: 24px;"><span style="word-break: break-word;"><span style="word-break: break-word; font-size: 16px;">От</span><strong> {{PIPE_1_PRICE}}</strong></span>
-                                                    </span>
-                                                  </p>
-                                                </div>
-                                              </div>
-                                            </td>
-                                          </tr>
-                                        </table>
-                                        <table class="button_block block-3" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0">
-                                          <tr>
-                                            <td class="pad" align="center">
-                                              <a href="{{PIPE_1_LINK}}" target="_blank" style="color:#ffffff;text-decoration:none;"><!--[if mso]>
-<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"  href="{{PIPE_1_LINK}}"  style="height:31px;width:179px;v-text-anchor:middle;" arcsize="11%" fillcolor="#1e69da">
-<v:stroke dashstyle="Solid" weight="8px" color="#1e69da"/>
-<w:anchorlock/>
-<v:textbox inset="0px,0px,0px,0px">
-<center dir="false" style="color:#ffffff;font-family:sans-serif;font-size:16px">
-<![endif]-->
-<span class="button" style="background-color: #1e69da; border-bottom: 8px solid transparent; border-left: 10px solid transparent; border-radius: 6px; border-right: 10px solid transparent; border-top: 8px solid transparent; color: #ffffff; display: inline-block; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; mso-border-alt: none; text-align: center; width: auto; word-break: keep-all; letter-spacing: normal;"><span class="btn-pad" style="word-break: break-word; padding-left: 60px; padding-right: 60px; padding-top: 0px; padding-bottom: 0px; display: block;"><span style="word-break: break-word; line-height: 32px;"><strong>Купить</strong></span></span></span>
-<!--[if mso]></center></v:textbox></v:roundrect><![endif]--></a></td>
                                           </tr>
                                         </table>
                                       </td>
@@ -637,15 +613,61 @@ src="{{PIPE_1_IMG}}" style="display:block;height:auto;border:0;width:100%;border
               </tr>
             </tbody>
           </table>
+
+          <!-- ТОВАР 2: ТЕКСТ СЛЕВА, КАРТИНКА СПРАВА -->
           <table class="row row-10" align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0">
             <tbody>
               <tr>
                 <td>
-                  <table class="row-content stack" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;background-color:#fff;border-radius:0;color:#000;width:640px;margin:0 auto" width="640">
+                  <table class="row-content stack" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;background-color:#fff;border-radius:0;color:#000;padding-bottom:30px;padding-left:25px;padding-right:25px;width:640px;margin:0 auto" width="640">
                     <tbody>
                       <tr>
-                        <td class="column column-1" width="100%" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;vertical-align:top">
-                          <div class="spacer_block block-1" style="height:5px;line-height:5px;font-size:1px">&#8202;</div>
+                        <td>
+                          <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0">
+                            <tbody>
+                              <tr>
+                                <!-- Левая колонка: Текст с фоном -->
+                                <td class="column column-1" width="285" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;background-color:#e9edf6;vertical-align:top;border-radius:10px;">
+                                  <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0">
+                                    <tr>
+                                      <td class="col-pad" style="padding:20px;">
+                                        <!-- Заголовок -->
+                                        <div style="font-family:Helvetica Neue,Helvetica,Arial,sans-serif; font-size:16px; font-weight:bold; color:#1e69da; margin-bottom:10px; line-height:1.2;">
+                                          <a href="{{PIPE_2_LINK}}" target="_blank" style="text-decoration:none; color:#1e69da;">{{PIPE_2_TITLE}}</a>
+                                        </div>
+                                        <!-- Описание (Умный текст со списками) -->
+                                        <div style="font-family:Helvetica Neue,Helvetica,Arial,sans-serif; font-size:13px; color:#555555; line-height:1.5; margin-bottom:15px;">
+                                          {{PIPE_2_DESC}}
+                                        </div>
+                                        <!-- Цена -->
+                                        <div style="font-family:Helvetica Neue,Helvetica,Arial,sans-serif; font-size:14px; color:#282824; margin-bottom:15px;">
+                                          От <strong style="font-size:20px;">{{PIPE_2_PRICE}}</strong>
+                                        </div>
+                                        <!-- Кнопка -->
+                                        <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                          <tr>
+                                            <td align="center" bgcolor="#1e69da" style="border-radius:6px;">
+                                              <a href="{{PIPE_2_LINK}}" target="_blank" style="display:block; padding:12px 20px; font-family:Helvetica Neue,Helvetica,Arial,sans-serif; font-size:15px; font-weight:bold; color:#ffffff; text-decoration:none;">Купить</a>
+                                            </td>
+                                          </tr>
+                                        </table>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+
+                                <!-- Отступ между колонками -->
+                                <td class="column gap" width="20" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;vertical-align:top">&nbsp;</td>
+
+                                <!-- Правая колонка: Картинка без фона -->
+                                <td class="column column-2" width="285" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;vertical-align:top;border-radius:10px; overflow:hidden; line-height:0;">
+                                  <a href="{{PIPE_2_LINK}}" target="_blank">
+                                    <img src="{{PIPE_2_IMG}}" style="display:block;height:auto;border:0;width:100%;border-radius:10px;" width="285" alt="{{PIPE_2_TITLE}}" title="{{PIPE_2_TITLE}}">
+                                  </a>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
                         </td>
                       </tr>
                     </tbody>
@@ -654,68 +676,6 @@ src="{{PIPE_1_IMG}}" style="display:block;height:auto;border:0;width:100%;border
               </tr>
             </tbody>
           </table>
-          <table class="row row-11" align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0">
-            <tbody>
-              <tr>
-                <td>
-                  <table class="row-content stack" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;background-color:#f8f9fa;border-radius:15px;color:#000;padding:10px 25px 15px 25px;width:640px;margin:0 auto"
-                    width="640">
-                    <tbody>
-                      <tr>
-                        <td>
-                          <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0">
-                            <tbody>
-                              <tr>
-                                <td class="column column-1" width="50%" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;background-color:#f8f9fa;vertical-align:top;border-radius:10px">
-                                  <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0">
-                                    <tr>
-                                      <td class="col-pad" style="padding-bottom:20px;padding-left:20px;padding-right:20px;padding-top:20px">
-                                        <table class="text_block block-1" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;word-break:break-word">
-                                          <tr>
-                                            <td class="pad" style="padding-bottom:15px;padding-left:5px;padding-right:5px">
-                                              <div style="font-family:sans-serif">
-                                                <div class style="font-size:14px;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;mso-line-height-alt:16.8px;color:#555;line-height:1.2">
-                                                  <p style="margin:0;mso-line-height-alt:16.8px">
-                                                    <span style="word-break: break-word; font-size: 18px;"><a href="{{PIPE_2_LINK}}" target="_blank" style="text-decoration: none; color: #1e69da;" rel="noopener"><strong>{{PIPE_2_TITLE}}</strong></a></span></p>
-                                                  <p
-                                                    style="margin:0;mso-line-height-alt:16.8px">&nbsp;</p>
-                                                    <p style="margin:0;mso-line-height-alt:21.599999999999998px">{{PIPE_2_DESC}}</p>
-                                                </div>
-                                              </div>
-                                            </td>
-                                          </tr>
-                                        </table>
-                                        <table class="text_block block-2" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;word-break:break-word">
-                                          <tr>
-                                            <td class="pad" style="padding-top:10px;padding-bottom:20px;padding-left:15px;padding-right:5px">
-                                              <div style="font-family:sans-serif">
-                                                <div class style="font-size:14px;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;mso-line-height-alt:16.8px;color:#282824;line-height:1.2">
-                                                  <p style="margin:0;font-size:14px;text-align:left;mso-line-height-alt:16.8px">
-                                                    <span style="word-break: break-word; font-size: 24px;"><span style="word-break: break-word;"><span style="word-break: break-word; font-size: 16px;">От</span><strong> {{PIPE_2_PRICE}}</strong></span>
-                                                    </span>
-                                                  </p>
-                                                </div>
-                                              </div>
-                                            </td>
-                                          </tr>
-                                        </table>
-                                        <table class="button_block block-3" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0">
-                                          <tr>
-                                            <td class="pad" align="center">
-                                              <a href="{{PIPE_2_LINK}}" target="_blank" style="color:#ffffff;text-decoration:none;"><!--[if mso]>
-<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"  href="{{PIPE_2_LINK}}"  style="height:31px;width:179px;v-text-anchor:middle;" arcsize="11%" fillcolor="#1e69da">
-<v:stroke dashstyle="Solid" weight="8px" color="#1e69da"/>
-<w:anchorlock/>
-<v:textbox inset="0px,0px,0px,0px">
-<center dir="false" style="color:#ffffff;font-family:sans-serif;font-size:16px">
-<![endif]-->
-<span class="button" style="background-color: #1e69da; border-bottom: 8px solid transparent; border-left: 10px solid transparent; border-radius: 6px; border-right: 10px solid transparent; border-top: 8px solid transparent; color: #ffffff; display: inline-block; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; mso-border-alt: none; text-align: center; width: auto; word-break: keep-all; letter-spacing: normal;"><span class="btn-pad" style="word-break: break-word; padding-left: 60px; padding-right: 60px; padding-top: 0px; padding-bottom: 0px; display: block;"><span style="word-break: break-word; line-height: 32px;"><strong>Купить</strong></span></span></span>
-<!--[if mso]></center></v:textbox></v:roundrect><![endif]--></a></td>
-                                          </tr>
-                                        </table>
-                                      </td>
-                                    </tr>
-                                  </table>
                                 </td>
                                 <td class="column gap" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;vertical-align:top">
                                   <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;width:20px;height:20px" width="20" height="20"></table>
