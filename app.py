@@ -494,6 +494,7 @@ else:
                     data[f'SHIP_I_{i}'] = st.text_input("URL фото отгрузки", key=f"sh_i{i}")
                     st.markdown("---")
 
+
         elif mode == "expert":
             st.subheader("⚙️ Настройка блоков (Трубы, Наличие, Отгрузки)")
             
@@ -501,39 +502,42 @@ else:
                 for i in range(1, 3):
                     st.markdown(f"**Труба №{i}**")
                     col1, col2 = st.columns(2)
-                    data[f'PIPE_T_{i}'] = col1.text_input("Название", key=f"expt_t{i}")
-                    data[f'PIPE_P_{i}'] = col2.text_input("Цена (Например: 100 000₽/т)", key=f"expt_p{i}")
+                    data[f'PIPE_{i}_TITLE'] = col1.text_input("Название", key=f"expt_t{i}")
+                    data[f'PIPE_{i}_PRICE'] = col2.text_input("Цена (Например: 100 000₽/т)", key=f"expt_p{i}")
                     pipe_desc_raw = st.text_area("Описания и ГОСТы (используйте - для списков)", key=f"expt_d{i}", height=100)
-                    data[f'PIPE_D_{i}'] = process_text_to_html(pipe_desc_raw)
-                    col3, col4 = st.columns(2)
-                    data[f'PIPE_I_{i}'] = col3.text_input("URL картинки", key=f"expt_i{i}")
-                    data[f'PIPE_L_{i}'] = col4.text_input("Ссылка на каталог", data.get('LINK_CATALOG', ''), key=f"expt_l{i}")
+                    data[f'PIPE_{i}_DESC'] = process_text_to_html(pipe_desc_raw)
+                    col3, col4, col5 = st.columns(3)
+                    data[f'PIPE_{i}_IMG'] = col3.text_input("URL картинки", key=f"expt_i{i}")
+                    data[f'PIPE_{i}_ALT'] = col4.text_input("Alt-текст картинки", key=f"expt_a{i}")
+                    data[f'PIPE_{i}_LINK'] = col5.text_input("Ссылка на каталог", data.get('LINK_CATALOG', ''), key=f"expt_l{i}")
                     st.markdown("---")
-
+ 
             with st.expander("2. Также в наличии на складе (3 товара)"):
                 data['STOCK_SECTION_TITLE'] = st.text_input("Заголовок блока наличия", "Также в наличии на складе")
                 for i in range(1, 4):
                     st.markdown(f"**Товар №{i}**")
                     col1, col2 = st.columns(2)
-                    data[f'STOCK_T_{i}'] = col1.text_input("Название", key=f"exst_t{i}")
-                    data[f'STOCK_P_{i}'] = col2.text_input("Цена", key=f"exst_p{i}")
-                    data[f'STOCK_D_{i}'] = st.text_input("Краткое описание", key=f"exst_d{i}")
-                    col3, col4 = st.columns(2)
-                    data[f'STOCK_I_{i}'] = col3.text_input("URL картинки товара", key=f"exst_i{i}")
-                    data[f'STOCK_L_{i}'] = col4.text_input("Ссылка", data.get('LINK_CATALOG', ''), key=f"exst_l{i}")
+                    data[f'STOCK_{i}_TITLE'] = col1.text_input("Название", key=f"exst_t{i}")
+                    data[f'STOCK_{i}_PRICE'] = col2.text_input("Цена", key=f"exst_p{i}")
+                    data[f'STOCK_{i}_DESC'] = st.text_input("Краткое описание", key=f"exst_d{i}")
+                    col3, col4, col5 = st.columns(3)
+                    data[f'STOCK_{i}_IMG'] = col3.text_input("URL картинки товара", key=f"exst_i{i}")
+                    data[f'STOCK_{i}_ALT'] = col4.text_input("Alt-текст", key=f"exst_a{i}")
+                    data[f'STOCK_{i}_LINK'] = col5.text_input("Ссылка", data.get('LINK_CATALOG', ''), key=f"exst_l{i}")
                     st.markdown("---")
-
+ 
             with st.expander("3. Наши отгрузки (2 кейса)"):
                 data['SHIP_SECTION_TITLE'] = st.text_input("Заголовок блока отгрузок", "Наши отгрузки")
                 for i in range(1, 3):
                     st.markdown(f"**Кейс №{i}**")
                     col1, col2 = st.columns(2)
-                    data[f'SHIP_T_{i}'] = col1.text_input("Что отгрузили", key=f"exsh_t{i}")
-                    data[f'SHIP_DATE_{i}'] = col2.text_input("Дата", key=f"exsh_dt{i}")
-                    data[f'SHIP_D_{i}'] = st.text_input("Описание", key=f"exsh_d{i}")
-                    col3, col4 = st.columns(2)
-                    data[f'SHIP_I_{i}'] = col3.text_input("URL картинки отгрузки", key=f"exsh_i{i}")
-                    data[f'SHIP_L_{i}'] = col4.text_input("Ссылка", data.get('LINK_CATALOG', ''), key=f"exsh_l{i}")
+                    data[f'SHIP_{i}_TITLE'] = col1.text_input("Что отгрузили", key=f"exsh_t{i}")
+                    data[f'SHIP_{i}_DATE'] = col2.text_input("Дата", key=f"exsh_dt{i}")
+                    data[f'SHIP_{i}_DESC'] = st.text_input("Описание", key=f"exsh_d{i}")
+                    col3, col4, col5 = st.columns(3)
+                    data[f'SHIP_{i}_IMG'] = col3.text_input("URL картинки отгрузки", key=f"exsh_i{i}")
+                    data[f'SHIP_{i}_ALT'] = col4.text_input("Alt-текст", key=f"exsh_a{i}")
+                    data[f'SHIP_{i}_LINK'] = col5.text_input("Ссылка", data.get('LINK_CATALOG', ''), key=f"exsh_l{i}")
                     st.markdown("---")
                     
     with tabs[4]:
