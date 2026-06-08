@@ -336,22 +336,17 @@ else:
 
         elif mode == "stock":
             st.subheader("📦 Настройка контента Поступления")
-            with st.expander("1. Блок бесплатного аудита", expanded=True):
-                data['AUDIT_TITLE'] = st.text_input("Заголовок", "Бесплатный аудит сметы и чертежей*")
-                data['AUDIT_SUB'] = st.text_input("Подзаголовок", "Индивидуальный расчет условий под ваш объем")
-                data['AUDIT_LINK'] = st.text_input("Ссылка кнопки", data['LINK_CATALOG'])
-
-            with st.expander("2. Описание и Буллиты"):
+            with st.expander("1. Описание и Буллиты"):
                 data['TEXT_TITLE'] = st.text_input("Заголовок текста", "Труба всех типоразмеров")
                 data['TEXT_BODY'] = st.text_area("Вводный текст", "Обновили складской запас...")
                 for i in range(1, 4):
                     data[f'BULLET_{i}'] = st.text_input(f"Пункт списка {i}", key=f"st_blt{i}")
 
-            with st.expander("3. Технический блок (ГОСТы и Размеры)"):
+            with st.expander("2. Технический блок (ГОСТы и Размеры)"):
                 data['GOST_BLOCK'] = st.text_area("ГОСТы (через пробел)", "ГОСТ 8639-82", key="st_gst")
                 data['SIZE_BLOCK'] = st.text_area("Размеры (через пробел)", "20х20 40x40", key="st_sz")
 
-            with st.expander("4. Также в наличии (3 товара)"):
+            with st.expander("3. Также в наличии (3 товара)"):
                 for i in range(1, 4):
                     st.markdown(f"**Товар №{i}**")
                     data[f'T_{i}'] = st.text_input("Название", key=f"st_t{i}")
@@ -361,7 +356,7 @@ else:
                     data[f'I_{i}'] = st.text_input("URL картинки", key=f"st_i{i}")
                     data[f'L_{i}'] = st.text_input("Ссылка", data['LINK_CATALOG'], key=f"st_l{i}")
 
-            with st.expander("5. Наши отгрузки (2 кейса)"):
+            with st.expander("4. Наши отгрузки (2 кейса)"):
                 for i in range(1, 3):
                     st.markdown(f"**Кейс №{i}**")
                     data[f'CASE_TITLE_{i}'] = st.text_input("Заголовок кейса", key=f"st_ct{i}")
