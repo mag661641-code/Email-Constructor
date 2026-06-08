@@ -562,8 +562,10 @@ else:
             file_path = file_name # Если в папке нет, ищем в корне
         try:
             with open(file_path, "r", encoding="utf-8") as f: html = f.read()
+            # Убрали if val, теперь заменяет всё
             for key, val in data.items():
-                if val: html = html.replace(f"{{{{{key}}}}}", str(val))
+                replacement = str(val) if val else ""
+                html = html.replace(f"{{{{{key}}}}}", replacement)
             
             st.success("Готово!")
             
