@@ -269,13 +269,18 @@ else:
 
         elif mode == "cases":
             st.subheader("Текст кейса (История успеха)")
-            data['CASE_TITLE'] = st.text_input("Заголовок кейса", "Как мы укомплектовали 12 позиций за 24 часа")
-            case_task_raw = st.text_area("Задача (что просил клиент)", "Снабженцу требовалось за сутки...")
-            data['CASE_TASK'] = process_text_to_html(case_task_raw)
+            data['CASE_MAIN_TITLE'] = st.text_input("Главный заголовок статьи", "Металл с гарантией: проверка по ГОСТ и полный пакет документов при отгрузке")
             
-            case_real_raw = st.text_area("Реализация (что мы сделали)", "- Сборный груз за 3 часа")
-            data['CASE_REALIZATION'] = process_text_to_html(case_real_raw)
-
+            task_raw = st.text_area("Задача / Вводный текст", "Недостаточная толщина стенки, отсутствие сертификатов или дефекты поверхности могут остановить стройку на недели. В «Стальметурал» мы внедрили трехступенчатый контроль отгрузки, чтобы вы спали спокойно.", height=100)
+            data['CASE_TASK'] = process_text_to_html(task_raw)
+            
+            steps_raw = st.text_area("Что мы сделали (Список / Буллиты)", 
+                "- **Замеры перед погрузкой:** Проверяем толщину стенки и параметры металла на соответствие ГОСТу.\n"
+                "- **Полная документация:** Пакет оригинальных сертификатов передается водителю сразу – никаких «дошлем почтой».\n"
+                "- **Точность до миллиметра:** Собственный цех резки на ЧПУ гарантирует, что детали встанут как влитые.", height=150)
+            data['CASE_STEPS'] = process_text_to_html(steps_raw)
+            
+            data['CASE_RESULT'] = st.text_input("Результат (выводится в рамке снизу)", "Ваш объект не будет простаивать из-за брака.")
         elif mode == "services":
             st.subheader("📝 Основной текстовый блок")
             data['TEXT_TITLE'] = st.text_input("Заголовок раздела", "Больше, чем просто продажа металла")
@@ -302,25 +307,43 @@ else:
     with tabs[3]:
         # --- ВСЕ НАСТРОЙКИ БЛОКОВ ---
         if mode == "cases":
-            st.subheader("⚙️ Настройка кейса отгрузки")
-            with st.expander("1. Описание истории", expanded=True):
-                data['CASE_MAIN_TITLE'] = st.text_input("Заголовок кейса", "Как мы укомплектовали 12 позиций...")
-                data['CASE_TASK'] = st.text_area("Задача", "Снабженцу требовалось...")
-                data['CASE_STEPS'] = st.text_area("Реализация", "- Сборный груз...")
-                data['CASE_RESULT'] = st.text_input("Результат", "Машина прибыла на объект...")
+            st.subheader("Настройка блоков (Товары, Услуги, Статистика)")
+            
+            with st.expander("1. Статистика (3 иконки под текстом)", expanded=True):
+                for i in range(1, 4):
+                    st.markdown(f"**Характеристика №{i}**")
+                    col1, col2 = st.columns(2)
+                    data[f'STAT_{i}_TITLE'] = col1.text_input("Название (Например: Срок)", key=f"s_t{i}")
+                    data[f'STAT_{i}_DESC'] = col2.text_input("Значение (Например: 24 часа)", key=f"s_d{i}")
+                    data[f'STAT_{i}_IMG'] = st.text_input("URL иконки", key=f"s_i{i}")
+                    st.markdown("---")
 
-            with st.expander("2. Статистика (иконки)"):
-                data['CASE_STAT_1'] = st.text_input("Срок", "24 часа")
-                data['CASE_STAT_2'] = st.text_input("Объем", "12 типов изделий")
-                data['CASE_STAT_3'] = st.text_input("Выгода", "Одна машина вместо трех")
-
-            with st.expander("3. Товары (2 шт.)"):
-                for i in range(1, 3):
+            with st.expander("2. Участвовали в отгрузке (4 товара)"):
+                for i in range(1, 5):
                     st.markdown(f"**Товар №{i}**")
-                    data[f'T_{i}'] = st.text_input("Название", key=f"cs_t{i}")
-                    data[f'D_{i}'] = st.text_input("Описание", key=f"cs_d{i}")
-                    data[f'I_{i}'] = st.text_input("URL картинки", key=f"cs_img{i}")
-                    data[f'L_{i}'] = st.text_input("Ссылка", data['LINK_CATALOG'], key=f"cs_l{i}")
+                    col1, col2 = st.columns(2)
+                    data[f'PROD_{i}_TITLE'] = col1.text_input("Название", key=f"pr_t{i}")
+                    data[f'PROD_{i}_PRICE'] = col2.text_input("Цена (Например: 39 500₽/т)", key=f"pr_p{i}")
+                    data[f'PROD_{i}_DESC'] = st.text_area("Описание (ГОСТ, марка)", key=f"pr_d{i}", height=70)
+                    col3, col4 = st.columns(2)
+                    data[f'PROD_{i}_IMG'] = col3.text_input("URL картинки товара", key=f"pr_i{i}")
+                    data[f'PROD_{i}_LINK'] = col4.text_input("Ссылка на каталог", data.get('LINK_CATALOG', ''), key=f"pr_l{i}")
+                    st.markdown("---")
+                
+                data['PROD_EXTRA_TEXT'] = st.text_input("Текст под товарами", "+ еще 8 позиций сопутствующего проката и метизов укомплектованы в эту же машину")
+                data['ALL_PROD_LINK'] = st.text_input("Ссылка кнопки 'Посмотреть весь сортамент'", data.get('LINK_CATALOG', ''))
+
+            with st.expander("3. Не тратьте время на подгонку (3 Услуги)"):
+                data['SERVICES_TITLE'] = st.text_input("Главный заголовок услуг", "Не тратьте время на подгонку на объекте")
+                for i in range(1, 4):
+                    st.markdown(f"**Услуга №{i}**")
+                    col1, col2 = st.columns(2)
+                    data[f'SERV_{i}_TITLE'] = col1.text_input("Название услуги", key=f"srv_t{i}")
+                    data[f'SERV_{i}_DESC'] = col2.text_input("Краткое описание", key=f"srv_d{i}")
+                    col3, col4 = st.columns(2)
+                    data[f'SERV_{i}_IMG'] = col3.text_input("URL картинки услуги", key=f"srv_i{i}")
+                    data[f'SERV_{i}_LINK'] = col4.text_input("Ссылка 'Заказать'", data.get('LINK_CATALOG', ''), key=f"srv_l{i}")
+                    st.markdown("---")
 
         elif mode == "stock":
             st.subheader("📦 Настройка контента Поступления")
