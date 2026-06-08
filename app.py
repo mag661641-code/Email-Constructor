@@ -231,7 +231,6 @@ else:
             data['HERO_BTN_LINK'] = st.text_input("Ссылка кнопки 'Рассчитать проект'", data.get('LINK_CATALOG', ''))        
         elif mode == "expert":
             data['HERO_TITLE'] = st.text_input('Заголовок на баннере', "БЕСШОВНАЯ ИЛИ ЭЛЕКТРОСВАРНАЯ")
-            data['HERO_BG_IMG'] = st.text_input("Фоновая картинка", "https://cp.unisender.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6dzzhth5h9wnshauf9n3p3mtxkdp4i7bgic7eirrduaxtfryt35pt4dso8hrqam4e713iwazy1cr56")
             data['HERO_IMG'] = st.text_input("Картинка справа", "https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6uyisxkcb9z7eaauf9n3p3mtxknbsdqxp466f8gerep3qqo3qg9gbanpmbuqopttjmnzyzspdqyqxfm55dgtdc1xhua6ni8nrnmqq1qo538z6idf768zyjwfpoohe8gbci4z3phict9wqfg496t8gqbqy5r6b3tjcs34m6na")
             data['HERO_BTN_LINK'] = st.text_input("Ссылка кнопки 'Читать подробнее'", data.get('LINK_CATALOG', ''))
         else:
