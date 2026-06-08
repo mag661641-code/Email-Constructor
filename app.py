@@ -229,6 +229,11 @@ else:
             default_bg = "https://cp.unisender.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6onoffr9spwg3rauf9n3p3mtxkb98nhpzugtp36yr4smm1mnuid9xzaqh6qaw8wyyxn6ircwydoatz4yhkeno9cb5u3mum5c3c8j5f9pxcd4q95izr51ecpifdwzh6n19h4rnygkteo34fcmjp5hwypi1hh"
             data['HERO_IMG'] = st.text_input("Картинка отгрузки (справа)", "https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=633kxjmua5h3e6auf9n3p3mtxkbqyuz5g9t4bxmiwacn4se1m7mm8f3xb9kfj4sdqs7u6wy3p67hniwanz5qzpz6e3oafgod1gfpiyt35tefhp8sjg7t3fqc9p5i93btrk54ju1mbjtetk")
             data['HERO_BTN_LINK'] = st.text_input("Ссылка кнопки 'Рассчитать проект'", data.get('LINK_CATALOG', ''))        
+        elif mode == "expert":
+            data['HERO_TITLE'] = st.text_input('Заголовок на баннере', "БЕСШОВНАЯ ИЛИ ЭЛЕКТРОСВАРНАЯ")
+            data['HERO_BG_IMG'] = st.text_input("Фоновая картинка", "https://cp.unisender.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6dzzhth5h9wnshauf9n3p3mtxkdp4i7bgic7eirrduaxtfryt35pt4dso8hrqam4e713iwazy1cr56")
+            data['HERO_IMG'] = st.text_input("Картинка справа", "https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6uyisxkcb9z7eaauf9n3p3mtxknbsdqxp466f8gerep3qqo3qg9gbanpmbuqopttjmnzyzspdqyqxfm55dgtdc1xhua6ni8nrnmqq1qo538z6idf768zyjwfpoohe8gbci4z3phict9wqfg496t8gqbqy5r6b3tjcs34m6na")
+            data['HERO_BTN_LINK'] = st.text_input("Ссылка кнопки 'Читать подробнее'", data.get('LINK_CATALOG', ''))
         else:
             data['HERO_TITLE'] = st.text_input('Заголовок баннера', "МЕТАЛЛОПРОКАТ ОТ ПРОИЗВОДИТЕЛЯ")
 
@@ -304,7 +309,15 @@ else:
                 )
             )
             data['TEXT_BODY'] = process_text_to_html(text_body_raw)
-
+            elif mode == "expert":
+            st.subheader("📝 Основная статья блога")
+            data['TEXT_TITLE'] = st.text_input("Заголовок статьи", "Выбираем трубу без переплат")
+            text_body_raw = st.text_area(
+                "Текст статьи (используйте ** для жирного и - для списков)", 
+                height=250, 
+                value="Часто в смету закладывают дорогую бесшовную трубу там, где можно безопасно использовать электросварную.\n\n**Где можно сэкономить до 40%?**\nЭлектросварная труба (ЭСВ) идеально подходит для легких металлоконструкций, заборов и систем ЖКХ с низким давлением.\n\n**Где рисковать нельзя?**\nВ нефтегазовой промышленности необходима только бесшовная труба (БШ)."
+            )
+            data['TEXT_BODY'] = process_text_to_html(text_body_raw)
         
 
     with tabs[3]:
@@ -480,6 +493,48 @@ else:
                     data[f'SHIP_DATE_{i}'] = col2.text_input("Дата", key=f"sh_dt{i}")
                     data[f'SHIP_D_{i}'] = st.text_input("Описание", key=f"sh_d{i}")
                     data[f'SHIP_I_{i}'] = st.text_input("URL фото отгрузки", key=f"sh_i{i}")
+                    st.markdown("---")
+
+        elif mode == "expert":
+            st.subheader("⚙️ Настройка блоков (Трубы, Наличие, Отгрузки)")
+            
+            with st.expander("1. Какая труба подходит под ваши задачи? (2 колонки)", expanded=True):
+                for i in range(1, 3):
+                    st.markdown(f"**Труба №{i}**")
+                    col1, col2 = st.columns(2)
+                    data[f'PIPE_T_{i}'] = col1.text_input("Название", key=f"expt_t{i}")
+                    data[f'PIPE_P_{i}'] = col2.text_input("Цена (Например: 100 000₽/т)", key=f"expt_p{i}")
+                    pipe_desc_raw = st.text_area("Описания и ГОСТы (используйте - для списков)", key=f"expt_d{i}", height=100)
+                    data[f'PIPE_D_{i}'] = process_text_to_html(pipe_desc_raw)
+                    col3, col4 = st.columns(2)
+                    data[f'PIPE_I_{i}'] = col3.text_input("URL картинки", key=f"expt_i{i}")
+                    data[f'PIPE_L_{i}'] = col4.text_input("Ссылка на каталог", data.get('LINK_CATALOG', ''), key=f"expt_l{i}")
+                    st.markdown("---")
+
+            with st.expander("2. Также в наличии на складе (3 товара)"):
+                data['STOCK_SECTION_TITLE'] = st.text_input("Заголовок блока наличия", "Также в наличии на складе")
+                for i in range(1, 4):
+                    st.markdown(f"**Товар №{i}**")
+                    col1, col2 = st.columns(2)
+                    data[f'STOCK_T_{i}'] = col1.text_input("Название", key=f"exst_t{i}")
+                    data[f'STOCK_P_{i}'] = col2.text_input("Цена", key=f"exst_p{i}")
+                    data[f'STOCK_D_{i}'] = st.text_input("Краткое описание", key=f"exst_d{i}")
+                    col3, col4 = st.columns(2)
+                    data[f'STOCK_I_{i}'] = col3.text_input("URL картинки товара", key=f"exst_i{i}")
+                    data[f'STOCK_L_{i}'] = col4.text_input("Ссылка", data.get('LINK_CATALOG', ''), key=f"exst_l{i}")
+                    st.markdown("---")
+
+            with st.expander("3. Наши отгрузки (2 кейса)"):
+                data['SHIP_SECTION_TITLE'] = st.text_input("Заголовок блока отгрузок", "Наши отгрузки")
+                for i in range(1, 3):
+                    st.markdown(f"**Кейс №{i}**")
+                    col1, col2 = st.columns(2)
+                    data[f'SHIP_T_{i}'] = col1.text_input("Что отгрузили", key=f"exsh_t{i}")
+                    data[f'SHIP_DATE_{i}'] = col2.text_input("Дата", key=f"exsh_dt{i}")
+                    data[f'SHIP_D_{i}'] = st.text_input("Описание", key=f"exsh_d{i}")
+                    col3, col4 = st.columns(2)
+                    data[f'SHIP_I_{i}'] = col3.text_input("URL картинки отгрузки", key=f"exsh_i{i}")
+                    data[f'SHIP_L_{i}'] = col4.text_input("Ссылка", data.get('LINK_CATALOG', ''), key=f"exsh_l{i}")
                     st.markdown("---")
                     
     with tabs[4]:
