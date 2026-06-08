@@ -460,7 +460,7 @@ else:
                     data[f'L_{i}'] = st.text_input("Ссылка кнопки 'Заказать'", data.get('LINK_CATALOG', ''), key=f"sv_l{i}")
                     st.markdown("---")
 
-            # --- БЛОК 2: СОРТАМЕНТ (2 товара) ---
+# --- БЛОК 2: СОРТАМЕНТ (2 товара) ---
             with st.expander("2. Сортамент под ваши чертежи"):
                 data['SORT_SECTION_TITLE'] = st.text_input("Заголовок раздела", "Сортамент под ваши чертежи")
                 sort_intro_raw = st.text_area(
@@ -476,7 +476,12 @@ else:
                     col1, col2 = st.columns(2)
                     data[f'SORT_T_{i}'] = col1.text_input("Название", key=f"sr_t{i}")
                     data[f'SORT_I_{i}'] = col2.text_input("URL картинки", key=f"sr_i{i}")
-                    data[f'SORT_D_{i}'] = st.text_area("Описание", key=f"sr_d{i}", height=80)
+                    
+                    # === ДОБАВИЛИ УМНЫЙ ТЕКСТ СЮДА ===
+                    desc_raw = st.text_area("Описание (можно списком через - )", key=f"sr_d{i}", height=120)
+                    data[f'SORT_D_{i}'] = process_text_to_html(desc_raw)
+                    # ==================================
+                    
                     col3, col4 = st.columns(2)
                     data[f'SORT_SPEC_{i}'] = col3.text_input("Характеристика (Размер / Сечение)", key=f"sr_sp{i}")
                     data[f'SORT_L_{i}'] = col4.text_input("Ссылка кнопки 'Узнать цену'", data.get('LINK_CATALOG', ''), key=f"sr_l{i}")
@@ -502,14 +507,17 @@ else:
                 for i in range(1, 3):
                     st.markdown(f"**Труба №{i}**")
                     col1, col2 = st.columns(2)
-                    data[f'PIPE_{i}_TITLE'] = col1.text_input("Название", key=f"expt_t{i}")
-                    data[f'PIPE_{i}_PRICE'] = col2.text_input("Цена (Например: 100 000₽/т)", key=f"expt_p{i}")
-                    pipe_desc_raw = st.text_area("Описания и ГОСТы (используйте - для списков)", key=f"expt_d{i}", height=100)
-                    data[f'PIPE_{i}_DESC'] = process_text_to_html(pipe_desc_raw)
-                    col3, col4, col5 = st.columns(3)
-                    data[f'PIPE_{i}_IMG'] = col3.text_input("URL картинки", key=f"expt_i{i}")
-                    data[f'PIPE_{i}_ALT'] = col4.text_input("Alt-текст картинки", key=f"expt_a{i}")
-                    data[f'PIPE_{i}_LINK'] = col5.text_input("Ссылка на каталог", data.get('LINK_CATALOG', ''), key=f"expt_l{i}")
+                    data[f'PIPE_T_{i}'] = col1.text_input("Название", key=f"expt_t{i}")
+                    data[f'PIPE_P_{i}'] = col2.text_input("Цена (Например: 100 000₽/т)", key=f"expt_p{i}")
+                    
+                    # === ДОБАВИЛИ УМНЫЙ ТЕКСТ СЮДА ===
+                    pipe_desc_raw = st.text_area("Описания и ГОСТы (используйте - для списков)", key=f"expt_d{i}", height=120)
+                    data[f'PIPE_D_{i}'] = process_text_to_html(pipe_desc_raw)
+                    # ==================================
+                    
+                    col3, col4 = st.columns(2)
+                    data[f'PIPE_I_{i}'] = col3.text_input("URL картинки", key=f"expt_i{i}")
+                    data[f'PIPE_L_{i}'] = col4.text_input("Ссылка на каталог", data.get('LINK_CATALOG', ''), key=f"expt_l{i}")
                     st.markdown("---")
  
             with st.expander("2. Также в наличии на складе (3 товара)"):
