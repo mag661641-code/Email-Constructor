@@ -309,7 +309,7 @@ else:
                 )
             )
             data['TEXT_BODY'] = process_text_to_html(text_body_raw)
-            elif mode == "expert":
+        elif mode == "expert":
             st.subheader("📝 Основная статья блога")
             data['TEXT_TITLE'] = st.text_input("Заголовок статьи", "Выбираем трубу без переплат")
             text_body_raw = st.text_area(
