@@ -413,7 +413,7 @@ else:
     with tabs[3]:
                 # --- ВСЕ НАСТРОЙКИ БЛОКОВ ---
         if mode == "cases":
-            st.subheader("Настройка блоков (Товары, Услуги, Статистика)")
+            st.subheader("Настройка блоков")
             with st.expander("1. Участвовали в отгрузке (4 товара)"):
                 for i in range(1, 5):
                     st.markdown(f"**Товар №{i}**")
@@ -442,7 +442,7 @@ else:
                     st.markdown("---")
 
         elif mode == "expert":
-            st.subheader("Настройка блоков (Трубы, Наличие, Отгрузки)")
+            st.subheader("Настройка блоков")
             
             with st.expander("1. Какой товар подходит под ваши задачи? (2 колонки)", expanded=True):
                 data['PIPE_SECTION_TITLE'] = st.text_input("Заголовок", "Какой товар подходит под ваши задачи?")
@@ -661,7 +661,7 @@ else:
                     st.markdown("---")
 
         elif mode == "services":
-            st.subheader("⚙️ Настройка блоков шаблона Услуги")
+            st.subheader("Настройка блоков")
 
             # --- БЛОК 1: ТЕХНОЛОГИИ (3 карточки) ---
             with st.expander("1. Технологии, которые сэкономят ваше время", expanded=True):
