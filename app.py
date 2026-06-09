@@ -106,68 +106,74 @@ base_styles = """
 
 if st.session_state.theme == "light":
     theme_css = """<style>
+    /* Основной фон и боковая панель */
     [data-testid="stAppViewContainer"] { background-color: #F8F9FA; color: #111827; } 
     [data-testid="stSidebar"] { background-color: #FFFFFF; border-right: 1px solid #E5E7EB; } 
-    .stButton > button { background-color: #FFFFFF !important; border: 1px solid #D1D5DB !important; color: #111827 !important; } 
-    .stButton > button:hover { color: #1e69da !important; background-color: #F3F4F6 !important; } 
+    
+    /* Тексты */
     h1, h2, h3, label, p, .stMarkdown { color: #111827 !important; } 
-    
-    .stTextInput input, .stTextArea textarea { 
-        background-color: #FFFFFF !important; 
-        color: #111827 !important; 
-        border: 1px solid #D1D5DB !important; 
-    }
-    
-    /* --- АГРЕССИВНЫЙ ФИКС СЕЛЕКТБОКСОВ (СВЕТЛАЯ ТЕМА) --- */
-    div[data-baseweb="select"],
-    div[data-baseweb="select"] > div,
-    div[data-baseweb="select"] > div > div { 
-        background-color: #FFFFFF !important; 
-    }
-    div[data-baseweb="select"] > div { border: 1px solid #D1D5DB !important; }
-    div[data-baseweb="select"] > div:hover { background-color: #F8F9FA !important; border-color: #1e69da !important; }
-    /* Принудительно делаем текст внутри селекта темным */
-    div[data-baseweb="select"] * { color: #111827 !important; }
-    
-    /* Меню выпадающего списка */
-    ul[data-baseweb="menu"] { background-color: #FFFFFF !important; border: 1px solid #D1D5DB !important; }
-    ul[data-baseweb="menu"] li { color: #111827 !important; background-color: transparent !important; }
-    ul[data-baseweb="menu"] li:hover { background-color: #F3F4F6 !important; }
-
     button[data-baseweb="tab"] p { color: #6B7280 !important; font-weight: 600 !important; } 
     button[data-baseweb="tab"][aria-selected="true"] p { color: #1e69da !important; }
+    
+    /* Кнопки */
+    .stButton > button { background-color: #FFFFFF !important; border: 1px solid #D1D5DB !important; color: #111827 !important; } 
+    .stButton > button:hover { color: #1e69da !important; background-color: #F3F4F6 !important; } 
+    
+    /* Обычные инпуты */
+    .stTextInput input, .stTextArea textarea { background-color: #FFFFFF !important; color: #111827 !important; border: 1px solid #D1D5DB !important; }
+    
+    /* --- ФИКС АККОРДЕОНОВ (st.expander) --- */
+    [data-testid="stExpander"] { border: 1px solid #D1D5DB !important; border-radius: 8px !important; }
+    [data-testid="stExpander"] details summary { background-color: #F3F4F6 !important; border-radius: 8px !important; }
+    [data-testid="stExpander"] details summary p { color: #111827 !important; font-weight: 600 !important; }
+    [data-testid="stExpander"] details summary svg { fill: #111827 !important; }
+
+    /* --- ФИКС СЕЛЕКТБОКСОВ (ПОЛЯ) --- */
+    div[data-baseweb="select"] > div { background-color: #FFFFFF !important; border: 1px solid #D1D5DB !important; }
+    div[data-baseweb="select"] > div:hover { background-color: #F8F9FA !important; border-color: #1e69da !important; }
+    div[data-baseweb="select"] * { color: #111827 !important; }
+    div[data-baseweb="select"] svg { fill: #111827 !important; }
+    
+    /* --- ФИКС ВЫПАДАЮЩЕГО СПИСКА (В ИЗОЛИРОВАННОМ СЛОЕ) --- */
+    div[data-baseweb="popover"] > div { background-color: #FFFFFF !important; border: 1px solid #D1D5DB !important; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;}
+    ul[role="listbox"] { background-color: #FFFFFF !important; }
+    ul[role="listbox"] li { color: #111827 !important; background-color: #FFFFFF !important; }
+    ul[role="listbox"] li:hover, ul[role="listbox"] li[aria-selected="true"] { background-color: #F3F4F6 !important; color: #1e69da !important; }
     </style>"""
 else:
     theme_css = """<style>
+    /* Основной фон и боковая панель */
     [data-testid="stAppViewContainer"] { background-color: #0F1117; color: #F3F4F6; } 
-    [data-testid="stSidebar"] { background-color: #161922; } 
-    .stButton > button { background-color: #1A1C24 !important; border: 1px solid #3e4452 !important; color: #F3F4F6 !important; } 
+    [data-testid="stSidebar"] { background-color: #161922; border-right: 1px solid #2D3748; } 
+    
+    /* Тексты */
     h1, h2, h3, label, p { color: #F3F4F6 !important; } 
-    
-    .stTextInput input, .stTextArea textarea { 
-        background-color: #1F2937 !important; 
-        color: #F3F4F6 !important; 
-        border: 1px solid #374151 !important; 
-    }
-    
-    /* --- АГРЕССИВНЫЙ ФИКС СЕЛЕКТБОКСОВ (ТЕМНАЯ ТЕМА) --- */
-    div[data-baseweb="select"],
-    div[data-baseweb="select"] > div,
-    div[data-baseweb="select"] > div > div { 
-        background-color: #1F2937 !important; 
-    }
-    div[data-baseweb="select"] > div { border: 1px solid #374151 !important; }
-    div[data-baseweb="select"] > div:hover { background-color: #374151 !important; border-color: #1e69da !important; }
-    /* Принудительно делаем текст внутри селекта светлым */
-    div[data-baseweb="select"] * { color: #F3F4F6 !important; }
-
-    /* Меню выпадающего списка */
-    ul[data-baseweb="menu"] { background-color: #1F2937 !important; border: 1px solid #374151 !important; }
-    ul[data-baseweb="menu"] li { color: #F3F4F6 !important; background-color: transparent !important; }
-    ul[data-baseweb="menu"] li:hover { background-color: #374151 !important; }
-
     button[data-baseweb="tab"] p { color: #9CA3AF !important; font-weight: 600 !important; } 
     button[data-baseweb="tab"][aria-selected="true"] p { color: #1e69da !important; }
+    
+    /* Кнопки */
+    .stButton > button { background-color: #1A1C24 !important; border: 1px solid #3e4452 !important; color: #F3F4F6 !important; } 
+    
+    /* Обычные инпуты */
+    .stTextInput input, .stTextArea textarea { background-color: #1F2937 !important; color: #F3F4F6 !important; border: 1px solid #374151 !important; }
+    
+    /* --- ФИКС АККОРДЕОНОВ (st.expander) --- */
+    [data-testid="stExpander"] { border: 1px solid #374151 !important; border-radius: 8px !important; }
+    [data-testid="stExpander"] details summary { background-color: #1F2937 !important; border-radius: 8px !important; }
+    [data-testid="stExpander"] details summary p { color: #F3F4F6 !important; font-weight: 600 !important; }
+    [data-testid="stExpander"] details summary svg { fill: #F3F4F6 !important; }
+
+    /* --- ФИКС СЕЛЕКТБОКСОВ (ПОЛЯ) --- */
+    div[data-baseweb="select"] > div { background-color: #1F2937 !important; border: 1px solid #374151 !important; }
+    div[data-baseweb="select"] > div:hover { background-color: #374151 !important; border-color: #1e69da !important; }
+    div[data-baseweb="select"] * { color: #F3F4F6 !important; }
+    div[data-baseweb="select"] svg { fill: #F3F4F6 !important; }
+
+    /* --- ФИКС ВЫПАДАЮЩЕГО СПИСКА (В ИЗОЛИРОВАННОМ СЛОЕ) --- */
+    div[data-baseweb="popover"] > div { background-color: #1F2937 !important; border: 1px solid #374151 !important; }
+    ul[role="listbox"] { background-color: #1F2937 !important; }
+    ul[role="listbox"] li { color: #F3F4F6 !important; background-color: #1F2937 !important; }
+    ul[role="listbox"] li:hover, ul[role="listbox"] li[aria-selected="true"] { background-color: #374151 !important; color: #60a5fa !important; }
     </style>"""
     
 st.markdown(base_styles, unsafe_allow_html=True)
