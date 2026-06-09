@@ -323,14 +323,19 @@ else:
 
         elif mode == "stock":
             st.subheader("Вводная статья и преимущества")
-            data['TEXT_TITLE'] = st.text_input("Главный заголовок", "Склад пополнен: Профильная труба всех типоразмеров")
+            
+            # Убрали "Склад пополнен:" из дефолтного значения, чтобы не было дубля!
+            data['TEXT_TITLE'] = st.text_input("Главный заголовок (после слов 'Склад пополнен:')", "Профильная труба всех типоразмеров")
             
             text_body_raw = st.text_area("Вводный абзац", "Обновили складской запас профильного проката. В наличии все позиции...")
             data['TEXT_BODY'] = process_text_to_html(text_body_raw)
             
             st.markdown("**Ключевые пункты (Буллиты):**")
             for i in range(1, 4):
-                data[f'BULLET_{i}'] = st.text_input(f"Пункт {i}", key=f"st_blt{i}")
+                col_b1, col_b2 = st.columns([1, 2])
+                # Теперь переменные ИДЕАЛЬНО совпадают с HTML-кодом
+                data[f'BULLET_TITLE_{i}'] = col_b1.text_input(f"Заголовок {i} (жирный)", key=f"st_bt{i}")
+                data[f'BULLET_TEXT_{i}'] = col_b2.text_input(f"Текст пункта {i}", key=f"st_bd{i}")
 
         elif mode == "cases":
             st.subheader("Текст кейса (История успеха)")
