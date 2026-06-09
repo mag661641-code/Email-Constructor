@@ -147,33 +147,135 @@
         </table>
 
         <!-- ТЕКСТОВАЯ ЧАСТЬ -->
-        <table class="row-content" width="640" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto; background-color: #ffffff;">
-          <tr>
-            <td style="padding: 20px 25px;">
-              <h2 style="font-family:inherit; font-size:22px; font-weight:800; color:#282824; text-transform:uppercase;">Склад пополнен: {{TEXT_TITLE}}</h2>
-              <div style="width:50px; height:3px; background-color:#1e69da; margin:15px 0;"></div>
-              <div style="font-family:inherit; font-size:14px; line-height:1.7; color:#3d4858; text-align: left;">{{TEXT_BODY}}</div>
-              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-top:20px;">
-                <tr><td width="20" valign="top" style="padding-top:5px;"><div style="width:8px; height:8px; background-color:#1e69da;"></div></td><td style="padding:0 0 15px 12px; font-family:inherit; font-size:14px; color:#3d4858; text-align: left;">{{BULLET_1}}</td></tr>
-                <tr><td width="20" valign="top" style="padding-top:5px;"><div style="width:8px; height:8px; background-color:#1e69da;"></div></td><td style="padding:0 0 15px 12px; font-family:inherit; font-size:14px; color:#3d4858; text-align: left;">{{BULLET_2}}</td></tr>
-                <tr><td width="20" valign="top" style="padding-top:5px;"><div style="width:8px; height:8px; background-color:#1e69da;"></div></td><td style="padding:0 0 15px 12px; font-family:inherit; font-size:14px; color:#3d4858; text-align: left;">{{BULLET_3}}</td></tr>
-              </table>
-              <div style="border:1px solid #d0dff5; border-radius:8px; padding:20px; font-family:inherit; text-align: left; margin-top:10px;">
-                <div style="font-size:11px; font-weight:bold; color:#282824; text-transform:uppercase; margin-bottom:15px;">Стандарты производства</div>
-                <div>{{GOST_BLOCK}}</div>
-                <div style="height:1px; background-color:#d0dff5; margin:20px 0;"></div>
-                <div style="font-size:11px; font-weight:bold; color:#282824; text-transform:uppercase; margin-bottom:15px;">Ходовые размеры</div>
-                <div>{{SIZE_BLOCK}}</div>
-              </div>
-            </td>
-          </tr>
-          <!-- Кнопка "Смотреть весь сортамент" -->
-          <tr>
-            <td align="center" style="padding: 20px 25px 40px;">
-              <a href="{{LINK_CATALOG}}" style="background-color: #1e69da; color: #ffffff; font-family: Arial, sans-serif; font-size: 16px; font-weight: normal; text-decoration: none; padding: 12px 40px; border-radius: 6px; display: inline-block; letter-spacing: 1px; line-height: 2;">Смотреть весь сортамент</a>
-            </td>
-          </tr>
-        </table>
+<table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;">
+  <tbody><tr><td>
+    <table class="row-content" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;background-color:#ffffff;width:640px;margin:0 auto;" width="640">
+      <tbody><tr>
+        <td style="padding:20px 25px 10px;">
+ 
+          <!-- Заголовок блока -->
+          <h2 style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;color:#282824;text-transform:uppercase;margin:0 0 10px;">Склад пополнен: {{TEXT_TITLE}}</h2>
+          <!-- Разделитель -->
+          <div style="width:50px;height:3px;background-color:#1e69da;margin:0 0 15px;"></div>
+ 
+          <!-- Описание (TEXT_BODY) -->
+          <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#3d4858;margin-bottom:20px;">{{TEXT_BODY}}</div>
+ 
+          <!-- Буллит 1 -->
+          <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:10px;">
+            <tbody><tr>
+              <td width="12" valign="top" style="padding-top:4px;">
+                <div style="width:8px;height:8px;background-color:#1e69da;"></div>
+              </td>
+              <td style="padding-left:15px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;color:#3d4858;padding-bottom:10px;">
+                <strong style="color:#282824;">{{BULLET_TITLE_1}}</strong> {{BULLET_TEXT_1}}
+              </td>
+            </tr></tbody>
+          </table>
+ 
+          <!-- Буллит 2 -->
+          <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:10px;">
+            <tbody><tr>
+              <td width="12" valign="top" style="padding-top:4px;">
+                <div style="width:8px;height:8px;background-color:#1e69da;"></div>
+              </td>
+              <td style="padding-left:15px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;color:#3d4858;padding-bottom:10px;">
+                <strong style="color:#282824;">{{BULLET_TITLE_2}}</strong> {{BULLET_TEXT_2}}
+              </td>
+            </tr></tbody>
+          </table>
+ 
+          <!-- Буллит 3 -->
+          <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:0;">
+            <tbody><tr>
+              <td width="12" valign="top" style="padding-top:4px;">
+                <div style="width:8px;height:8px;background-color:#1e69da;"></div>
+              </td>
+              <td style="padding-left:15px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;color:#3d4858;">
+                <strong style="color:#282824;">{{BULLET_TITLE_3}}</strong> {{BULLET_TEXT_3}}
+              </td>
+            </tr></tbody>
+          </table>
+ 
+        </td>
+      </tr></tbody>
+    </table>
+  </td></tr></tbody>
+</table>
+ 
+<!-- ============================================================ -->
+<!-- ROW 7: СТАНДАРТЫ — ГОСТ и ходовые размеры                   -->
+<!--                                                              -->
+<!-- ПЕРЕМЕННЫЕ:                                                   -->
+<!--   {{GOST_BLOCK}} — HTML со span-тегами для значков ГОСТ      -->
+<!--   {{SIZE_BLOCK}} — HTML со span-тегами для значков размеров  -->
+<!--                                                              -->
+<!-- ПРИМЕР значения {{GOST_BLOCK}}:                              -->
+<!--   <span style="display:inline-block;background:#F6F7FC;      -->
+<!--   border:1px solid #d0dff5;color:#3D4858;font-size:11px;     -->
+<!--   padding:3px 8px;border-radius:4px;margin:0 4px 6px 0;      -->
+<!--   white-space:nowrap;font-family:'Helvetica Neue',Helvetica, -->
+<!--   Arial,sans-serif;">ГОСТ 8639-82</span>                     -->
+<!--   ... (повторить для каждого стандарта)                      -->
+<!--                                                              -->
+<!-- ПРИМЕР значения {{SIZE_BLOCK}}:                              -->
+<!--   <span style="display:inline-block;background:#F6F7FC;      -->
+<!--   border:1px solid #d0dff5;color:#3D4858;font-size:12px;     -->
+<!--   padding:4px 10px;border-radius:4px;margin:0 4px 8px 0;     -->
+<!--   font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;"> -->
+<!--   15×15</span> ...                                           -->
+<!-- ============================================================ -->
+<table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;">
+  <tbody><tr><td>
+    <table class="row-content" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;background-color:#ffffff;width:640px;margin:0 auto;" width="640">
+      <tbody><tr>
+        <td style="padding:15px 15px 10px;">
+          <div style="border:1px solid #d0dff5;border-radius:8px;padding:20px;">
+ 
+            <!-- Заголовок ГОСТ -->
+            <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:700;color:#282824;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:15px;">Стандарты производства (ГОСТ / ТУ)</div>
+            <!-- Значки ГОСТ -->
+            <div style="text-align:left;margin-bottom:20px;line-height:1.8;">{{GOST_BLOCK}}</div>
+ 
+            <!-- Разделитель -->
+            <div style="height:1px;background-color:#d0dff5;margin-bottom:20px;"></div>
+ 
+            <!-- Заголовок размеров -->
+            <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:700;color:#282824;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:15px;">Ходовые размеры в наличии (мм)</div>
+            <!-- Значки размеров -->
+            <div style="text-align:left;line-height:1.8;">{{SIZE_BLOCK}}</div>
+ 
+          </div>
+        </td>
+      </tr></tbody>
+    </table>
+  </td></tr></tbody>
+</table>
+ 
+<!-- ============================================================ -->
+<!-- ROW 8: КНОПКА «Смотреть весь сортамент»                      -->
+<!-- ПЕРЕМЕННЫЕ: {{LINK_CATALOG}}                                  -->
+<!-- ============================================================ -->
+<table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;">
+  <tbody><tr><td>
+    <table class="row-content" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;background-color:#ffffff;width:640px;margin:0 auto;" width="640">
+      <tbody><tr>
+        <td align="center" style="padding:15px 25px 35px;">
+          <a href="{{LINK_CATALOG}}" style="display:inline-block;background-color:#1e69da;color:#ffffff;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;text-decoration:none;padding:12px 40px;border-radius:6px;letter-spacing:1px;line-height:2;">Смотреть весь сортамент</a>
+        </td>
+      </tr></tbody>
+    </table>
+  </td></tr></tbody>
+</table>
+ 
+<!-- отступ -->
+<table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;">
+  <tbody><tr><td>
+    <table class="row-content" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;background-color:#ffffff;width:640px;margin:0 auto;" width="640">
+      <tbody><tr><td style="height:5px;line-height:5px;font-size:1px;">&nbsp;</td></tr></tbody>
+    </table>
+  </td></tr></tbody>
+</table>
 
         <!-- ТОВАРЫ -->
         <table class="row-content" width="640" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto; background-color: #ffffff;">
