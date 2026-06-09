@@ -105,10 +105,53 @@ base_styles = """
 """
 
 if st.session_state.theme == "light":
-    theme_css = """<style>[data-testid="stAppViewContainer"] { background-color: #F8F9FA; color: #111827; } [data-testid="stSidebar"] { background-color: #FFFFFF; border-right: 1px solid #E5E7EB; } .stButton > button { background-color: #FFFFFF !important; border: 1px solid #D1D5DB !important; color: #111827 !important; } .stButton > button:hover { color: #1e69da !important; } h1, h2, h3, label, p, .stMarkdown { color: #111827 !important; } .stTextInput input, .stTextArea textarea { background-color: #FFFFFF !important; color: #111827 !important; border: 1px solid #D1D5DB !important; } button[data-baseweb="tab"] p { color: #6B7280 !important; font-weight: 600 !important; } button[data-baseweb="tab"][aria-selected="true"] p { color: #1e69da !important; }</style>"""
-else:
-    theme_css = """<style>[data-testid="stAppViewContainer"] { background-color: #0F1117; color: #F3F4F6; } [data-testid="stSidebar"] { background-color: #161922; } .stButton > button { background-color: #1A1C24 !important; border: 1px solid #3e4452 !important; color: #F3F4F6 !important; } h1, h2, h3, label, p { color: #F3F4F6 !important; } .stTextInput input, .stTextArea textarea { background-color: #1F2937 !important; color: #F3F4F6 !important; border: 1px solid #374151 !important; } button[data-baseweb="tab"] p { color: #9CA3AF !important; font-weight: 600 !important; } button[data-baseweb="tab"][aria-selected="true"] p { color: #1e69da !important; }</style>"""
+    theme_css = """<style>
+    [data-testid="stAppViewContainer"] { background-color: #F8F9FA; color: #111827; } 
+    [data-testid="stSidebar"] { background-color: #FFFFFF; border-right: 1px solid #E5E7EB; } 
+    .stButton > button { background-color: #FFFFFF !important; border: 1px solid #D1D5DB !important; color: #111827 !important; } 
+    .stButton > button:hover { color: #1e69da !important; background-color: #F3F4F6 !important; } 
+    h1, h2, h3, label, p, .stMarkdown { color: #111827 !important; } 
+    
+    /* --- ИСПРАВЛЕНИЕ ДЛЯ ПОЛЕЙ И ВЫПАДАЮЩИХ СПИСКОВ (SELECTBOX) --- */
+    .stTextInput input, .stTextArea textarea, div[data-baseweb="select"] > div { 
+        background-color: #FFFFFF !important; 
+        color: #111827 !important; 
+        border: 1px solid #D1D5DB !important; 
+    }
+    /* Убираем черный фон у selectbox при наведении/убирании курсора */
+    div[data-baseweb="select"] > div:hover { background-color: #F8F9FA !important; border-color: #1e69da !important; }
+    
+    /* Фиксим выпадающее меню списка */
+    ul[data-baseweb="menu"] { background-color: #FFFFFF !important; }
+    ul[data-baseweb="menu"] li { color: #111827 !important; }
+    ul[data-baseweb="menu"] li:hover { background-color: #F3F4F6 !important; }
 
+    button[data-baseweb="tab"] p { color: #6B7280 !important; font-weight: 600 !important; } 
+    button[data-baseweb="tab"][aria-selected="true"] p { color: #1e69da !important; }
+    </style>"""
+else:
+    theme_css = """<style>
+    [data-testid="stAppViewContainer"] { background-color: #0F1117; color: #F3F4F6; } 
+    [data-testid="stSidebar"] { background-color: #161922; } 
+    .stButton > button { background-color: #1A1C24 !important; border: 1px solid #3e4452 !important; color: #F3F4F6 !important; } 
+    h1, h2, h3, label, p { color: #F3F4F6 !important; } 
+    
+    /* --- ИСПРАВЛЕНИЕ ДЛЯ ПОЛЕЙ И ВЫПАДАЮЩИХ СПИСКОВ (SELECTBOX) --- */
+    .stTextInput input, .stTextArea textarea, div[data-baseweb="select"] > div { 
+        background-color: #1F2937 !important; 
+        color: #F3F4F6 !important; 
+        border: 1px solid #374151 !important; 
+    }
+    div[data-baseweb="select"] > div:hover { background-color: #374151 !important; }
+
+    ul[data-baseweb="menu"] { background-color: #1F2937 !important; }
+    ul[data-baseweb="menu"] li { color: #F3F4F6 !important; }
+    ul[data-baseweb="menu"] li:hover { background-color: #374151 !important; }
+
+    button[data-baseweb="tab"] p { color: #9CA3AF !important; font-weight: 600 !important; } 
+    button[data-baseweb="tab"][aria-selected="true"] p { color: #1e69da !important; }
+    </style>"""
+    
 st.markdown(base_styles, unsafe_allow_html=True)
 st.markdown(theme_css, unsafe_allow_html=True)
 
@@ -378,7 +421,7 @@ else:
                     st.markdown("---")
 
         elif mode == "stock":
-            st.subheader("📦 Настройка контента Поступления")
+            st.subheader("Настройка контента Поступления")
  
             with st.expander("1. Описание и Буллиты"):
                 data['TEXT_TITLE'] = st.text_input("Заголовок текста", "Труба всех типоразмеров")
@@ -392,7 +435,7 @@ else:
             with st.expander("2. Технический блок (ГОСТы и Размеры)"):
  
                 # ========== БЛОК ГОСТОВ ==========
-                st.markdown("##### 📋 Стандарты производства (ГОСТ / ТУ)")
+                st.markdown("##### Стандарты производства (ГОСТ / ТУ)")
  
                 gost_preset = st.selectbox(
                     "Быстрый выбор по типу металла",
@@ -406,7 +449,7 @@ else:
                         st.rerun()
  
                 if st.session_state.gost_tags:
-                    st.markdown("**Текущие стандарты** (нажми ✕ чтобы удалить):")
+                    st.markdown("**Текущие стандарты** (кликните на ячейку, чтобы удалить):")
                     cols_g = st.columns(4)
                     tags_to_remove_g = []
                     for idx, tag in enumerate(st.session_state.gost_tags):
@@ -431,7 +474,7 @@ else:
                 st.markdown("---")
  
                 # ========== БЛОК РАЗМЕРОВ ==========
-                st.markdown("##### 📐 Ходовые размеры в наличии (мм)")
+                st.markdown("##### Ходовые размеры в наличии (мм)")
  
                 size_preset = st.selectbox(
                     "Быстрый выбор размеров по типу",
@@ -445,7 +488,7 @@ else:
                         st.rerun()
  
                 if st.session_state.size_tags:
-                    st.markdown("**Текущие размеры** (нажми ✕ чтобы удалить):")
+                    st.markdown("**Текущие размеры** (кликните на ячейку, чтобы удалить):")
                     cols_s = st.columns(5)
                     tags_to_remove_s = []
                     for idx, tag in enumerate(st.session_state.size_tags):
@@ -500,7 +543,7 @@ else:
                     data[f'CASE_IMG_{i}'] = st.text_input("URL картинки кейса", key=f"st_ci{i}")
 
         elif mode == "promo":
-            st.subheader("📦 Товарные и структурные блоки")
+            st.subheader("Товарные и структурные блоки")
             
             # --- 1. ПЕРСОНАЛЬНЫЕ ЦЕНЫ (Сетка 2х2) ---
             with st.expander("1. Ваши персональные цены (Сетка 2x2)", expanded=True):
