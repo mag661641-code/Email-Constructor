@@ -322,10 +322,15 @@ else:
             data['TEXT_BTN_LINK'] = st.text_input("Ссылка для кнопки 'Связаться с нами'", "https://stalmetural.ru/contacts/")
 
         elif mode == "stock":
-            st.subheader("Текст для статьи 'Поступление'")
-            data['STOCK_MAIN_TITLE'] = st.text_input("Заголовок статьи", "Склад пополнен: Профильная труба всех типоразмеров")
-            stock_intro_raw = st.text_area("Вводный абзац", "Обновили складской запас профильного проката. В наличии все позиции...")
-            data['STOCK_INTRO'] = process_text_to_html(stock_intro_raw)
+            st.subheader("📝 Вводная статья и преимущества")
+            data['TEXT_TITLE'] = st.text_input("Главный заголовок", "Склад пополнен: Профильная труба всех типоразмеров")
+            
+            text_body_raw = st.text_area("Вводный абзац", "Обновили складской запас профильного проката. В наличии все позиции...")
+            data['TEXT_BODY'] = process_text_to_html(text_body_raw)
+            
+            st.markdown("**Ключевые пункты (Буллиты):**")
+            for i in range(1, 4):
+                data[f'BULLET_{i}'] = st.text_input(f"Пункт {i}", key=f"st_blt{i}")
 
         elif mode == "cases":
             st.subheader("Текст кейса (История успеха)")
@@ -445,13 +450,7 @@ else:
                     st.markdown("---")
 
         elif mode == "stock":
-            st.subheader("Настройка контента Поступления")
- 
-            with st.expander("1. Описание и Буллиты"):
-                data['TEXT_TITLE'] = st.text_input("Заголовок текста", "Труба всех типоразмеров")
-                data['TEXT_BODY'] = st.text_area("Вводный текст", "Обновили складской запас...")
-                for i in range(1, 4):
-                    data[f'BULLET_{i}'] = st.text_input(f"Пункт списка {i}", key=f"st_blt{i}")
+            st.subheader("Настройка технических блоков и товаров") 
 
            # ===================================================
             # БЛОК 2: ГОСТЫ И РАЗМЕРЫ
