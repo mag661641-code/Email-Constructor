@@ -119,8 +119,12 @@ if st.session_state.theme == "light":
     .stButton > button { background-color: #FFFFFF !important; border: 1px solid #D1D5DB !important; color: #111827 !important; } 
     .stButton > button:hover { color: #1e69da !important; background-color: #F3F4F6 !important; } 
     
-    /* Обычные инпуты */
-    .stTextInput input, .stTextArea textarea { background-color: #FFFFFF !important; color: #111827 !important; border: 1px solid #D1D5DB !important; }
+    /* Обычные инпуты (ДОБАВЛЕН CARET-COLOR ДЛЯ КУРССОРА) */
+    .stTextInput input, .stTextArea textarea { 
+        background-color: #FFFFFF !important; 
+        color: #111827 !important; 
+        caret-color: #111827 !important; 
+        border: 1px solid #D1D5DB !important; 
     
     /* --- ФИКС АККОРДЕОНОВ (st.expander) --- */
     [data-testid="stExpander"] { border: 1px solid #D1D5DB !important; border-radius: 8px !important; }
@@ -154,8 +158,13 @@ else:
     /* Кнопки */
     .stButton > button { background-color: #1A1C24 !important; border: 1px solid #3e4452 !important; color: #F3F4F6 !important; } 
     
-    /* Обычные инпуты */
-    .stTextInput input, .stTextArea textarea { background-color: #1F2937 !important; color: #F3F4F6 !important; border: 1px solid #374151 !important; }
+    /* Обычные инпуты (ДОБАВЛЕН CARET-COLOR ДЛЯ КУРССОРА) */
+    .stTextInput input, .stTextArea textarea { 
+        background-color: #1F2937 !important; 
+        color: #F3F4F6 !important; 
+        caret-color: #F3F4F6 !important; 
+        border: 1px solid #374151 !important; 
+    }
     
     /* --- ФИКС АККОРДЕОНОВ (st.expander) --- */
     [data-testid="stExpander"] { border: 1px solid #374151 !important; border-radius: 8px !important; }
