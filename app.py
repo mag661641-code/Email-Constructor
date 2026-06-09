@@ -342,9 +342,154 @@ else:
                 for i in range(1, 4):
                     data[f'BULLET_{i}'] = st.text_input(f"Пункт списка {i}", key=f"st_blt{i}")
 
-            with st.expander("2. Технический блок (ГОСТы и Размеры)"):
-                data['GOST_BLOCK'] = st.text_area("ГОСТы (через пробел)", "ГОСТ 8639-82", key="st_gst")
-                data['SIZE_BLOCK'] = st.text_area("Размеры (через пробел)", "20х20 40x40", key="st_sz")
+with st.expander("2. Технический блок (ГОСТы и Размеры)"):
+
+    # ---- ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ----
+    # Преобразует список строк в HTML-значки для письма
+    def make_badges(items, font_size="11px", padding="3px 8px"):
+        span_style = (
+            f"display:inline-block;"
+            f"background:#F6F7FC;"
+            f"border:1px solid #d0dff5;"
+            f"color:#3D4858;"
+            f"font-size:{font_size};"
+            f"font-weight:400;"
+            f"padding:{padding};"
+            f"border-radius:4px;"
+            f"margin:0 4px 6px 0;"
+            f"white-space:nowrap;"
+            f"font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;"
+        )
+        return "".join(f'<span style="{span_style}">{item.strip()}</span>' for item in items if item.strip())
+
+    # ---- ПРЕДНАСТРОЕННЫЕ НАБОРЫ ГОСТОВ ----
+    GOST_PRESETS = {
+        "Труба профильная": ["ГОСТ 8639-82", "ГОСТ 8645-82", "ГОСТ 30245-2003", "ГОСТ 13663-86", "ГОСТ 25577-83", "EN 10219", "СТО 00186217"],
+        "Труба круглая": ["ГОСТ 8734-75", "ГОСТ 8732-78", "ГОСТ 10704-91", "ГОСТ 10705-80", "ГОСТ 3262-75"],
+        "Лист стальной": ["ГОСТ 19903-90", "ГОСТ 14637-89", "ГОСТ 16523-97", "ГОСТ 1577-93"],
+        "Уголок": ["ГОСТ 8509-93", "ГОСТ 8510-86", "ТУ 14-2-686"],
+        "Двутавр": ["ГОСТ 8239-89", "ГОСТ 26020-83", "СТО АСЧМ 20-93"],
+        "Швеллер": ["ГОСТ 8240-97", "ГОСТ 6526-68"],
+        "Арматура": ["ГОСТ 5781-82", "ГОСТ 10884-94", "ГОСТ Р 52544-2006"],
+        "Своя настройка": []
+    }
+
+    # ---- ПРЕДНАСТРОЕННЫЕ НАБОРЫ РАЗМЕРОВ ----
+    SIZE_PRESETS = {
+        "Труба профильная": ["15×15", "20×20", "40×40", "60×40", "60×60", "80×80", "100×100", "120×120", "140×140", "150×150", "160×160", "180×180", "200×200", "300×300", "и другие"],
+        "Труба круглая": ["Ø 15", "Ø 20", "Ø 25", "Ø 32", "Ø 40", "Ø 50", "Ø 57", "Ø 76", "Ø 89", "Ø 108", "Ø 159", "Ø 219", "и другие"],
+        "Лист стальной": ["1×1000", "1,5×1250", "2×1500", "3×1500", "4×1500", "5×1500", "6×1500", "8×1500", "10×1500", "12×1500", "16×1500", "20×1500", "и другие"],
+        "Уголок": ["25×25", "32×32", "40×40", "45×45", "50×50", "63×63", "70×70", "75×75", "80×80", "100×100", "125×125", "150×150", "и другие"],
+        "Двутавр": ["10", "12", "14", "16", "18", "20", "24", "27", "30", "36", "40", "45", "50", "55", "60", "и другие"],
+        "Швеллер": ["5П", "6,5П", "8П", "10П", "12П", "14П", "16П", "18П", "20П", "22П", "24П", "27П", "30П", "и другие"],
+        "Арматура": ["6", "8", "10", "12", "14", "16", "18", "20", "22", "25", "28", "32", "36", "40", "и другие"],
+        "Своя настройка": []
+    }
+
+    # ========== БЛОК ГОСТОВ ==========
+    st.markdown("##### 📋 Стандарты производства (ГОСТ / ТУ)")
+
+    gost_preset = st.selectbox(
+        "Быстрый выбор по типу металла",
+        options=list(GOST_PRESETS.keys()),
+        key="gost_preset_select"
+    )
+
+    # Инициализация session_state для тегов ГОСТ
+    if "gost_tags" not in st.session_state:
+        st.session_state.gost_tags = GOST_PRESETS[gost_preset].copy()
+
+    # При смене пресета — обновляем теги
+    if gost_preset != "Своя настройка":
+        if st.button("↺ Загрузить стандарты для выбранного типа", key="load_gost"):
+            st.session_state.gost_tags = GOST_PRESETS[gost_preset].copy()
+            st.rerun()
+
+    # Показываем текущие теги с кнопками удаления
+    if st.session_state.gost_tags:
+        st.markdown("**Текущие стандарты** (нажми ✕ чтобы удалить):")
+        cols_g = st.columns(4)
+        tags_to_remove_g = []
+        for idx, tag in enumerate(st.session_state.gost_tags):
+            with cols_g[idx % 4]:
+                if st.button(f"{tag} ✕", key=f"del_gost_{idx}", use_container_width=True):
+                    tags_to_remove_g.append(tag)
+        for t in tags_to_remove_g:
+            st.session_state.gost_tags.remove(t)
+            st.rerun()
+    else:
+        st.info("Список стандартов пуст. Добавьте вручную ниже.")
+
+    # Поле для добавления нового ГОСТ вручную
+    col_g1, col_g2 = st.columns([3, 1])
+    new_gost = col_g1.text_input("Добавить стандарт вручную", placeholder="Например: ГОСТ 8639-82 или EN 10219", key="new_gost_input")
+    if col_g2.button("＋ Добавить", key="add_gost_btn", use_container_width=True):
+        if new_gost.strip() and new_gost.strip() not in st.session_state.gost_tags:
+            st.session_state.gost_tags.append(new_gost.strip())
+            st.rerun()
+
+    # Генерируем HTML для шаблона
+    data['GOST_BLOCK'] = make_badges(st.session_state.gost_tags, font_size="11px", padding="3px 8px")
+
+    st.markdown("---")
+
+    # ========== БЛОК РАЗМЕРОВ ==========
+    st.markdown("##### 📐 Ходовые размеры в наличии (мм)")
+
+    size_preset = st.selectbox(
+        "Быстрый выбор размеров по типу",
+        options=list(SIZE_PRESETS.keys()),
+        key="size_preset_select"
+    )
+
+    # Инициализация session_state для тегов размеров
+    if "size_tags" not in st.session_state:
+        st.session_state.size_tags = SIZE_PRESETS[size_preset].copy()
+
+    if size_preset != "Своя настройка":
+        if st.button("↺ Загрузить размеры для выбранного типа", key="load_size"):
+            st.session_state.size_tags = SIZE_PRESETS[size_preset].copy()
+            st.rerun()
+
+    # Показываем текущие теги размеров с кнопками удаления
+    if st.session_state.size_tags:
+        st.markdown("**Текущие размеры** (нажми ✕ чтобы удалить):")
+        cols_s = st.columns(5)
+        tags_to_remove_s = []
+        for idx, tag in enumerate(st.session_state.size_tags):
+            with cols_s[idx % 5]:
+                if st.button(f"{tag} ✕", key=f"del_size_{idx}", use_container_width=True):
+                    tags_to_remove_s.append(tag)
+        for t in tags_to_remove_s:
+            st.session_state.size_tags.remove(t)
+            st.rerun()
+    else:
+        st.info("Список размеров пуст. Добавьте вручную ниже.")
+
+    # Поле для добавления нового размера вручную
+    col_s1, col_s2 = st.columns([3, 1])
+    new_size = col_s1.text_input("Добавить размер вручную", placeholder="Например: 80×80 или Ø 57", key="new_size_input")
+    if col_s2.button("＋ Добавить", key="add_size_btn", use_container_width=True):
+        if new_size.strip() and new_size.strip() not in st.session_state.size_tags:
+            st.session_state.size_tags.append(new_size.strip())
+            st.rerun()
+
+    # Генерируем HTML для шаблона
+    data['SIZE_BLOCK'] = make_badges(st.session_state.size_tags, font_size="12px", padding="4px 10px")
+
+    # Предпросмотр прямо в Streamlit
+    st.markdown("---")
+    st.markdown("**Предпросмотр блока в письме:**")
+    preview_html = f"""
+    <div style="border:1px solid #d0dff5;border-radius:8px;padding:20px;background:#fff;font-family:Arial,sans-serif;">
+        <div style="font-size:11px;font-weight:700;color:#282824;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Стандарты производства (ГОСТ / ТУ)</div>
+        <div style="line-height:2;margin-bottom:20px;">{data['GOST_BLOCK']}</div>
+        <div style="height:1px;background:#d0dff5;margin-bottom:20px;"></div>
+        <div style="font-size:11px;font-weight:700;color:#282824;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Ходовые размеры в наличии (мм)</div>
+        <div style="line-height:2;">{data['SIZE_BLOCK']}</div>
+    </div>
+    """
+    st.components.v1.html(preview_html, height=280)
 
             with st.expander("3. Также в наличии (3 товара)"):
                 for i in range(1, 4):
