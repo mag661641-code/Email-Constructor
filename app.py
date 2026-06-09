@@ -112,18 +112,26 @@ if st.session_state.theme == "light":
     .stButton > button:hover { color: #1e69da !important; background-color: #F3F4F6 !important; } 
     h1, h2, h3, label, p, .stMarkdown { color: #111827 !important; } 
     
-    /* --- ИСПРАВЛЕНИЕ ДЛЯ ПОЛЕЙ И ВЫПАДАЮЩИХ СПИСКОВ (SELECTBOX) --- */
-    .stTextInput input, .stTextArea textarea, div[data-baseweb="select"] > div { 
+    .stTextInput input, .stTextArea textarea { 
         background-color: #FFFFFF !important; 
         color: #111827 !important; 
         border: 1px solid #D1D5DB !important; 
     }
-    /* Убираем черный фон у selectbox при наведении/убирании курсора */
-    div[data-baseweb="select"] > div:hover { background-color: #F8F9FA !important; border-color: #1e69da !important; }
     
-    /* Фиксим выпадающее меню списка */
-    ul[data-baseweb="menu"] { background-color: #FFFFFF !important; }
-    ul[data-baseweb="menu"] li { color: #111827 !important; }
+    /* --- АГРЕССИВНЫЙ ФИКС СЕЛЕКТБОКСОВ (СВЕТЛАЯ ТЕМА) --- */
+    div[data-baseweb="select"],
+    div[data-baseweb="select"] > div,
+    div[data-baseweb="select"] > div > div { 
+        background-color: #FFFFFF !important; 
+    }
+    div[data-baseweb="select"] > div { border: 1px solid #D1D5DB !important; }
+    div[data-baseweb="select"] > div:hover { background-color: #F8F9FA !important; border-color: #1e69da !important; }
+    /* Принудительно делаем текст внутри селекта темным */
+    div[data-baseweb="select"] * { color: #111827 !important; }
+    
+    /* Меню выпадающего списка */
+    ul[data-baseweb="menu"] { background-color: #FFFFFF !important; border: 1px solid #D1D5DB !important; }
+    ul[data-baseweb="menu"] li { color: #111827 !important; background-color: transparent !important; }
     ul[data-baseweb="menu"] li:hover { background-color: #F3F4F6 !important; }
 
     button[data-baseweb="tab"] p { color: #6B7280 !important; font-weight: 600 !important; } 
@@ -136,16 +144,26 @@ else:
     .stButton > button { background-color: #1A1C24 !important; border: 1px solid #3e4452 !important; color: #F3F4F6 !important; } 
     h1, h2, h3, label, p { color: #F3F4F6 !important; } 
     
-    /* --- ИСПРАВЛЕНИЕ ДЛЯ ПОЛЕЙ И ВЫПАДАЮЩИХ СПИСКОВ (SELECTBOX) --- */
-    .stTextInput input, .stTextArea textarea, div[data-baseweb="select"] > div { 
+    .stTextInput input, .stTextArea textarea { 
         background-color: #1F2937 !important; 
         color: #F3F4F6 !important; 
         border: 1px solid #374151 !important; 
     }
-    div[data-baseweb="select"] > div:hover { background-color: #374151 !important; }
+    
+    /* --- АГРЕССИВНЫЙ ФИКС СЕЛЕКТБОКСОВ (ТЕМНАЯ ТЕМА) --- */
+    div[data-baseweb="select"],
+    div[data-baseweb="select"] > div,
+    div[data-baseweb="select"] > div > div { 
+        background-color: #1F2937 !important; 
+    }
+    div[data-baseweb="select"] > div { border: 1px solid #374151 !important; }
+    div[data-baseweb="select"] > div:hover { background-color: #374151 !important; border-color: #1e69da !important; }
+    /* Принудительно делаем текст внутри селекта светлым */
+    div[data-baseweb="select"] * { color: #F3F4F6 !important; }
 
-    ul[data-baseweb="menu"] { background-color: #1F2937 !important; }
-    ul[data-baseweb="menu"] li { color: #F3F4F6 !important; }
+    /* Меню выпадающего списка */
+    ul[data-baseweb="menu"] { background-color: #1F2937 !important; border: 1px solid #374151 !important; }
+    ul[data-baseweb="menu"] li { color: #F3F4F6 !important; background-color: transparent !important; }
     ul[data-baseweb="menu"] li:hover { background-color: #374151 !important; }
 
     button[data-baseweb="tab"] p { color: #9CA3AF !important; font-weight: 600 !important; } 
@@ -449,7 +467,7 @@ else:
                         st.rerun()
  
                 if st.session_state.gost_tags:
-                    st.markdown("**Текущие стандарты** (кликните на ячейку, чтобы удалить):")
+                    st.markdown("**Текущие стандарты** (кликните на ячейку с ✕ , чтобы удалить):")
                     cols_g = st.columns(4)
                     tags_to_remove_g = []
                     for idx, tag in enumerate(st.session_state.gost_tags):
@@ -488,7 +506,7 @@ else:
                         st.rerun()
  
                 if st.session_state.size_tags:
-                    st.markdown("**Текущие размеры** (кликните на ячейку, чтобы удалить):")
+                    st.markdown("**Текущие размеры** (кликните на ячейку с ✕ , чтобы удалить):")
                     cols_s = st.columns(5)
                     tags_to_remove_s = []
                     for idx, tag in enumerate(st.session_state.size_tags):
