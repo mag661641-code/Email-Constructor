@@ -336,6 +336,7 @@ else:
 
         elif mode == "stock":
             st.subheader("📦 Настройка контента Поступления")
+ 
             with st.expander("1. Описание и Буллиты"):
                 data['TEXT_TITLE'] = st.text_input("Заголовок текста", "Труба всех типоразмеров")
                 data['TEXT_BODY'] = st.text_area("Вводный текст", "Обновили складской запас...")
