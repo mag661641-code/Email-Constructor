@@ -311,7 +311,7 @@ else:
             data['PS_BLOCK'] = f'P.S. Также в наличии <a href="{data["LINK_CATALOG"]}">{n1}</a>, <a href="{data["LINK_CATALOG"]}">{n2}</a> и <a href="{data["LINK_CATALOG"]}">{n3}</a>. Напишите нам.'
        
         elif mode == "expert":
-            st.subheader("📝 Основная статья блога")
+            st.subheader("Основная статья блога")
             data['TEXT_TITLE'] = st.text_input("Заголовок статьи", "Выбираем трубу без переплат")
             text_body_raw = st.text_area(
                 "Текст статьи (используйте ** для жирного и - для списков)", 
@@ -322,7 +322,7 @@ else:
             data['TEXT_BTN_LINK'] = st.text_input("Ссылка для кнопки 'Связаться с нами'", "https://stalmetural.ru/contacts/")
 
         elif mode == "stock":
-            st.subheader("📝 Вводная статья и преимущества")
+            st.subheader("Вводная статья и преимущества")
             data['TEXT_TITLE'] = st.text_input("Главный заголовок", "Склад пополнен: Профильная труба всех типоразмеров")
             
             text_body_raw = st.text_area("Вводный абзац", "Обновили складской запас профильного проката. В наличии все позиции...")
@@ -348,7 +348,7 @@ else:
             data['CASE_RESULT'] = st.text_input("Результат (выводится в рамке снизу)", "Ваш объект не будет простаивать из-за брака.")
 
         elif mode == "services":
-            st.subheader("📝 Основной текстовый блок")
+            st.subheader("Основной текстовый блок")
             data['TEXT_TITLE'] = st.text_input("Заголовок раздела", "Больше, чем просто продажа металла")
 
             text_body_raw = st.text_area(
@@ -455,7 +455,7 @@ else:
            # ===================================================
             # БЛОК 2: ГОСТЫ И РАЗМЕРЫ
             # ===================================================
-            with st.expander("2. Технический блок (ГОСТы и Размеры)"):
+            with st.expander("1. Технический блок (ГОСТы и Размеры)"):
  
                 # ========== БЛОК ГОСТОВ ==========
                 st.markdown("##### Стандарты производства (ГОСТ / ТУ)")
@@ -547,7 +547,7 @@ else:
                 """
                 components.html(preview_html, height=280)
 
-            with st.expander("3. Также в наличии (3 товара)"):
+            with st.expander("2. Также в наличии (3 товара)"):
                 for i in range(1, 4):
                     st.markdown(f"**Товар №{i}**")
                     data[f'T_{i}'] = st.text_input("Название", key=f"st_t{i}")
@@ -557,7 +557,7 @@ else:
                     data[f'I_{i}'] = st.text_input("URL картинки", key=f"st_i{i}")
                     data[f'L_{i}'] = st.text_input("Ссылка", data['LINK_CATALOG'], key=f"st_l{i}")
 
-            with st.expander("4. Наши отгрузки (2 кейса)"):
+            with st.expander("3. Наши отгрузки (2 кейса)"):
                 for i in range(1, 3):
                     st.markdown(f"**Кейс №{i}**")
                     data[f'CASE_TITLE_{i}'] = st.text_input("Заголовок кейса", key=f"st_ct{i}")
