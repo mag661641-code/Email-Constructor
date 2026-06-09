@@ -75,6 +75,8 @@ st.set_page_config(layout="wide", page_title="Стальметурал | Кон�
 if 'mode' not in st.session_state: st.session_state.mode = None
 if 'cute_img' not in st.session_state: st.session_state.cute_img = None
 if 'theme' not in st.session_state: st.session_state.theme = "dark"
+if 'gost_tags' not in st.session_state: st.session_state.gost_tags = []
+if 'size_tags' not in st.session_state: st.session_state.size_tags = []
 
 # ==========================================
 # 2. УМНЫЙ CSS
