@@ -137,9 +137,9 @@ def init_db():
 
         # Заполняем пользователей
         users = [
-            ("stalmetural",  make_hash("smu2024!"),     brand_ids["Стальметурал"]),
-            ("inmetprom",    make_hash("imp2024!"),     brand_ids["Инметпром"]),
-            ("metpromenergo",make_hash("mpe2024!"),     brand_ids["Метпромэнерго"]),
+            ("stalmetural",  make_hash("smu2026!"),     brand_ids["Стальметурал"]),
+            ("inmetprom",    make_hash("imp2026!"),     brand_ids["Инметпром"]),
+            ("metpromenergo",make_hash("mpe2026!"),     brand_ids["Метпромэнерго"]),
         ]
         c.executemany(
             "INSERT INTO users (login, password_hash, brand_id) VALUES (?,?,?)",
@@ -402,8 +402,16 @@ B64_METPROMENERGO = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4gHbSUND
 # 4. ЭКРАН АВТОРИЗАЦИИ
 # ==========================================
 if not st.session_state.authenticated:
+    # Кнопка темы в правом верхнем углу (доступна до входа)
+    _login_tl, _login_tr = st.columns([12, 1])
+    with _login_tr:
+        _login_theme_icon = "☀" if st.session_state.theme == "dark" else "☾"
+        if st.button(_login_theme_icon, key="theme_btn_login"):
+            st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
+            st.rerun()
+
     st.markdown("""
-    <div style="max-width:420px; margin:80px auto 0;">
+    <div style="max-width:420px; margin:40px auto 0;">
         <h1 style="text-align:center; margin-bottom:8px;">Вход в конструктор</h1>
         <p style="text-align:center; opacity:.6; margin-bottom:32px;">Введите логин и пароль вашего бренда</p>
     </div>
