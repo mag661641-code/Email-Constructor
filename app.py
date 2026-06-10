@@ -137,9 +137,9 @@ def init_db():
 
         # Заполняем пользователей
         users = [
-            ("stalmetural",  make_hash("smu2026!"),     brand_ids["Стальметурал"]),
-            ("inmetprom",    make_hash("imp2026!"),     brand_ids["Инметпром"]),
-            ("metpromenergo",make_hash("mpe2026!"),     brand_ids["Метпромэнерго"]),
+            ("stalmetural",  make_hash("smu2024!"),     brand_ids["Стальметурал"]),
+            ("inmetprom",    make_hash("imp2024!"),     brand_ids["Инметпром"]),
+            ("metpromenergo",make_hash("mpe2024!"),     brand_ids["Метпромэнерго"]),
         ]
         c.executemany(
             "INSERT INTO users (login, password_hash, brand_id) VALUES (?,?,?)",
@@ -620,6 +620,19 @@ with st.sidebar:
     .sb-brand-name  {{ font-size:20px; font-weight:700; letter-spacing:-.4px; color:{_sb_txt}; line-height:1.2; }}
     .sb-brand-login {{ font-size:12px; color:{_sb_sub}; margin-top:2px; }}
     .sb-divider     {{ height:1px; background:{_sb_div}; margin:14px 0; border:none; }}
+    /* Кнопки переключения аккаунта — прозрачные, поверх HTML-строки */
+    [data-testid="stSidebar"] [data-testid^="stButton-sw_acc_"] > button,
+    section[data-testid="stSidebar"] div[data-testid="element-container"]:has(button[kind="secondary"][data-testid*="sw_acc"]) button {{
+        opacity: 0 !important;
+        position: absolute !important;
+        top: -36px !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 36px !important;
+        margin: 0 !important;
+        cursor: pointer !important;
+        z-index: 10 !important;
+    }}
     </style>
     <div class="sb-brand-block">
         <div class="sb-brand-label">Бренд</div>
@@ -639,23 +652,67 @@ with st.sidebar:
         st.session_state.show_history = not st.session_state.show_history
         st.rerun()
 
-    # Переключение аккаунта
-    st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
-    with st.expander("Сменить аккаунт"):
-        sw_login = st.text_input("Логин", key="sw_login", placeholder="inmetprom")
-        sw_pass  = st.text_input("Пароль", type="password", key="sw_pass", placeholder="••••••••")
-        if st.button("Войти", key="sw_submit", use_container_width=True):
-            sw_user = check_login(sw_login, sw_pass)
-            if sw_user:
-                st.session_state.user          = sw_user
-                st.session_state.authenticated = True
-                st.session_state.data          = {}
-                st.session_state.mode          = None
-                st.session_state.show_history  = False
-                st.query_params["u"] = sw_user['login']
-                st.rerun()
-            else:
-                st.error("Неверный логин или пароль")
+    # ── Переключение аккаунта ─────────────────────────────────────────────
+    # Собираем все бренды из БД для отображения
+    _all_brands_conn = get_db()
+    _all_brands_c = _all_brands_conn.cursor()
+    _all_brands_c.execute("""
+        SELECT u.login, b.name, b.accent_color
+        FROM users u JOIN brands b ON u.brand_id = b.id
+        ORDER BY b.name
+    """)
+    _all_accounts = [dict(r) for r in _all_brands_c.fetchall()]
+    _all_brands_conn.close()
+
+    st.markdown(f'<div class="sb-divider"></div>', unsafe_allow_html=True)
+    st.markdown(f'<div style="font-size:10px; font-weight:600; letter-spacing:1.4px; text-transform:uppercase; color:{_sb_sub}; margin-bottom:10px;">Сменить аккаунт</div>', unsafe_allow_html=True)
+
+    for _acc in _all_accounts:
+        _is_current = (_acc['login'] == user['login'])
+        _dot_color  = _acc['accent_color']
+        _name_color = _sb_txt if not _is_current else _acc['accent_color']
+        _weight     = "700" if _is_current else "500"
+        _check      = f'<span style="margin-left:auto; color:{_acc["accent_color"]}; font-size:13px;">✓</span>' if _is_current else ""
+
+        st.markdown(f"""
+        <div style="display:flex; align-items:center; gap:10px; padding:8px 10px;
+             border-radius:9px; margin-bottom:4px; cursor:pointer;
+             background:{'rgba(255,255,255,.06)' if _is_current and _sidebar_dark else ('rgba(0,0,0,.04)' if _is_current else 'transparent')};"
+             id="acc_{_acc['login']}">
+            <span style="width:8px; height:8px; border-radius:50%; background:{_dot_color};
+                  flex-shrink:0; display:inline-block;"></span>
+            <span style="font-size:13px; font-weight:{_weight}; color:{_name_color};
+                  flex:1; letter-spacing:-.1px;">{_acc['name']}</span>
+            {_check}
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Кнопка клика — скрытая, поверх визуала
+        if not _is_current:
+            if st.button(_acc['name'], key=f"sw_acc_{_acc['login']}", use_container_width=True):
+                # Авторизуем без пароля — переключаем по логину (доверенная среда)
+                _sw_conn = get_db()
+                _sw_c = _sw_conn.cursor()
+                _sw_c.execute("""
+                    SELECT u.id, u.login, u.brand_id, b.name as brand_name,
+                           b.logo_url, b.accent_color, b.site_url, b.catalog_url,
+                           b.about_url, b.delivery_url, b.contacts_url,
+                           b.vk_url, b.tg_url, b.footer_address,
+                           b.default_email, b.default_phone, b.default_city
+                    FROM users u JOIN brands b ON u.brand_id = b.id
+                    WHERE u.login = ?
+                """, (_acc['login'],))
+                _sw_row = _sw_c.fetchone()
+                _sw_conn.close()
+                if _sw_row:
+                    st.session_state.user          = dict(_sw_row)
+                    st.session_state.authenticated = True
+                    st.session_state.data          = {}
+                    st.session_state.mode          = None
+                    st.session_state.show_history  = False
+                    st.query_params["u"] = _acc['login']
+                    st.rerun()
+    # ─────────────────────────────────────────────────────────────────────
 
     # Психологическая поддержка
     if st.session_state.cute_img and not st.session_state.show_history:
@@ -1243,9 +1300,9 @@ else:
     save_col, build_col = st.columns([1, 2])
 
     with save_col:
-        with st.expander("Сохранить проект"):
+        with st.expander("💾 Сохранить проект"):
             proj_name = st.text_input("Название проекта", placeholder="Например: Труба профильная июнь 2024", key="save_project_name")
-            if st.button("Сохранить", use_container_width=True):
+            if st.button("✅ Сохранить", use_container_width=True):
                 name = proj_name.strip() or f"{menu_items[mode]['title']} {datetime.now().strftime('%d.%m.%Y %H:%M')}"
                 save_project(
                     brand_id      = brand['brand_id'],
