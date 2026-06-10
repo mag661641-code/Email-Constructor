@@ -2,11 +2,239 @@ import streamlit as st
 import os
 import requests
 import random
-import streamlit.components.v1 as components
+import sqlite3
+import hashlib
+import json
 import re
+from datetime import datetime
+import streamlit.components.v1 as components
 
 # ==========================================
-# 0. УМНАЯ ФУНКЦИЯ ОБРАБОТКИ ТЕКСТА
+# 0. БАЗА ДАННЫХ
+# ==========================================
+DB_PATH = "constructor.db"
+
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_db():
+    conn = get_db()
+    c = conn.cursor()
+
+    # Таблица брендов
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS brands (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            logo_url TEXT,
+            accent_color TEXT DEFAULT '#1e69da',
+            site_url TEXT,
+            catalog_url TEXT,
+            about_url TEXT,
+            delivery_url TEXT,
+            contacts_url TEXT,
+            vk_url TEXT,
+            tg_url TEXT,
+            footer_address TEXT,
+            default_email TEXT,
+            default_phone TEXT,
+            default_city TEXT
+        )
+    """)
+
+    # Таблица пользователей
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            login TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            brand_id INTEGER,
+            FOREIGN KEY (brand_id) REFERENCES brands(id)
+        )
+    """)
+
+    # Таблица истории проектов
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS projects (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            brand_id INTEGER NOT NULL,
+            template_mode TEXT NOT NULL,
+            project_name TEXT NOT NULL,
+            data_json TEXT NOT NULL,
+            gost_tags TEXT DEFAULT '[]',
+            size_tags TEXT DEFAULT '[]',
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (brand_id) REFERENCES brands(id)
+        )
+    """)
+
+    # Заполняем бренды если таблица пустая
+    c.execute("SELECT COUNT(*) FROM brands")
+    if c.fetchone()[0] == 0:
+        brands = [
+            (
+                "Стальметурал",
+                "https://stalmetural.ru/wp-content/themes/stalmetural/img/logo.svg",
+                "#1e69da",
+                "https://stalmetural.ru/",
+                "https://stalmetural.ru/catalog/",
+                "https://stalmetural.ru/about/",
+                "https://stalmetural.ru/delivery/",
+                "https://stalmetural.ru/contacts/",
+                "https://vk.com/stalmetural",
+                "https://t.me/stalmetural",
+                'ООО "СМУ", г. Екатеринбург, ул. Машиностроителей 10',
+                "msk@stalmetural.ru",
+                "+7 (499) 130-60-28",
+                "в Москве"
+            ),
+            (
+                "Инметпром",
+                "https://inmetprom.ru/logo.svg",
+                "#1d42a5",
+                "https://inmetprom.ru/",
+                "https://inmetprom.ru/catalog/",
+                "https://inmetprom.ru/about/",
+                "https://inmetprom.ru/delivery/",
+                "https://inmetprom.ru/contacts/",
+                "https://vk.com/inmetprom",
+                "https://t.me/inmetprom",
+                'ООО "Инметпром", г. Москва, ул. Промышленная 5',
+                "info@inmetprom.ru",
+                "+7 (495) 000-00-01",
+                "в Москве"
+            ),
+            (
+                "Метпромэнерго",
+                "https://metpromenergo.ru/logo.svg",
+                "#e83e3a",
+                "https://metpromenergo.ru/",
+                "https://metpromenergo.ru/catalog/",
+                "https://metpromenergo.ru/about/",
+                "https://metpromenergo.ru/delivery/",
+                "https://metpromenergo.ru/contacts/",
+                "https://vk.com/metpromenergo",
+                "https://t.me/metpromenergo",
+                'ООО "МПЭ", г. Санкт-Петербург, пр. Металлистов 22',
+                "info@metpromenergo.ru",
+                "+7 (812) 000-00-02",
+                "в Санкт-Петербурге"
+            ),
+        ]
+        c.executemany("""
+            INSERT INTO brands
+            (name, logo_url, accent_color, site_url, catalog_url, about_url, delivery_url,
+             contacts_url, vk_url, tg_url, footer_address, default_email, default_phone, default_city)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        """, brands)
+        conn.commit()
+
+        # Получаем ID брендов
+        c.execute("SELECT id, name FROM brands ORDER BY id")
+        brand_ids = {row['name']: row['id'] for row in c.fetchall()}
+
+        # Заполняем пользователей
+        users = [
+            ("stalmetural",  make_hash("smu2026!"),     brand_ids["Стальметурал"]),
+            ("inmetprom",    make_hash("imp2026!"),     brand_ids["Инметпром"]),
+            ("metpromenergo",make_hash("mpe2026!"),     brand_ids["Метпромэнерго"]),
+        ]
+        c.executemany(
+            "INSERT INTO users (login, password_hash, brand_id) VALUES (?,?,?)",
+            users
+        )
+        conn.commit()
+
+    conn.close()
+
+def patch_accent_colors():
+    """Обновляет акцентные цвета брендов в уже существующей БД."""
+    colors = {
+        "Стальметурал":  "#1e69da",
+        "Инметпром":     "#1d42a5",
+        "Метпромэнерго": "#e83e3a",
+    }
+    conn = get_db()
+    c = conn.cursor()
+    for name, color in colors.items():
+        c.execute("UPDATE brands SET accent_color = ? WHERE name = ?", (color, name))
+    conn.commit()
+    conn.close()
+
+def make_hash(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def check_login(login: str, password: str):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""
+        SELECT u.id, u.login, u.brand_id, b.name as brand_name,
+               b.logo_url, b.accent_color, b.site_url, b.catalog_url,
+               b.about_url, b.delivery_url, b.contacts_url,
+               b.vk_url, b.tg_url, b.footer_address,
+               b.default_email, b.default_phone, b.default_city
+        FROM users u
+        JOIN brands b ON u.brand_id = b.id
+        WHERE u.login = ? AND u.password_hash = ?
+    """, (login.strip(), make_hash(password)))
+    row = c.fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def save_project(brand_id, template_mode, project_name, data_dict, gost_tags, size_tags):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""
+        INSERT INTO projects (brand_id, template_mode, project_name, data_json, gost_tags, size_tags, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (
+        brand_id,
+        template_mode,
+        project_name,
+        json.dumps(data_dict, ensure_ascii=False),
+        json.dumps(gost_tags, ensure_ascii=False),
+        json.dumps(size_tags, ensure_ascii=False),
+        datetime.now().strftime("%d.%m.%Y %H:%M")
+    ))
+    conn.commit()
+    conn.close()
+
+def load_projects(brand_id):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""
+        SELECT id, template_mode, project_name, created_at
+        FROM projects WHERE brand_id = ?
+        ORDER BY id DESC
+    """, (brand_id,))
+    rows = [dict(r) for r in c.fetchall()]
+    conn.close()
+    return rows
+
+def load_project_data(project_id):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT * FROM projects WHERE id = ?", (project_id,))
+    row = c.fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def delete_project(project_id):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("DELETE FROM projects WHERE id = ?", (project_id,))
+    conn.commit()
+    conn.close()
+
+# Инициализируем БД при старте
+init_db()
+patch_accent_colors()
+
+# ==========================================
+# 1. УМНАЯ ФУНКЦИЯ ОБРАБОТКИ ТЕКСТА
 # ==========================================
 def process_text_to_html(text):
     if not text: return ""
@@ -29,24 +257,15 @@ def process_text_to_html(text):
 def get_stored(key, default=""):
     return st.session_state.data.get(key, default)
 
-# ---- ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ ЗНАЧКОВ ----
 def make_badges(items, font_size="11px", padding="3px 8px"):
     span_style = (
-        f"display:inline-block;"
-        f"background:#F6F7FC;"
-        f"border:1px solid #d0dff5;"
-        f"color:#3D4858;"
-        f"font-size:{font_size};"
-        f"font-weight:400;"
-        f"padding:{padding};"
-        f"border-radius:4px;"
-        f"margin:0 4px 6px 0;"
-        f"white-space:nowrap;"
+        f"display:inline-block;background:#F6F7FC;border:1px solid #d0dff5;"
+        f"color:#3D4858;font-size:{font_size};font-weight:400;padding:{padding};"
+        f"border-radius:4px;margin:0 4px 6px 0;white-space:nowrap;"
         f"font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;"
     )
     return "".join(f'<span style="{span_style}">{item.strip()}</span>' for item in items if item.strip())
- 
-# ---- ПРЕДНАСТРОЕННЫЕ НАБОРЫ ГОСТОВ ----
+
 GOST_PRESETS = {
     "Труба профильная": ["ГОСТ 8639-82", "ГОСТ 8645-82", "ГОСТ 30245-2003", "ГОСТ 13663-86", "ГОСТ 25577-83", "EN 10219", "СТО 00186217"],
     "Труба круглая": ["ГОСТ 8734-75", "ГОСТ 8732-78", "ГОСТ 10704-91", "ГОСТ 10705-80", "ГОСТ 3262-75"],
@@ -57,8 +276,7 @@ GOST_PRESETS = {
     "Арматура": ["ГОСТ 5781-82", "ГОСТ 10884-94", "ГОСТ Р 52544-2006"],
     "Своя настройка": []
 }
- 
-# ---- ПРЕДНАСТРОЕННЫЕ НАБОРЫ РАЗМЕРОВ ----
+
 SIZE_PRESETS = {
     "Труба профильная": ["15×15", "20×20", "40×40", "60×40", "60×60", "80×80", "100×100", "120×120", "140×140", "150×150", "160×160", "180×180", "200×200", "300×300", "и другие"],
     "Труба круглая": ["Ø 15", "Ø 20", "Ø 25", "Ø 32", "Ø 40", "Ø 50", "Ø 57", "Ø 76", "Ø 89", "Ø 108", "Ø 159", "Ø 219", "и другие"],
@@ -71,196 +289,168 @@ SIZE_PRESETS = {
 }
 
 # ==========================================
-# 1. КОНФИГУРАЦИЯ СТРАНИЦЫ
+# 2. КОНФИГУРАЦИЯ СТРАНИЦЫ
 # ==========================================
-st.set_page_config(layout="wide", page_title="Стальметурал | Конструктор", initial_sidebar_state="expanded")
+st.set_page_config(layout="wide", page_title="Конструктор рассылок", initial_sidebar_state="expanded")
 
-# Инициализируем хранилище данных, если его еще нет
-if 'data' not in st.session_state:
-    st.session_state.data = {}
-
-if 'mode' not in st.session_state: st.session_state.mode = None
-if 'cute_img' not in st.session_state: st.session_state.cute_img = None
-if 'theme' not in st.session_state: st.session_state.theme = "dark"
-if 'gost_tags' not in st.session_state: st.session_state.gost_tags = []
-if 'size_tags' not in st.session_state: st.session_state.size_tags = []
+# Session state
+for key, val in [
+    ('data', {}), ('mode', None), ('cute_img', None),
+    ('theme', 'dark'), ('gost_tags', []), ('size_tags', []),
+    ('authenticated', False), ('user', None),
+    ('show_history', False)
+]:
+    if key not in st.session_state:
+        st.session_state[key] = val
 
 # ==========================================
-# 2. УМНЫЙ CSS
+# 3. CSS — ДИНАМИЧЕСКИЙ АКЦЕНТНЫЙ ЦВЕТ
 # ==========================================
-base_styles = """
+accent = st.session_state.user['accent_color'] if st.session_state.user else "#1e69da"
+
+base_styles = f"""
 <style>
-    #MainMenu {visibility: hidden;} 
-    header {visibility: hidden; height: 0px !important;} 
-    footer {visibility: hidden;}
-    .block-container { padding-top: 1rem !important; padding-bottom: 0rem !important; }
+    #MainMenu {{visibility: hidden;}}
+    header {{visibility: hidden; height: 0px !important;}}
+    footer {{visibility: hidden;}}
+    .block-container {{ padding-top: 1rem !important; padding-bottom: 0rem !important; }}
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-    .stButton > button {
+    html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
+    .stButton > button {{
         height: 90px !important; border-radius: 12px !important;
         transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
         display: flex !important; flex-direction: column !important;
         align-items: center !important; justify-content: center !important;
         gap: 5px !important; white-space: pre-wrap !important;
-        text-align: center !important; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-    .stButton > button:hover { transform: translateY(-5px) !important; border-color: #1e69da !important; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1) !important; }
-    .stButton > button div p { font-size: 14px !important; font-weight: 700 !important; }
-    [data-testid="column"]:last-child button { height: 25px !important; line-height: 1 !important; padding: 0 !important; }
-    div.stButton > button[kind="primary"] { background-color: #1e69da !important; color: white !important; height: 55px !important; border: none !important; font-weight: 700 !important; text-transform: uppercase; transform: none !important; }
+        text-align: center !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }}
+    .stButton > button:hover {{ transform: translateY(-5px) !important; border-color: {accent} !important; box-shadow: 0 10px 15px rgba(0,0,0,0.1) !important; }}
+    .stButton > button div p {{ font-size: 14px !important; font-weight: 700 !important; }}
+    [data-testid="column"]:last-child button {{ height: 25px !important; line-height: 1 !important; padding: 0 !important; }}
+    div.stButton > button[kind="primary"] {{ background-color: {accent} !important; color: white !important; height: 55px !important; border: none !important; font-weight: 700 !important; text-transform: uppercase; transform: none !important; }}
+    button[data-baseweb="tab"][aria-selected="true"] p {{ color: {accent} !important; }}
+    button[data-baseweb="tab"][aria-selected="true"] {{ border-bottom-color: {accent} !important; }}
 </style>
 """
 
 if st.session_state.theme == "light":
-    theme_css = """<style>
-    /* Основной фон и боковая панель */
-    [data-testid="stAppViewContainer"] { background-color: #F8F9FA; color: #111827; } 
-    [data-testid="stSidebar"] { background-color: #FFFFFF; border-right: 1px solid #E5E7EB; } 
-    
-    /* Тексты */
-    h1, h2, h3, label, p, .stMarkdown { color: #111827 !important; } 
-    button[data-baseweb="tab"] p { color: #6B7280 !important; font-weight: 600 !important; } 
-    button[data-baseweb="tab"][aria-selected="true"] p { color: #1e69da !important; }
-    
-    /* Кнопки */
-    .stButton > button { background-color: #FFFFFF !important; border: 1px solid #D1D5DB !important; color: #111827 !important; } 
-    .stButton > button:hover { color: #1e69da !important; background-color: #F3F4F6 !important; } 
-    
-    /* Обычные инпуты (с видимым курсором) */
-    .stTextInput input, .stTextArea textarea { 
-        background-color: #FFFFFF !important; 
-        color: #111827 !important; 
-        caret-color: #111827 !important; 
-        border: 1px solid #D1D5DB !important; 
-    }
-
-    /* !!! ИСПРАВЛЕНИЕ ДЛЯ ПЛЕЙСХОЛДЕРА В СВЕТЛОЙ ТЕМЕ !!! */
-    .stTextInput input::placeholder, .stTextArea textarea::placeholder {
-        color: #9CA3AF !important; /* Серый цвет, который будет видно на белом */
-        opacity: 1 !important;
-    }
-    
-    /* --- ФИКС АККОРДЕОНОВ (st.expander) --- */
-    [data-testid="stExpander"] { border: 1px solid #D1D5DB !important; border-radius: 8px !important; background-color: #FFFFFF !important; }
-    [data-testid="stExpander"] details summary, 
+    theme_css = f"""<style>
+    [data-testid="stAppViewContainer"] {{ background-color: #F8F9FA; color: #111827; }}
+    [data-testid="stSidebar"] {{ background-color: #FFFFFF; border-right: 1px solid #E5E7EB; }}
+    h1, h2, h3, label, p, .stMarkdown {{ color: #111827 !important; }}
+    button[data-baseweb="tab"] p {{ color: #6B7280 !important; font-weight: 600 !important; }}
+    .stButton > button {{ background-color: #FFFFFF !important; border: 1px solid #D1D5DB !important; color: #111827 !important; }}
+    .stButton > button:hover {{ color: {accent} !important; background-color: #F3F4F6 !important; }}
+    .stTextInput input, .stTextArea textarea {{
+        background-color: #FFFFFF !important; color: #111827 !important;
+        caret-color: #111827 !important; border: 1px solid #D1D5DB !important;
+    }}
+    .stTextInput input::placeholder, .stTextArea textarea::placeholder {{ color: #9CA3AF !important; opacity: 1 !important; }}
+    [data-testid="stExpander"] {{ border: 1px solid #D1D5DB !important; border-radius: 8px !important; background-color: #FFFFFF !important; }}
+    [data-testid="stExpander"] details summary,
     [data-testid="stExpander"] details summary:hover,
-    [data-testid="stExpander"] details summary * { 
-        background-color: #F3F4F6 !important; 
-        color: #111827 !important; 
-    }
-    [data-testid="stExpander"] details summary p { font-weight: 600 !important; }
-    [data-testid="stExpander"] details summary svg { fill: #111827 !important; }
-
-    /* --- ФИКС СЕЛЕКТБОКСОВ (ПОЛЯ) --- */
-    div[data-baseweb="select"],
-    div[data-baseweb="select"] > div,
-    div[data-baseweb="select"] > div > div { 
-        background-color: #FFFFFF !important; 
-    }
-    div[data-baseweb="select"] > div { border: 1px solid #D1D5DB !important; }
-    div[data-baseweb="select"] > div:hover { background-color: #F8F9FA !important; border-color: #1e69da !important; }
-    div[data-baseweb="select"] * { color: #111827 !important; }
-    div[data-baseweb="select"] svg { fill: #111827 !important; }
-    
-    /* --- ФИКС ВЫПАДАЮЩЕГО СПИСКА (В ИЗОЛИРОВАННОМ СЛОЕ) --- */
-    div[data-baseweb="popover"] > div { background-color: #FFFFFF !important; border: 1px solid #D1D5DB !important; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;}
-    ul[role="listbox"] { background-color: #FFFFFF !important; }
-    ul[role="listbox"] li { color: #111827 !important; background-color: transparent !important; }
-    ul[role="listbox"] li:hover, ul[role="listbox"] li[aria-selected="true"] { background-color: #F3F4F6 !important; color: #1e69da !important; }
+    [data-testid="stExpander"] details summary * {{ background-color: #F3F4F6 !important; color: #111827 !important; }}
+    [data-testid="stExpander"] details summary p {{ font-weight: 600 !important; }}
+    [data-testid="stExpander"] details summary svg {{ fill: #111827 !important; }}
+    div[data-baseweb="select"], div[data-baseweb="select"] > div, div[data-baseweb="select"] > div > div {{ background-color: #FFFFFF !important; }}
+    div[data-baseweb="select"] > div {{ border: 1px solid #D1D5DB !important; }}
+    div[data-baseweb="select"] > div:hover {{ background-color: #F8F9FA !important; border-color: {accent} !important; }}
+    div[data-baseweb="select"] * {{ color: #111827 !important; }}
+    div[data-baseweb="select"] svg {{ fill: #111827 !important; }}
+    div[data-baseweb="popover"] > div {{ background-color: #FFFFFF !important; border: 1px solid #D1D5DB !important; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important; }}
+    ul[role="listbox"] {{ background-color: #FFFFFF !important; }}
+    ul[role="listbox"] li {{ color: #111827 !important; background-color: transparent !important; }}
+    ul[role="listbox"] li:hover, ul[role="listbox"] li[aria-selected="true"] {{ background-color: #F3F4F6 !important; color: {accent} !important; }}
     </style>"""
 else:
-    theme_css = """<style>
-    /* Основной фон и боковая панель */
-    [data-testid="stAppViewContainer"] { background-color: #0F1117; color: #F3F4F6; } 
-    [data-testid="stSidebar"] { background-color: #161922; border-right: 1px solid #2D3748; } 
-    
-    /* Тексты */
-    h1, h2, h3, label, p { color: #F3F4F6 !important; } 
-    button[data-baseweb="tab"] p { color: #9CA3AF !important; font-weight: 600 !important; } 
-    button[data-baseweb="tab"][aria-selected="true"] p { color: #1e69da !important; }
-    
-    /* Кнопки */
-    .stButton > button { background-color: #1A1C24 !important; border: 1px solid #3e4452 !important; color: #F3F4F6 !important; } 
-    
-    /* Обычные инпуты (с видимым курсором) */
-    .stTextInput input, .stTextArea textarea { 
-        background-color: #1F2937 !important; 
-        color: #F3F4F6 !important; 
-        caret-color: #F3F4F6 !important; 
-        border: 1px solid #374151 !important; 
-    }
-
-    /* !!! ИСПРАВЛЕНИЕ ДЛЯ ПЛЕЙСХОЛДЕРА В ТЕМНОЙ ТЕМЕ !!! */
-    .stTextInput input::placeholder, .stTextArea textarea::placeholder {
-        color: #6B7280 !important; /* Приглушенный серый для темной темы */
-        opacity: 1 !important;
-    }
-    
-    /* --- ФИКС АККОРДЕОНОВ (st.expander) --- */
-    [data-testid="stExpander"] { border: 1px solid #374151 !important; border-radius: 8px !important; background-color: #0F1117 !important; }
-    [data-testid="stExpander"] details summary, 
+    theme_css = f"""<style>
+    [data-testid="stAppViewContainer"] {{ background-color: #0F1117; color: #F3F4F6; }}
+    [data-testid="stSidebar"] {{ background-color: #161922; border-right: 1px solid #2D3748; }}
+    h1, h2, h3, label, p {{ color: #F3F4F6 !important; }}
+    button[data-baseweb="tab"] p {{ color: #9CA3AF !important; font-weight: 600 !important; }}
+    .stButton > button {{ background-color: #1A1C24 !important; border: 1px solid #3e4452 !important; color: #F3F4F6 !important; }}
+    .stTextInput input, .stTextArea textarea {{
+        background-color: #1F2937 !important; color: #F3F4F6 !important;
+        caret-color: #F3F4F6 !important; border: 1px solid #374151 !important;
+    }}
+    .stTextInput input::placeholder, .stTextArea textarea::placeholder {{ color: #6B7280 !important; opacity: 1 !important; }}
+    [data-testid="stExpander"] {{ border: 1px solid #374151 !important; border-radius: 8px !important; background-color: #0F1117 !important; }}
+    [data-testid="stExpander"] details summary,
     [data-testid="stExpander"] details summary:hover,
-    [data-testid="stExpander"] details summary * { 
-        background-color: #1F2937 !important; 
-        color: #F3F4F6 !important; 
-    }
-    [data-testid="stExpander"] details summary p { font-weight: 600 !important; }
-    [data-testid="stExpander"] details summary svg { fill: #F3F4F6 !important; }
-
-    /* --- ФИКС СЕЛЕКТБОКСОВ (ПОЛЯ) --- */
-    div[data-baseweb="select"],
-    div[data-baseweb="select"] > div,
-    div[data-baseweb="select"] > div > div { 
-        background-color: #1F2937 !important; 
-    }
-    div[data-baseweb="select"] > div { border: 1px solid #374151 !important; }
-    div[data-baseweb="select"] > div:hover { background-color: #374151 !important; border-color: #1e69da !important; }
-    div[data-baseweb="select"] * { color: #F3F4F6 !important; }
-    div[data-baseweb="select"] svg { fill: #F3F4F6 !important; }
-
-    /* --- ФИКС ВЫПАДАЮЩЕГО СПИСКА (В ИЗОЛИРОВАННОМ СЛОЕ) --- */
-    div[data-baseweb="popover"] > div { background-color: #1F2937 !important; border: 1px solid #374151 !important; }
-    ul[role="listbox"] { background-color: #1F2937 !important; }
-    ul[role="listbox"] li { color: #F3F4F6 !important; background-color: transparent !important; }
-    ul[role="listbox"] li:hover, ul[role="listbox"] li[aria-selected="true"] { background-color: #374151 !important; color: #60a5fa !important; }
+    [data-testid="stExpander"] details summary * {{ background-color: #1F2937 !important; color: #F3F4F6 !important; }}
+    [data-testid="stExpander"] details summary p {{ font-weight: 600 !important; }}
+    [data-testid="stExpander"] details summary svg {{ fill: #F3F4F6 !important; }}
+    div[data-baseweb="select"], div[data-baseweb="select"] > div, div[data-baseweb="select"] > div > div {{ background-color: #1F2937 !important; }}
+    div[data-baseweb="select"] > div {{ border: 1px solid #374151 !important; }}
+    div[data-baseweb="select"] > div:hover {{ background-color: #374151 !important; border-color: {accent} !important; }}
+    div[data-baseweb="select"] * {{ color: #F3F4F6 !important; }}
+    div[data-baseweb="select"] svg {{ fill: #F3F4F6 !important; }}
+    div[data-baseweb="popover"] > div {{ background-color: #1F2937 !important; border: 1px solid #374151 !important; }}
+    ul[role="listbox"] {{ background-color: #1F2937 !important; }}
+    ul[role="listbox"] li {{ color: #F3F4F6 !important; background-color: transparent !important; }}
+    ul[role="listbox"] li:hover, ul[role="listbox"] li[aria-selected="true"] {{ background-color: #374151 !important; color: #60a5fa !important; }}
     </style>"""
-    
+
 st.markdown(base_styles, unsafe_allow_html=True)
 st.markdown(theme_css, unsafe_allow_html=True)
 
 # ==========================================
-# 3. ЛОГИКА
+# 4. ЭКРАН АВТОРИЗАЦИИ
 # ==========================================
+if not st.session_state.authenticated:
+    st.markdown("""
+    <div style="max-width:420px; margin:80px auto 0;">
+        <h1 style="text-align:center; margin-bottom:8px;">🔐 Вход в конструктор</h1>
+        <p style="text-align:center; opacity:.6; margin-bottom:32px;">Введите логин и пароль вашего бренда</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col_l, col_c, col_r = st.columns([1, 2, 1])
+    with col_c:
+        login_val = st.text_input("Логин", placeholder="stalmetural", key="login_input")
+        pass_val  = st.text_input("Пароль", type="password", placeholder="••••••••", key="pass_input")
+        if st.button("ВОЙТИ", type="primary", use_container_width=True):
+            user = check_login(login_val, pass_val)
+            if user:
+                st.session_state.authenticated = True
+                st.session_state.user = user
+                st.rerun()
+            else:
+                st.error("Неверный логин или пароль")
+
+        st.markdown("""
+        <div style="margin-top:24px; padding:16px; border-radius:8px; background:rgba(30,105,218,0.08); border:1px solid rgba(30,105,218,0.2); font-size:13px;">
+        <b>Доступные аккаунты:</b><br><br>
+        🔵 <b>Стальметурал</b><br>
+        &nbsp;&nbsp;Логин: <code>stalmetural</code> &nbsp;|&nbsp; Пароль: <code>smu2024!</code><br><br>
+        🔴 <b>Инметпром</b><br>
+        &nbsp;&nbsp;Логин: <code>inmetprom</code> &nbsp;|&nbsp; Пароль: <code>imp2024!</code><br><br>
+        🟢 <b>Метпромэнерго</b><br>
+        &nbsp;&nbsp;Логин: <code>metpromenergo</code> &nbsp;|&nbsp; Пароль: <code>mpe2024!</code>
+        </div>
+        """, unsafe_allow_html=True)
+    st.stop()
+
+# ==========================================
+# 5. ХЕЛПЕРЫ (после авторизации)
+# ==========================================
+user   = st.session_state.user
+brand  = user  # содержит все поля бренда
+
 def get_cute_gif():
     try:
         animal = random.choice(["cat", "dog"])
         res = requests.get(f"https://api.the{animal}api.com/v1/images/search?mime_types=gif,jpg", timeout=5).json()
         return res[0]['url']
-    except: return "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif"
+    except:
+        return "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif"
 
 def set_mode(name):
     st.session_state.mode = name
-    if name: st.session_state.cute_img = get_cute_gif()
+    if name:
+        st.session_state.cute_img = get_cute_gif()
 
-menu_items = {
-    "stock": {"title": "ПОСТУПЛЕНИЕ", "desc": "Наличие, ГОСТы"},
-    "promo": {"title": "СПЕЦПРЕДЛОЖЕНИЕ", "desc": "Товары, таймер"},
-    "services": {"title": "УСЛУГИ", "desc": "Обработка, резка"},
-    "cases": {"title": "ОТГРУЗКИ", "desc": "Фото, статистика"},
-    "expert": {"title": "ЭКСПЕРТНОЕ", "desc": "Статьи и советы"}
-}
-
-# ==========================================
-# ХЕЛПЕР: сохраняет значение в data и возвращает его
-# ==========================================
 def cached_input(label, key, default="", placeholder="", col=None, area=False, height=100):
-    """
-    Рендерит text_input или text_area.
-    - value= подставляется только если пользователь сам что-то вводил (хранится в st.session_state.data[key]).
-    - Если пользователь ничего не вводил — поле пустое, виден placeholder.
-    - При сборке HTML возвращает введённое значение или default (плейсхолдер как запасное).
-    """
-    # Берём только явно сохранённое пользователем значение, без дефолта
     current = st.session_state.data.get(key, "")
     ph = placeholder or default
     widget = (col if col else st)
@@ -268,92 +458,151 @@ def cached_input(label, key, default="", placeholder="", col=None, area=False, h
         val = widget.text_area(label, value=current, placeholder=ph, key=key, height=height)
     else:
         val = widget.text_input(label, value=current, placeholder=ph, key=key)
-    # Сохраняем только то, что ввёл пользователь (пустая строка тоже валидна)
     st.session_state.data[key] = val
-    # Для сборки HTML: если пусто — подставляем default
     return val if val else default
 
+menu_items = {
+    "stock":    {"title": "ПОСТУПЛЕНИЕ",    "desc": "Наличие, ГОСТы"},
+    "promo":    {"title": "СПЕЦПРЕДЛОЖЕНИЕ","desc": "Товары, таймер"},
+    "services": {"title": "УСЛУГИ",         "desc": "Обработка, резка"},
+    "cases":    {"title": "ОТГРУЗКИ",       "desc": "Фото, статистика"},
+    "expert":   {"title": "ЭКСПЕРТНОЕ",     "desc": "Статьи и советы"},
+}
+
 # ==========================================
-# 4. ВЕРХНЯЯ ПАНЕЛЬ
+# 6. БОКОВАЯ ПАНЕЛЬ
 # ==========================================
-t_col1, t_col2 = st.columns([12, 1])
-with t_col2:
+with st.sidebar:
+    # Шапка бренда
+    st.markdown(f"""
+    <div style="padding:12px 0 8px;">
+        <div style="font-size:11px; opacity:.5; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Бренд</div>
+        <div style="font-size:18px; font-weight:700;">{brand['brand_name']}</div>
+        <div style="font-size:12px; opacity:.5;">{user['login']}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if st.session_state.mode is not None:
+        st.button("« В ГЛАВНОЕ МЕНЮ", on_click=set_mode, args=(None,), use_container_width=True)
+
+    # Кнопка История
+    hist_label = "📋 История проектов" if not st.session_state.show_history else "✏️ Конструктор"
+    if st.button(hist_label, use_container_width=True):
+        st.session_state.show_history = not st.session_state.show_history
+        st.rerun()
+
+    st.write("---")
+
+    # Тема
+    t_col1, t_col2 = st.columns([3, 1])
+    t_col1.markdown("Тема оформления")
     label = "☀️" if st.session_state.theme == "dark" else "🌙"
-    if st.button(label):
+    if t_col2.button(label):
         st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
         st.rerun()
 
+    st.write("---")
+
+    if st.session_state.cute_img and not st.session_state.show_history:
+        st.image(st.session_state.cute_img, use_container_width=True)
+        st.caption("Ваша психологическая поддержка")
+
+    st.write("---")
+    if st.button("🚪 Выйти", use_container_width=True):
+        for k in ['authenticated', 'user', 'data', 'mode', 'cute_img',
+                  'gost_tags', 'size_tags', 'show_history']:
+            if k in st.session_state:
+                del st.session_state[k]
+        st.rerun()
+
 # ==========================================
-# 5. ГЛАВНОЕ МЕНЮ
+# 7. ИСТОРИЯ ПРОЕКТОВ
+# ==========================================
+if st.session_state.show_history:
+    st.title("📋 История проектов")
+    projects = load_projects(brand['brand_id'])
+
+    if not projects:
+        st.info("Сохранённых проектов пока нет. Создайте письмо и нажмите «Сохранить проект».")
+    else:
+        for proj in projects:
+            mode_label = menu_items.get(proj['template_mode'], {}).get('title', proj['template_mode'])
+            col_a, col_b, col_c = st.columns([4, 2, 1])
+            col_a.markdown(f"**{proj['project_name']}**  \n`{mode_label}` · {proj['created_at']}")
+            if col_b.button("📂 Открыть", key=f"open_{proj['id']}"):
+                full = load_project_data(proj['id'])
+                st.session_state.data      = json.loads(full['data_json'])
+                st.session_state.gost_tags = json.loads(full['gost_tags'])
+                st.session_state.size_tags = json.loads(full['size_tags'])
+                st.session_state.mode      = full['template_mode']
+                st.session_state.show_history = False
+                st.rerun()
+            if col_c.button("🗑️", key=f"del_{proj['id']}"):
+                delete_project(proj['id'])
+                st.rerun()
+            st.write("---")
+    st.stop()
+
+# ==========================================
+# 8. ГЛАВНОЕ МЕНЮ ШАБЛОНОВ
 # ==========================================
 if st.session_state.mode is None:
-    st.markdown("<h1 style='text-align:center;'>Конструктор рассылок</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align:center; opacity: 0.7;'>Выберите шаблон</p><br>", unsafe_allow_html=True)
-    
+    st.markdown(f"<h1 style='text-align:center;'>Конструктор рассылок</h1>", unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align:center; opacity:0.7;'>Бренд: <b>{brand['brand_name']}</b> · Выберите шаблон</p><br>", unsafe_allow_html=True)
+
     cols = st.columns(5)
     for i, (m_id, info) in enumerate(menu_items.items()):
         with cols[i]:
-            btn_label = f"{info['title']}\n{info['desc']}"
-            if st.button(btn_label, key=m_id, use_container_width=True):
+            if st.button(f"{info['title']}\n{info['desc']}", key=m_id, use_container_width=True):
                 set_mode(m_id)
                 st.rerun()
+
 else:
     # ==========================================
-    # 6. РЕДАКТОР
+    # 9. РЕДАКТОР
     # ==========================================
     mode = st.session_state.mode
     data = {}
-    
-    with st.sidebar:
-        st.button("« В ГЛАВНОЕ МЕНЮ", on_click=set_mode, args=(None,), use_container_width=True)
-        st.write("---")
-        if st.session_state.cute_img:
-            st.image(st.session_state.cute_img, use_container_width=True)
-            st.caption("Ваша психологическая поддержка")
 
     st.title(f"Шаблон: {menu_items[mode]['title']}")
     tabs = st.tabs(["Контакты", "Баннер", "Тексты", "Блоки", "Эксперт"])
 
-    # ==========================================
-    # ТАБ 0: КОНТАКТЫ
-    # ==========================================
+    # ---- ТАБ 0: КОНТАКТЫ ----
     with tabs[0]:
         c1, c2 = st.columns(2)
 
-        d_email = "msk@stalmetural.ru"
+        d_email = brand['default_email']
         data['EMAIL'] = cached_input("Email филиала", "EMAIL", d_email, d_email, col=c1) or d_email
 
-        d_phone = "+7 (499) 130-60-28"
+        d_phone = brand['default_phone']
         data['PHONE'] = cached_input("Телефон филиала", "PHONE", d_phone, d_phone, col=c1) or d_phone
 
         data['PHONE_DIGITS'] = "".join(filter(str.isdigit, data['PHONE']))
         if not data['PHONE_DIGITS'].startswith('+'): data['PHONE_DIGITS'] = "+" + data['PHONE_DIGITS']
         data['PHONE_LINK'] = f"tel:{data['PHONE_DIGITS']}"
 
-        d_city = "в Москве"
+        d_city = brand['default_city']
         data['CITY_IN'] = cached_input("Город", "CITY_IN", d_city, d_city, col=c2) or d_city
 
-        d_logo = "https://stalmetural.ru/"
+        d_logo = brand['site_url']
         data['LINK_LOGO'] = cached_input("Ссылка при клике на логотип", "LINK_LOGO", d_logo, d_logo, col=c2) or d_logo
 
         col_m1, col_m2, col_m3 = st.columns(3)
-        d_cat = "https://stalmetural.ru/catalog/"
+        d_cat = brand['catalog_url']
         data['LINK_CATALOG'] = cached_input("Ссылка 'Каталог'", "LINK_CATALOG", d_cat, d_cat, col=col_m1) or d_cat
 
-        d_about = "https://stalmetural.ru/about/"
+        d_about = brand['about_url']
         data['LINK_COMPANY'] = cached_input("Ссылка 'О компании/Кейсы'", "LINK_COMPANY", d_about, d_about, col=col_m2) or d_about
 
-        d_deliv = "https://stalmetural.ru/delivery/"
+        d_deliv = brand['delivery_url']
         data['LINK_DELIVERY'] = cached_input("Ссылка 'Доставка'", "LINK_DELIVERY", d_deliv, d_deliv, col=col_m3) or d_deliv
 
-        d_addr = "ООО \"СМУ\", г. Екатеринбург, ул. Машиностроителей 10"
+        d_addr = brand['footer_address']
         data['FOOTER_ADDRESS'] = cached_input("Адрес в футере", "FOOTER_ADDRESS", d_addr, d_addr) or d_addr
 
         data['UnsubscribeUrl'], data['webversion'], data['email'] = "{{UnsubscribeUrl}}", "{{webversion}}", "{{email}}"
 
-    # ==========================================
-    # ТАБ 1: БАННЕР
-    # ==========================================
+    # ---- ТАБ 1: БАННЕР ----
     with tabs[1]:
         d_pre = "Узнайте подробности в письме..."
         data['PREHEADER_TEXT'] = cached_input("Прехедер", "PREHEADER_TEXT", d_pre, d_pre) or d_pre
@@ -364,35 +613,29 @@ else:
             data['HERO_TITLE'] = cached_input("Заголовок на баннере", f"{mode}_HERO_TITLE", d_ht, d_ht) or d_ht
             d_dl = "СКИДКА 10%"
             data['DISCOUNT_LABEL'] = cached_input("Метка скидки", f"{mode}_DISCOUNT_LABEL", d_dl, d_dl) or d_dl
-
         elif mode == "stock":
             d_ht = "ТРУБА ПРОФИЛЬНАЯ"
             data['HERO_TITLE'] = cached_input("Заголовок на баннере", f"{mode}_HERO_TITLE", d_ht, d_ht) or d_ht
-
         elif mode == "cases":
             d_ht = "НУЖЕН МЕТАЛЛ ТОЧНО В СРОК И ПО ГОСТУ?"
             data['HERO_TITLE'] = cached_input("Заголовок на баннере", f"{mode}_HERO_TITLE", d_ht, d_ht) or d_ht
             d_hi = "https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=633kxjmua5h3e6auf9n3p3mtxkbqyuz5g9t4bxmiwacn4se1m7mm8f3xb9kfj4sdqs7u6wy3p67hniwanz5qzpz6e3oafgod1gfpiyt35tefhp8sjg7t3fqc9p5i93btrk54ju1mbjtetk"
             data['HERO_IMG'] = cached_input("Картинка отгрузки", f"{mode}_HERO_IMG", d_hi, d_hi) or d_hi
             data['HERO_BTN_LINK'] = cached_input("Ссылка кнопки", f"{mode}_HERO_BTN_LINK", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', '')) or data.get('LINK_CATALOG', '')
-
         elif mode == "expert":
             d_ht = "БЕСШОВНАЯ ИЛИ ЭЛЕКТРОСВАРНАЯ"
             data['HERO_TITLE'] = cached_input("Заголовок на баннере", f"{mode}_HERO_TITLE", d_ht, d_ht) or d_ht
             d_hi = "https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6uyisxkcb9z7eaauf9n3p3mtxknbsdqxp466f8gerep3qqo3qg9gbanpmbuqopttjmnzyzspdqyqxfm55dgtdc1xhua6ni8nrnmqq1qo538z6idf768zyjwfpoohe8gbci4z3phict9wqfg496t8gqbqy5r6b3tjcs34m6na"
             data['HERO_IMG'] = cached_input("Картинка справа", f"{mode}_HERO_IMG", d_hi, d_hi) or d_hi
             data['HERO_BTN_LINK'] = cached_input("Ссылка кнопки", f"{mode}_HERO_BTN_LINK", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', '')) or data.get('LINK_CATALOG', '')
-
         else:
             d_ht = "МЕТАЛЛОПРОКАТ ОТ ПРОИЗВОДИТЕЛЯ"
             data['HERO_TITLE'] = cached_input("Заголовок баннера", f"{mode}_HERO_TITLE", d_ht, d_ht) or d_ht
 
-    # ==========================================
-    # ТАБ 2: ТЕКСТЫ
-    # ==========================================
+    # ---- ТАБ 2: ТЕКСТЫ ----
     with tabs[2]:
-        st.markdown("""
-        <div style="background-color: #1e69da33; padding: 10px; border-radius: 5px; border: 1px solid #1e69da; margin-bottom: 15px;">
+        st.markdown(f"""
+        <div style="background-color:{accent}33; padding:10px; border-radius:5px; border:1px solid {accent}; margin-bottom:15px;">
             <strong>Как оформлять текст:</strong><br>
             • <b>**текст**</b> — жирный | <b>- пункт</b> — список | <b>Enter</b> — новая строка
         </div>
@@ -400,45 +643,31 @@ else:
 
         if mode == "promo":
             st.subheader("📝 Главная статья")
-
             title_def = "Снижаем стоимость на партию"
             data['TEXT_TITLE'] = cached_input("Заголовок статьи", f"{mode}_TEXT_TITLE", title_def, title_def) or title_def
-
             pre_def = "Мы открываем **спецпредложение**..."
             t_pre_raw = cached_input("Текст ДО ссылки", f"{mode}_TEXT_PRE", pre_def, pre_def, area=True, height=100) or pre_def
-
             col_a1, col_a2 = st.columns(2)
             word_def = "партию квадрата"
             a_word = cached_input("Слово-ссылка", f"{mode}_LINK_WORD", word_def, word_def, col=col_a1) or word_def
-
             link_def = "https://stalmetural.ru/catalog/"
             a_link = cached_input("Куда ведет", f"{mode}_LINK_HREF", link_def, link_def, col=col_a2) or link_def
-
             post_def = "из наличия."
             t_post_raw = cached_input("Текст ПОСЛЕ ссылки", f"{mode}_TEXT_POST", post_def, post_def, area=True, height=80) or post_def
-
-            data['TEXT_BODY'] = f'{process_text_to_html(t_pre_raw)} <a href="{a_link}" style="text-decoration:none; color:#1e69da; font-weight:bold;">{a_word}</a> {process_text_to_html(t_post_raw)}'
-
+            data['TEXT_BODY'] = f'{process_text_to_html(t_pre_raw)} <a href="{a_link}" style="text-decoration:none; color:{accent}; font-weight:bold;">{a_word}</a> {process_text_to_html(t_post_raw)}'
             st.markdown("---")
             st.subheader("📎 Блок P.S.")
             ps_c = st.columns(3)
-
-            n1_def = "профнастил"
-            n1 = cached_input("Товар 1", f"{mode}_PS_N1", n1_def, n1_def, col=ps_c[0]) or n1_def
-            n2_def = "втулки"
-            n2 = cached_input("Товар 2", f"{mode}_PS_N2", n2_def, n2_def, col=ps_c[1]) or n2_def
-            n3_def = "услуги"
-            n3 = cached_input("Товар 3", f"{mode}_PS_N3", n3_def, n3_def, col=ps_c[2]) or n3_def
-
-            link_style = "color: #1e69da; text-decoration: none; font-weight: bold;"
-            data['PS_BLOCK'] = f'P.S. Также в наличии <a href="{data["LINK_CATALOG"]}" style="{link_style}">{n1}</a>, <a href="{data["LINK_CATALOG"]}" style="{link_style}">{n2}</a> и <a href="{data["LINK_CATALOG"]}" style="{link_style}">{n3}</a>. Напишите нам в ответ на это письмо – подберем решение.'
+            n1 = cached_input("Товар 1", f"{mode}_PS_N1", "профнастил", "профнастил", col=ps_c[0]) or "профнастил"
+            n2 = cached_input("Товар 2", f"{mode}_PS_N2", "втулки", "втулки", col=ps_c[1]) or "втулки"
+            n3 = cached_input("Товар 3", f"{mode}_PS_N3", "услуги", "услуги", col=ps_c[2]) or "услуги"
+            ls = f"color:{accent}; text-decoration:none; font-weight:bold;"
+            data['PS_BLOCK'] = f'P.S. Также в наличии <a href="{data["LINK_CATALOG"]}" style="{ls}">{n1}</a>, <a href="{data["LINK_CATALOG"]}" style="{ls}">{n2}</a> и <a href="{data["LINK_CATALOG"]}" style="{ls}">{n3}</a>. Напишите нам в ответ на это письмо – подберем решение.'
 
         elif mode == "expert":
             st.subheader("Основная статья блога")
-
             d_title = "Выбираем трубу без переплат"
             data['TEXT_TITLE'] = cached_input("Заголовок статьи", f"{mode}_TEXT_TITLE", d_title, d_title) or d_title
-
             d_body = (
                 "Часто в смету закладывают дорогую бесшовную трубу там, где можно безопасно использовать электросварную.\n\n"
                 "**Где можно сэкономить до 40%?**\n"
@@ -446,53 +675,43 @@ else:
                 "**Где рисковать нельзя?**\n"
                 "В нефтегазовой промышленности необходима только бесшовная труба (БШ)."
             )
-            text_body_raw = cached_input("Текст статьи (используйте ** для жирного и - для списков)", f"{mode}_TEXT_BODY_RAW", d_body, d_body, area=True, height=250) or d_body
+            text_body_raw = cached_input("Текст статьи", f"{mode}_TEXT_BODY_RAW", d_body, d_body, area=True, height=250) or d_body
             data['TEXT_BODY'] = process_text_to_html(text_body_raw)
-
-            d_link = "https://stalmetural.ru/contacts/"
+            d_link = brand['contacts_url']
             data['TEXT_BTN_LINK'] = cached_input("Ссылка для кнопки 'Связаться с нами'", f"{mode}_TEXT_BTN_LINK", d_link, d_link) or d_link
 
         elif mode == "stock":
             st.subheader("Вводная статья и преимущества")
-
             d_tt = "Профильная труба всех типоразмеров"
             data['TEXT_TITLE'] = cached_input("Главный заголовок", f"{mode}_TEXT_TITLE", d_tt, d_tt) or d_tt
-
             d_tb = "Обновили складской запас профильного проката. В наличии все позиции..."
             raw_tb = cached_input("Вводный абзац", f"{mode}_TEXT_BODY_RAW", d_tb, d_tb, area=True, height=100) or d_tb
             data['TEXT_BODY'] = process_text_to_html(raw_tb)
-
             st.markdown("**Ключевые пункты (Буллиты):**")
             for i in range(1, 4):
                 col_b1, col_b2 = st.columns([1, 2])
                 d_bt = f"Заголовок {i}"
                 d_bd = f"Описание пункта {i}"
                 data[f'BULLET_TITLE_{i}'] = cached_input(f"Заголовок {i}", f"{mode}_BULLET_TITLE_{i}", d_bt, d_bt, col=col_b1) or d_bt
-                data[f'BULLET_TEXT_{i}'] = cached_input(f"Текст {i}", f"{mode}_BULLET_TEXT_{i}", d_bd, d_bd, col=col_b2) or d_bd
+                data[f'BULLET_TEXT_{i}']  = cached_input(f"Текст {i}",     f"{mode}_BULLET_TEXT_{i}",  d_bd, d_bd, col=col_b2) or d_bd
 
         elif mode == "cases":
             st.subheader("Текст кейса (История успеха)")
-
             d_ct = "Металл с гарантией: проверка по ГОСТ и полный пакет документов"
             data['CASE_MAIN_TITLE'] = cached_input("Заголовок статьи", f"{mode}_CASE_MAIN_TITLE", d_ct, d_ct) or d_ct
-
             d_ctask = "Недостаточная толщина стенки может остановить стройку..."
             raw_task = cached_input("Задача", f"{mode}_CASE_TASK_RAW", d_ctask, d_ctask, area=True, height=100) or d_ctask
             data['CASE_TASK'] = process_text_to_html(raw_task)
-
             d_csteps = "- **Замеры перед погрузкой**\n- **Полная документация**"
             raw_steps = cached_input("Что сделали", f"{mode}_CASE_STEPS_RAW", d_csteps, d_csteps, area=True, height=100) or d_csteps
             data['CASE_STEPS'] = process_text_to_html(raw_steps)
-
             d_cres = "Ваш объект не будет простаивать из-за брака."
             data['CASE_RESULT'] = cached_input("Результат", f"{mode}_CASE_RESULT", d_cres, d_cres) or d_cres
 
         elif mode == "services":
             st.subheader("Основной текстовый блок")
-
             d_title = "Больше, чем просто продажа металла"
             data['TEXT_TITLE'] = cached_input("Заголовок раздела", f"{mode}_TEXT_TITLE", d_title, d_title) or d_title
-
             d_body = (
                 "Закупка металла «с запасом» и ручная подрезка на объекте — это **скрытые убытки вашего проекта**. "
                 "Вы переплачиваете за лишний вес при доставке и тратите оплачиваемое время рабочих на подгонку деталей.\n\n"
@@ -506,19 +725,16 @@ else:
             )
             raw_body = cached_input("Основной текст", f"{mode}_TEXT_BODY_RAW", d_body, d_body, area=True, height=300) or d_body
             data['TEXT_BODY'] = process_text_to_html(raw_body)
-
         else:
             d_tt = "Заголовок статьи"
             data['TEXT_TITLE'] = cached_input("Заголовок статьи", f"{mode}_TEXT_TITLE", d_tt, d_tt) or d_tt
             d_tb = "Основной текст письма..."
             raw_tb = cached_input("Текст", f"{mode}_TEXT_BODY_RAW", d_tb, d_tb, area=True, height=100) or d_tb
             data['TEXT_BODY'] = process_text_to_html(raw_tb)
-            d_tl = "https://stalmetural.ru/contacts/"
+            d_tl = brand['contacts_url']
             data['TEXT_BTN_LINK'] = cached_input("Ссылка для кнопки", f"{mode}_TEXT_BTN_LINK", d_tl, d_tl) or d_tl
 
-    # ==========================================
-    # ТАБ 3: БЛОКИ
-    # ==========================================
+    # ---- ТАБ 3: БЛОКИ ----
     with tabs[3]:
         if mode == "cases":
             st.subheader("Настройка блоков")
@@ -532,15 +748,13 @@ else:
                     data[f'PROD_{i}_PRICE'] = cached_input("Цена", f"{mode}_prod_{i}_price", d_p, d_p, col=col2) or d_p
                     d_desc = "ГОСТ 8639-82, сталь 3пс"
                     data[f'PROD_{i}_DESC'] = cached_input("Описание", f"{mode}_prod_{i}_desc", d_desc, d_desc, area=True, height=70) or d_desc
-
                     col3, col4 = st.columns(2)
                     d_img = "https://img.hiteml.com/example.jpg"
-                    data[f'PROD_{i}_IMG'] = cached_input("URL картинки", f"{mode}_prod_{i}_img", d_img, d_img, col=col3) or d_img
-                    data[f'PROD_{i}_LINK'] = cached_input("Ссылка на каталог", f"{mode}_prod_{i}_link", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', ''), col=col4) or data.get('LINK_CATALOG', '')
-
+                    data[f'PROD_{i}_IMG']  = cached_input("URL картинки", f"{mode}_prod_{i}_img",  d_img, d_img, col=col3) or d_img
+                    data[f'PROD_{i}_LINK'] = cached_input("Ссылка на каталог", f"{mode}_prod_{i}_link", data.get('LINK_CATALOG',''), data.get('LINK_CATALOG',''), col=col4) or data.get('LINK_CATALOG','')
                 d_extra = "+ еще 8 позиций сопутствующего проката..."
                 data['PROD_EXTRA_TEXT'] = cached_input("Текст под товарами", f"{mode}_prod_extra_text", d_extra, d_extra) or d_extra
-                data['ALL_PROD_LINK'] = cached_input("Ссылка кнопки 'Весь сортамент'", f"{mode}_all_prod_link", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', '')) or data.get('LINK_CATALOG', '')
+                data['ALL_PROD_LINK']   = cached_input("Ссылка кнопки 'Весь сортамент'", f"{mode}_all_prod_link", data.get('LINK_CATALOG',''), data.get('LINK_CATALOG','')) or data.get('LINK_CATALOG','')
 
             with st.expander("2. Не тратьте время на подгонку (3 Услуги)"):
                 d_st = "Не тратьте время на подгонку на объекте"
@@ -551,11 +765,11 @@ else:
                     d_sv_t = "Резка в размер"
                     data[f'SERV_{i}_TITLE'] = cached_input("Название услуги", f"{mode}_serv_{i}_title", d_sv_t, d_sv_t, col=col1) or d_sv_t
                     d_sv_d = "Точность до 1 мм"
-                    data[f'SERV_{i}_DESC'] = cached_input("Краткое описание", f"{mode}_serv_{i}_desc", d_sv_d, d_sv_d, col=col2) or d_sv_d
+                    data[f'SERV_{i}_DESC']  = cached_input("Краткое описание", f"{mode}_serv_{i}_desc",  d_sv_d, d_sv_d, col=col2) or d_sv_d
                     col3, col4 = st.columns(2)
                     d_sv_i = "https://img.hiteml.com/service.jpg"
-                    data[f'SERV_{i}_IMG'] = cached_input("URL картинки", f"{mode}_serv_{i}_img", d_sv_i, d_sv_i, col=col3) or d_sv_i
-                    data[f'SERV_{i}_LINK'] = cached_input("Ссылка", f"{mode}_serv_{i}_link", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', ''), col=col4) or data.get('LINK_CATALOG', '')
+                    data[f'SERV_{i}_IMG']  = cached_input("URL картинки", f"{mode}_serv_{i}_img",  d_sv_i, d_sv_i, col=col3) or d_sv_i
+                    data[f'SERV_{i}_LINK'] = cached_input("Ссылка",       f"{mode}_serv_{i}_link", data.get('LINK_CATALOG',''), data.get('LINK_CATALOG',''), col=col4) or data.get('LINK_CATALOG','')
                     st.markdown("---")
 
         elif mode == "expert":
@@ -574,8 +788,8 @@ else:
                     data[f'PIPE_{i}_DESC'] = process_text_to_html(raw_pd)
                     col3, col4 = st.columns(2)
                     d_p_i = "https://img.hiteml.com/pipe.jpg"
-                    data[f'PIPE_{i}_IMG'] = cached_input("URL картинки", f"{mode}_pipe_{i}_img", d_p_i, d_p_i, col=col3) or d_p_i
-                    data[f'PIPE_{i}_LINK'] = cached_input("Ссылка", f"{mode}_pipe_{i}_link", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', ''), col=col4) or data.get('LINK_CATALOG', '')
+                    data[f'PIPE_{i}_IMG']  = cached_input("URL картинки", f"{mode}_pipe_{i}_img",  d_p_i, d_p_i, col=col3) or d_p_i
+                    data[f'PIPE_{i}_LINK'] = cached_input("Ссылка",       f"{mode}_pipe_{i}_link", data.get('LINK_CATALOG',''), data.get('LINK_CATALOG',''), col=col4) or data.get('LINK_CATALOG','')
 
             with st.expander("2. Также в наличии на складе"):
                 d_ss_t = "Также в наличии на складе"
@@ -590,8 +804,8 @@ else:
                     data[f'STOCK_{i}_DESC'] = cached_input("Описание", f"{mode}_stock_{i}_desc", d_s_d, d_s_d) or d_s_d
                     col3, col4 = st.columns(2)
                     d_s_i = "https://img.hiteml.com/stock.jpg"
-                    data[f'STOCK_{i}_IMG'] = cached_input("URL картинки", f"{mode}_stock_{i}_img", d_s_i, d_s_i, col=col3) or d_s_i
-                    data[f'STOCK_{i}_LINK'] = cached_input("Ссылка", f"{mode}_stock_{i}_link", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', ''), col=col4) or data.get('LINK_CATALOG', '')
+                    data[f'STOCK_{i}_IMG']  = cached_input("URL картинки", f"{mode}_stock_{i}_img",  d_s_i, d_s_i, col=col3) or d_s_i
+                    data[f'STOCK_{i}_LINK'] = cached_input("Ссылка",       f"{mode}_stock_{i}_link", data.get('LINK_CATALOG',''), data.get('LINK_CATALOG',''), col=col4) or data.get('LINK_CATALOG','')
                     st.markdown("---")
 
         elif mode == "stock":
@@ -599,17 +813,11 @@ else:
 
             with st.expander("1. Технический блок (ГОСТы и Размеры)"):
                 st.markdown("##### Стандарты производства (ГОСТ / ТУ)")
-
-                gost_preset = st.selectbox(
-                    "Быстрый выбор по типу металла",
-                    options=list(GOST_PRESETS.keys()),
-                    key="gost_preset_select"
-                )
+                gost_preset = st.selectbox("Быстрый выбор по типу металла", options=list(GOST_PRESETS.keys()), key="gost_preset_select")
                 if gost_preset != "Своя настройка":
                     if st.button("↺ Загрузить стандарты для выбранного типа", key="load_gost"):
                         st.session_state.gost_tags = GOST_PRESETS[gost_preset].copy()
                         st.rerun()
-
                 if st.session_state.gost_tags:
                     st.markdown("**Текущие стандарты** (кликните на ячейку с ✕ , чтобы удалить):")
                     cols_g = st.columns(4)
@@ -623,29 +831,21 @@ else:
                         st.rerun()
                 else:
                     st.info("Список стандартов пуст. Добавьте вручную ниже.")
-
                 col_g1, col_g2 = st.columns([3, 1])
                 new_gost = col_g1.text_input("Добавить стандарт вручную", placeholder="Например: ГОСТ 8639-82 или EN 10219", key="new_gost_input")
                 if col_g2.button("＋ Добавить", key="add_gost_btn", use_container_width=True):
                     if new_gost.strip() and new_gost.strip() not in st.session_state.gost_tags:
                         st.session_state.gost_tags.append(new_gost.strip())
                         st.rerun()
-
                 data['GOST_BLOCK'] = make_badges(st.session_state.gost_tags, font_size="11px", padding="3px 8px")
 
                 st.markdown("---")
                 st.markdown("##### Ходовые размеры в наличии (мм)")
-
-                size_preset = st.selectbox(
-                    "Быстрый выбор размеров по типу",
-                    options=list(SIZE_PRESETS.keys()),
-                    key="size_preset_select"
-                )
+                size_preset = st.selectbox("Быстрый выбор размеров по типу", options=list(SIZE_PRESETS.keys()), key="size_preset_select")
                 if size_preset != "Своя настройка":
                     if st.button("↺ Загрузить размеры для выбранного типа", key="load_size"):
                         st.session_state.size_tags = SIZE_PRESETS[size_preset].copy()
                         st.rerun()
-
                 if st.session_state.size_tags:
                     st.markdown("**Текущие размеры** (кликните на ячейку с ✕ , чтобы удалить):")
                     cols_s = st.columns(5)
@@ -659,14 +859,12 @@ else:
                         st.rerun()
                 else:
                     st.info("Список размеров пуст. Добавьте вручную ниже.")
-
                 col_s1, col_s2 = st.columns([3, 1])
                 new_size = col_s1.text_input("Добавить размер вручную", placeholder="Например: 80×80 или Ø 57", key="new_size_input")
                 if col_s2.button("＋ Добавить", key="add_size_btn", use_container_width=True):
                     if new_size.strip() and new_size.strip() not in st.session_state.size_tags:
                         st.session_state.size_tags.append(new_size.strip())
                         st.rerun()
-
                 data['SIZE_BLOCK'] = make_badges(st.session_state.size_tags, font_size="12px", padding="4px 10px")
 
                 st.markdown("---")
@@ -686,20 +884,20 @@ else:
                 for i in range(1, 4):
                     st.markdown(f"**Товар №{i}**")
                     d_t, d_d, d_p = f"Товар {i}", "ГОСТ, марка стали", "50 000₽"
-                    data[f'T_{i}'] = cached_input("Название", f"{mode}_also_t_{i}", d_t, d_t) or d_t
-                    data[f'D_{i}'] = cached_input("Описание", f"{mode}_also_d_{i}", d_d, d_d) or d_d
-                    data[f'P_{i}'] = cached_input("Цена", f"{mode}_also_p_{i}", d_p, d_p) or d_p
-                    data[f'I_{i}'] = cached_input("URL картинки", f"{mode}_also_i_{i}", "", "https://...") or ""
-                    data[f'L_{i}'] = cached_input("Ссылка", f"{mode}_also_l_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
+                    data[f'T_{i}'] = cached_input("Название",    f"{mode}_also_t_{i}", d_t, d_t) or d_t
+                    data[f'D_{i}'] = cached_input("Описание",    f"{mode}_also_d_{i}", d_d, d_d) or d_d
+                    data[f'P_{i}'] = cached_input("Цена",        f"{mode}_also_p_{i}", d_p, d_p) or d_p
+                    data[f'I_{i}'] = cached_input("URL картинки",f"{mode}_also_i_{i}", "", "https://...") or ""
+                    data[f'L_{i}'] = cached_input("Ссылка",      f"{mode}_also_l_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
 
             with st.expander("3. Наши отгрузки (2 кейса)"):
                 for i in range(1, 3):
                     st.markdown(f"**Кейс №{i}**")
                     d_ct, d_cd, d_cdt = "Партия труб", "Отгружено 20 тонн", "15.05.2024"
                     data[f'CASE_TITLE_{i}'] = cached_input("Заголовок кейса", f"{mode}_case_title_{i}", d_ct, d_ct) or d_ct
-                    data[f'CASE_DESC_{i}'] = cached_input("Описание кейса", f"{mode}_case_desc_{i}", d_cd, d_cd) or d_cd
-                    data[f'CASE_DATE_{i}'] = cached_input("Дата", f"{mode}_case_date_{i}", d_cdt, d_cdt) or d_cdt
-                    data[f'CASE_IMG_{i}'] = cached_input("URL фото", f"{mode}_case_img_{i}", "", "https://...") or ""
+                    data[f'CASE_DESC_{i}']  = cached_input("Описание кейса",  f"{mode}_case_desc_{i}",  d_cd, d_cd) or d_cd
+                    data[f'CASE_DATE_{i}']  = cached_input("Дата",            f"{mode}_case_date_{i}",  d_cdt, d_cdt) or d_cdt
+                    data[f'CASE_IMG_{i}']   = cached_input("URL фото",        f"{mode}_case_img_{i}",   "", "https://...") or ""
 
         elif mode == "promo":
             st.subheader("Товарные и структурные блоки")
@@ -709,24 +907,24 @@ else:
                     st.markdown(f"**Товар №{i}**")
                     col1, col2, col3 = st.columns([2, 1, 1])
                     d_t, d_p, d_op = f"Лист х/к {i}", "495₽/т", "550₽"
-                    data[f'T_{i}'] = cached_input("Название", f"{mode}_t_{i}", d_t, d_t, col=col1) or d_t
-                    data[f'P_{i}'] = cached_input("Цена со скидкой", f"{mode}_p_{i}", d_p, d_p, col=col2) or d_p
-                    data[f'OLD_P_{i}'] = cached_input("Старая цена", f"{mode}_op_{i}", d_op, d_op, col=col3) or d_op
+                    data[f'T_{i}']     = cached_input("Название",       f"{mode}_t_{i}",  d_t,  d_t,  col=col1) or d_t
+                    data[f'P_{i}']     = cached_input("Цена со скидкой",f"{mode}_p_{i}",  d_p,  d_p,  col=col2) or d_p
+                    data[f'OLD_P_{i}'] = cached_input("Старая цена",    f"{mode}_op_{i}", d_op, d_op, col=col3) or d_op
                     d_d = "ГОСТ 16523-97"
-                    data[f'D_{i}'] = cached_input("Описание", f"{mode}_d_{i}", d_d, d_d) or d_d
-                    data[f'I_{i}'] = cached_input("URL картинки", f"{mode}_i_{i}", "", "https://...") or ""
-                    data[f'L_{i}'] = cached_input("Ссылка", f"{mode}_l_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
+                    data[f'D_{i}'] = cached_input("Описание",    f"{mode}_d_{i}", d_d, d_d) or d_d
+                    data[f'I_{i}'] = cached_input("URL картинки",f"{mode}_i_{i}", "", "https://...") or ""
+                    data[f'L_{i}'] = cached_input("Ссылка",      f"{mode}_l_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
                     st.markdown("---")
 
             with st.expander("2. Также зафиксировали цены (Малые блоки 1x3)"):
                 for i in range(1, 4):
                     st.markdown(f"**Малый товар №{i}**")
                     d_sm_t, d_sm_p, d_sm_d = "Сетка цинк", "305₽/т", "ГОСТ 23279-2012"
-                    data[f'SMALL_T_{i}'] = cached_input("Название", f"{mode}_sm_t_{i}", d_sm_t, d_sm_t) or d_sm_t
-                    data[f'SMALL_P_{i}'] = cached_input("Цена", f"{mode}_sm_p_{i}", d_sm_p, d_sm_p) or d_sm_p
-                    data[f'SMALL_D_{i}'] = cached_input("Описание", f"{mode}_sm_d_{i}", d_sm_d, d_sm_d) or d_sm_d
-                    data[f'SMALL_I_{i}'] = cached_input("URL фото", f"{mode}_sm_img_{i}", "", "https://...") or ""
-                    data[f'SMALL_L_{i}'] = cached_input("Ссылка", f"{mode}_sm_link_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
+                    data[f'SMALL_T_{i}'] = cached_input("Название",  f"{mode}_sm_t_{i}",   d_sm_t, d_sm_t) or d_sm_t
+                    data[f'SMALL_P_{i}'] = cached_input("Цена",      f"{mode}_sm_p_{i}",   d_sm_p, d_sm_p) or d_sm_p
+                    data[f'SMALL_D_{i}'] = cached_input("Описание",  f"{mode}_sm_d_{i}",   d_sm_d, d_sm_d) or d_sm_d
+                    data[f'SMALL_I_{i}'] = cached_input("URL фото",  f"{mode}_sm_img_{i}", "", "https://...") or ""
+                    data[f'SMALL_L_{i}'] = cached_input("Ссылка",    f"{mode}_sm_link_{i}",data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
                     st.markdown("---")
 
             with st.expander("3. Категории товаров"):
@@ -737,9 +935,9 @@ else:
                     d_ct_t = "Трубный прокат"
                     data[f'CAT_TITLE_{i}'] = cached_input("Заголовок", f"{mode}_cat_title_{i}", d_ct_t, d_ct_t) or d_ct_t
                     d_ct_d = "Огромный выбор диаметров и стенок"
-                    data[f'CAT_DESC_{i}'] = cached_input("Описание", f"{mode}_cat_desc_{i}", d_ct_d, d_ct_d, area=True, height=80) or d_ct_d
-                    data[f'CAT_IMG_{i}'] = cached_input("URL картинки", f"{mode}_cat_img_{i}", "", "https://...") or ""
-                    data[f'CAT_LINK_{i}'] = cached_input("Ссылка", f"{mode}_cat_link_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
+                    data[f'CAT_DESC_{i}']  = cached_input("Описание",  f"{mode}_cat_desc_{i}",  d_ct_d, d_ct_d, area=True, height=80) or d_ct_d
+                    data[f'CAT_IMG_{i}']   = cached_input("URL картинки",f"{mode}_cat_img_{i}", "", "https://...") or ""
+                    data[f'CAT_LINK_{i}']  = cached_input("Ссылка",    f"{mode}_cat_link_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
                     st.markdown("---")
 
             with st.expander("4. Наши отгрузки за неделю"):
@@ -749,12 +947,12 @@ else:
                     st.markdown(f"**Кейс №{i}**")
                     col_k1, col_k2 = st.columns([2, 1])
                     d_c_title = f"Отгрузка металлопроката {i}"
-                    data[f'CASE_TITLE_{i}'] = cached_input("Заголовок отгрузки", f"{mode}_case_title_{i}", d_c_title, d_c_title, col=col_k1) or d_c_title
+                    data[f'CASE_TITLE_{i}'] = cached_input("Заголовок отгрузки",      f"{mode}_case_title_{i}", d_c_title, d_c_title, col=col_k1) or d_c_title
                     d_c_date = "10.06.2024"
-                    data[f'CASE_DATE_{i}'] = cached_input("Дата", f"{mode}_case_date_{i}", d_c_date, d_c_date, col=col_k2) or d_c_date
+                    data[f'CASE_DATE_{i}']  = cached_input("Дата",                    f"{mode}_case_date_{i}",  d_c_date,  d_c_date,  col=col_k2) or d_c_date
                     d_c_desc = "Укомплектовали и доставили заказ на объект"
-                    data[f'CASE_DESC_{i}'] = cached_input("Описание (что отгрузили)", f"{mode}_case_desc_{i}", d_c_desc, d_c_desc) or d_c_desc
-                    data[f'CASE_IMG_{i}'] = cached_input("URL фото отгрузки", f"{mode}_case_img_{i}", "", "https://...") or ""
+                    data[f'CASE_DESC_{i}']  = cached_input("Описание (что отгрузили)",f"{mode}_case_desc_{i}",  d_c_desc,  d_c_desc) or d_c_desc
+                    data[f'CASE_IMG_{i}']   = cached_input("URL фото отгрузки",       f"{mode}_case_img_{i}",   "", "https://...") or ""
                     st.markdown("---")
 
         elif mode == "services":
@@ -766,10 +964,10 @@ else:
                 for i in range(1, 4):
                     st.markdown(f"**Услуга №{i}**")
                     d_sv_t, d_sv_d = "Лазерная резка", "Точность до микрона"
-                    data[f'T_{i}'] = cached_input("Название", f"{mode}_sv_t_{i}", d_sv_t, d_sv_t) or d_sv_t
-                    data[f'D_{i}'] = cached_input("Описание", f"{mode}_sv_d_{i}", d_sv_d, d_sv_d) or d_sv_d
-                    data[f'I_{i}'] = cached_input("URL картинки", f"{mode}_sv_i_{i}", "", "https://...") or ""
-                    data[f'L_{i}'] = cached_input("Ссылка", f"{mode}_sv_l_{i}", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', '')) or data.get('LINK_CATALOG', '')
+                    data[f'T_{i}'] = cached_input("Название",    f"{mode}_sv_t_{i}", d_sv_t, d_sv_t) or d_sv_t
+                    data[f'D_{i}'] = cached_input("Описание",    f"{mode}_sv_d_{i}", d_sv_d, d_sv_d) or d_sv_d
+                    data[f'I_{i}'] = cached_input("URL картинки",f"{mode}_sv_i_{i}", "", "https://...") or ""
+                    data[f'L_{i}'] = cached_input("Ссылка",      f"{mode}_sv_l_{i}", data.get('LINK_CATALOG',''), data.get('LINK_CATALOG','')) or data.get('LINK_CATALOG','')
                     st.markdown("---")
 
             with st.expander("2. Сортамент под ваши чертежи"):
@@ -778,17 +976,16 @@ else:
                 d_sort_i = "Поставляем прокат напрямую с заводов..."
                 raw_sort_i = cached_input("Вводный текст", f"{mode}_sort_intro_raw", d_sort_i, d_sort_i, area=True, height=80) or d_sort_i
                 data['SORT_INTRO'] = process_text_to_html(raw_sort_i)
-
                 for i in range(1, 3):
                     st.markdown(f"**Товар №{i}**")
                     d_sr_t, d_sr_sp = "Труба БШ", "ГОСТ 8734-75"
-                    data[f'SORT_T_{i}'] = cached_input("Название", f"{mode}_sr_t_{i}", d_sr_t, d_sr_t) or d_sr_t
-                    data[f'SORT_SPEC_{i}'] = cached_input("Характеристика", f"{mode}_sr_sp_{i}", d_sr_sp, d_sr_sp) or d_sr_sp
+                    data[f'SORT_T_{i}']    = cached_input("Название",       f"{mode}_sr_t_{i}",    d_sr_t,  d_sr_t) or d_sr_t
+                    data[f'SORT_SPEC_{i}'] = cached_input("Характеристика", f"{mode}_sr_sp_{i}",   d_sr_sp, d_sr_sp) or d_sr_sp
                     d_sr_d = "- Сталь 20\n- Любая нарезка"
                     raw_sr_d = cached_input("Описание", f"{mode}_sr_d_{i}_raw", d_sr_d, d_sr_d, area=True, height=80) or d_sr_d
                     data[f'SORT_D_{i}'] = process_text_to_html(raw_sr_d)
-                    data[f'SORT_I_{i}'] = cached_input("URL фото", f"{mode}_sr_i_{i}", "", "https://...") or ""
-                    data[f'SORT_L_{i}'] = cached_input("Ссылка", f"{mode}_sr_l_{i}", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', '')) or data.get('LINK_CATALOG', '')
+                    data[f'SORT_I_{i}'] = cached_input("URL фото",f"{mode}_sr_i_{i}", "", "https://...") or ""
+                    data[f'SORT_L_{i}'] = cached_input("Ссылка",  f"{mode}_sr_l_{i}", data.get('LINK_CATALOG',''), data.get('LINK_CATALOG','')) or data.get('LINK_CATALOG','')
                     st.markdown("---")
 
             with st.expander("3. Монтаж без задержек: отгружаем точно в срок"):
@@ -798,45 +995,58 @@ else:
                     st.markdown(f"**Отгрузка №{i}**")
                     col1, col2 = st.columns(2)
                     d_sh_t = f"Название товара {i}"
-                    data[f'SHIP_T_{i}'] = cached_input("Название товара", f"{mode}_sh_t_{i}", d_sh_t, d_sh_t, col=col1) or d_sh_t
+                    data[f'SHIP_T_{i}']    = cached_input("Название товара", f"{mode}_sh_t_{i}",  d_sh_t, d_sh_t, col=col1) or d_sh_t
                     d_sh_date = "12.06.2024"
-                    data[f'SHIP_DATE_{i}'] = cached_input("Дата", f"{mode}_sh_dt_{i}", d_sh_date, d_sh_date, col=col2) or d_sh_date
+                    data[f'SHIP_DATE_{i}'] = cached_input("Дата",            f"{mode}_sh_dt_{i}", d_sh_date, d_sh_date, col=col2) or d_sh_date
                     d_sh_d = "Описание процесса отгрузки или логистики"
-                    data[f'SHIP_D_{i}'] = cached_input("Описание", f"{mode}_sh_d_{i}", d_sh_d, d_sh_d) or d_sh_d
-                    data[f'SHIP_I_{i}'] = cached_input("URL фото отгрузки", f"{mode}_sh_i_{i}", "", "https://...") or ""
+                    data[f'SHIP_D_{i}'] = cached_input("Описание",       f"{mode}_sh_d_{i}", d_sh_d, d_sh_d) or d_sh_d
+                    data[f'SHIP_I_{i}'] = cached_input("URL фото отгрузки",f"{mode}_sh_i_{i}", "", "https://...") or ""
                     st.markdown("---")
 
         else:
             st.info("Блоки для данного шаблона настраиваются индивидуально. Перейдите в другой шаблон.")
 
-    # ==========================================
-    # ТАБ 4: ЭКСПЕРТ
-    # ==========================================
+    # ---- ТАБ 4: ЭКСПЕРТ ----
     with tabs[4]:
         st.info("Блок Алины зафиксирован в дизайне. Здесь меняется только ссылка кнопки.")
-        d_alink = "https://stalmetural.ru/contacts/"
+        d_alink = brand['contacts_url']
         data['ALINA_BTN_LINK'] = cached_input("Ссылка для кнопки 'Рассчитать смету'", "ALINA_BTN_LINK", d_alink, d_alink) or d_alink
 
     # ==========================================
-    # СБОРКА HTML
+    # 10. СОХРАНЕНИЕ И СБОРКА
     # ==========================================
     st.write("---")
-    if st.button("СОБРАТЬ ФИНАЛЬНЫЙ HTML", type="primary", use_container_width=True):
-        file_name = f"template_{mode}.html"
-        file_path = os.path.join("templates", file_name)
-        if not os.path.exists(file_path): file_path = file_name
-        
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                html = f.read()
-            
-            for key, val in data.items():
-                replacement = str(val) if val else ""
-                html = html.replace(f"{{{{{key}}}}}", replacement)
-            
-            st.success("Готово!")
-            components.html(html, height=800, scrolling=True)
-            with st.expander("Скопировать код"):
-                st.code(html, language="html")
-        except Exception as e:
-            st.error(f"Файл шаблона `{file_name}` не найден или произошла ошибка! {e}")
+    save_col, build_col = st.columns([1, 2])
+
+    with save_col:
+        with st.expander("💾 Сохранить проект"):
+            proj_name = st.text_input("Название проекта", placeholder="Например: Труба профильная июнь 2024", key="save_project_name")
+            if st.button("✅ Сохранить", use_container_width=True):
+                name = proj_name.strip() or f"{menu_items[mode]['title']} {datetime.now().strftime('%d.%m.%Y %H:%M')}"
+                save_project(
+                    brand_id      = brand['brand_id'],
+                    template_mode = mode,
+                    project_name  = name,
+                    data_dict     = {k: v for k, v in st.session_state.data.items()},
+                    gost_tags     = st.session_state.gost_tags,
+                    size_tags     = st.session_state.size_tags
+                )
+                st.success(f"Проект «{name}» сохранён!")
+
+    with build_col:
+        if st.button("СОБРАТЬ ФИНАЛЬНЫЙ HTML", type="primary", use_container_width=True):
+            file_name = f"template_{mode}.html"
+            file_path = os.path.join("templates", file_name)
+            if not os.path.exists(file_path): file_path = file_name
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    html = f.read()
+                for key, val in data.items():
+                    replacement = str(val) if val else ""
+                    html = html.replace(f"{{{{{key}}}}}", replacement)
+                st.success("Готово!")
+                components.html(html, height=800, scrolling=True)
+                with st.expander("Скопировать код"):
+                    st.code(html, language="html")
+            except Exception as e:
+                st.error(f"Файл шаблона `{file_name}` не найден или произошла ошибка! {e}")
