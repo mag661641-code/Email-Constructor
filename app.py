@@ -484,35 +484,114 @@ menu_items = {
 # ==========================================
 # 6. БОКОВАЯ ПАНЕЛЬ
 # ==========================================
+_sidebar_dark = st.session_state.theme == "dark"
+_sb_bg      = "#161922" if _sidebar_dark else "#F5F5F7"
+_sb_txt     = "#F5F5F7" if _sidebar_dark else "#1D1D1F"
+_sb_sub     = "rgba(245,245,247,.45)" if _sidebar_dark else "rgba(29,29,31,.4)"
+_sb_btn_bg  = "rgba(255,255,255,.07)" if _sidebar_dark else "rgba(0,0,0,.06)"
+_sb_btn_hov = accent
+_sb_div     = "rgba(255,255,255,.10)" if _sidebar_dark else "rgba(0,0,0,.08)"
+
 with st.sidebar:
-    # Шапка бренда
+    # --- Шапка бренда ---
     st.markdown(f"""
-    <div style="padding:12px 0 8px;">
-        <div style="font-size:11px; opacity:.5; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Бренд</div>
-        <div style="font-size:18px; font-weight:700;">{brand['brand_name']}</div>
-        <div style="font-size:12px; opacity:.5;">{user['login']}</div>
+    <style>
+    section[data-testid="stSidebar"] {{
+        background: {_sb_bg} !important;
+    }}
+    .sb-brand-block {{
+        padding: 20px 4px 4px;
+    }}
+    .sb-brand-label {{
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        color: {_sb_sub};
+        margin-bottom: 4px;
+    }}
+    .sb-brand-name {{
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -.4px;
+        color: {_sb_txt};
+        line-height: 1.2;
+    }}
+    .sb-brand-login {{
+        font-size: 12px;
+        color: {_sb_sub};
+        margin-top: 2px;
+    }}
+    .sb-divider {{
+        height: 1px;
+        background: {_sb_div};
+        margin: 16px 0;
+        border: none;
+    }}
+    .sb-nav-btn {{
+        display: block;
+        width: fit-content;
+        min-width: 148px;
+        padding: 9px 18px;
+        margin-bottom: 8px;
+        background: {_sb_btn_bg};
+        color: {_sb_txt};
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        letter-spacing: -.1px;
+        transition: background .15s, color .15s;
+        text-align: left;
+    }}
+    .sb-nav-btn:hover {{ background: {_sb_btn_hov}; color: #fff; }}
+    .sb-logout-btn {{
+        display: block;
+        width: fit-content;
+        min-width: 148px;
+        padding: 9px 18px;
+        margin-bottom: 8px;
+        background: transparent;
+        color: {_sb_sub};
+        font-size: 13px;
+        font-weight: 400;
+        border-radius: 10px;
+        border: 1px solid {_sb_div};
+        cursor: pointer;
+        letter-spacing: -.1px;
+        transition: background .15s, color .15s, border-color .15s;
+        text-align: left;
+    }}
+    .sb-logout-btn:hover {{ background: rgba(255,59,48,.12); color: #FF3B30; border-color: rgba(255,59,48,.3); }}
+    </style>
+    <div class="sb-brand-block">
+        <div class="sb-brand-label">Бренд</div>
+        <div class="sb-brand-name">{brand['brand_name']}</div>
+        <div class="sb-brand-login">{user['login']}</div>
     </div>
+    <div class="sb-divider"></div>
     """, unsafe_allow_html=True)
 
-    st.write("---")
-
-    # Кнопки — узкие, не на всю ширину
-    sb_col, _ = st.columns([2, 1])
-
     if st.session_state.mode is not None:
-        if sb_col.button("« Главное меню", use_container_width=True):
+        if st.button("← Главное меню", key="sb_back", use_container_width=False):
             set_mode(None)
             st.rerun()
 
-    # Кнопка История
     hist_label = "История проектов" if not st.session_state.show_history else "Конструктор"
-    if sb_col.button(hist_label, use_container_width=True):
+    if st.button(hist_label, key="sb_hist", use_container_width=False):
         st.session_state.show_history = not st.session_state.show_history
         st.rerun()
 
-    st.write("---")
+    # Психологическая поддержка
+    if st.session_state.cute_img and not st.session_state.show_history:
+        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+        st.image(st.session_state.cute_img, use_container_width=True)
+        st.markdown(f'<div style="font-size:11px; color:{_sb_sub}; margin-top:4px;">Психологическая поддержка</div>', unsafe_allow_html=True)
 
-    if sb_col.button("Выйти", use_container_width=True):
+    st.markdown('<div class="sb-divider" style="margin-top:auto;"></div>', unsafe_allow_html=True)
+
+    if st.button("Выйти", key="sb_logout", use_container_width=False):
         for k in ['authenticated', 'user', 'data', 'mode', 'cute_img',
                   'gost_tags', 'size_tags', 'show_history']:
             if k in st.session_state:
@@ -524,37 +603,93 @@ with st.sidebar:
 # ==========================================
 _top_l, _top_r = st.columns([12, 1])
 with _top_r:
-    _theme_label = "☀️" if st.session_state.theme == "dark" else "🌙"
-    if st.button(_theme_label, key="theme_btn_top"):
+    _theme_icon = "☀" if st.session_state.theme == "dark" else "☾"
+    if st.button(_theme_icon, key="theme_btn_top"):
         st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
         st.rerun()
 
 # ==========================================
 # 8. ИСТОРИЯ ПРОЕКТОВ
 # ==========================================
+_card_bg     = "rgba(255,255,255,.05)" if _sidebar_dark else "#FFFFFF"
+_card_border = "rgba(255,255,255,.10)" if _sidebar_dark else "rgba(0,0,0,.08)"
+_tag_colors  = {
+    "stock":    ("#E8F5E9","#2E7D32","#1B5E20"),
+    "promo":    ("#FFF3E0","#E65100","#BF360C"),
+    "services": ("#E3F2FD","#1565C0","#0D47A1"),
+    "cases":    ("#F3E5F5","#6A1B9A","#4A148C"),
+    "expert":   ("#E8EAF6","#283593","#1A237E"),
+}
+_tag_colors_dark = {
+    "stock":    ("rgba(46,125,50,.25)","#81C784","#81C784"),
+    "promo":    ("rgba(230,81,0,.25)","#FFB74D","#FFB74D"),
+    "services": ("rgba(21,101,192,.25)","#64B5F6","#64B5F6"),
+    "cases":    ("rgba(106,27,154,.25)","#CE93D8","#CE93D8"),
+    "expert":   ("rgba(40,53,147,.25)","#9FA8DA","#9FA8DA"),
+}
+
 if st.session_state.show_history:
-    st.title("История проектов")
+    st.markdown(f"""
+    <h1 style="font-size:32px; font-weight:700; letter-spacing:-.6px; margin-bottom:24px;">
+        История проектов
+    </h1>
+    """, unsafe_allow_html=True)
+
     projects = load_projects(brand['brand_id'])
 
     if not projects:
-        st.info("Сохранённых проектов пока нет. Создайте письмо и нажмите «Сохранить проект».")
+        st.markdown(f"""
+        <div style="padding:40px 32px; border-radius:16px;
+             background:{_card_bg}; border:1px solid {_card_border};
+             text-align:center; color:{_sb_sub}; font-size:15px;">
+            Проектов пока нет.<br>Создайте письмо и нажмите «Сохранить проект».
+        </div>
+        """, unsafe_allow_html=True)
     else:
         for proj in projects:
-            mode_label = menu_items.get(proj['template_mode'], {}).get('title', proj['template_mode'])
-            col_a, col_b, col_c = st.columns([4, 2, 1])
-            col_a.markdown(f"**{proj['project_name']}**  \n`{mode_label}` · {proj['created_at']}")
-            if col_b.button("📂 Открыть", key=f"open_{proj['id']}"):
-                full = load_project_data(proj['id'])
-                st.session_state.data      = json.loads(full['data_json'])
-                st.session_state.gost_tags = json.loads(full['gost_tags'])
-                st.session_state.size_tags = json.loads(full['size_tags'])
-                st.session_state.mode      = full['template_mode']
-                st.session_state.show_history = False
-                st.rerun()
-            if col_c.button("🗑️", key=f"del_{proj['id']}"):
-                delete_project(proj['id'])
-                st.rerun()
-            st.write("---")
+            m_id   = proj['template_mode']
+            m_title = menu_items.get(m_id, {}).get('title', m_id)
+            tcolors = (_tag_colors_dark if _sidebar_dark else _tag_colors).get(
+                m_id, ("rgba(120,120,128,.2)","#888","#666"))
+            tag_bg, tag_txt, _ = tcolors
+
+            col_a, col_b, col_c = st.columns([6, 1, 1])
+            with col_a:
+                st.markdown(f"""
+                <div style="padding:16px 20px; border-radius:14px;
+                     background:{_card_bg}; border:1px solid {_card_border};
+                     display:flex; align-items:center; gap:14px;">
+                    <div>
+                        <div style="font-size:15px; font-weight:600;
+                             color:{_sb_txt}; letter-spacing:-.2px; margin-bottom:5px;">
+                            {proj['project_name']}
+                        </div>
+                        <span style="display:inline-block; padding:2px 9px;
+                              border-radius:20px; font-size:11px; font-weight:600;
+                              letter-spacing:.4px; text-transform:uppercase;
+                              background:{tag_bg}; color:{tag_txt};">
+                            {m_title}
+                        </span>
+                        <span style="font-size:12px; color:{_sb_sub}; margin-left:8px;">
+                            {proj['created_at']}
+                        </span>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            with col_b:
+                if st.button("Открыть", key=f"open_{proj['id']}", use_container_width=True):
+                    full = load_project_data(proj['id'])
+                    st.session_state.data      = json.loads(full['data_json'])
+                    st.session_state.gost_tags = json.loads(full['gost_tags'])
+                    st.session_state.size_tags = json.loads(full['size_tags'])
+                    st.session_state.mode      = full['template_mode']
+                    st.session_state.show_history = False
+                    st.rerun()
+            with col_c:
+                if st.button("Удалить", key=f"del_{proj['id']}", use_container_width=True):
+                    delete_project(proj['id'])
+                    st.rerun()
+            st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
     st.stop()
 
 # ==========================================
@@ -1033,9 +1168,9 @@ else:
     save_col, build_col = st.columns([1, 2])
 
     with save_col:
-        with st.expander("💾 Сохранить проект"):
+        with st.expander("Сохранить проект"):
             proj_name = st.text_input("Название проекта", placeholder="Например: Труба профильная июнь 2024", key="save_project_name")
-            if st.button("✅ Сохранить", use_container_width=True):
+            if st.button("Сохранить", use_container_width=True):
                 name = proj_name.strip() or f"{menu_items[mode]['title']} {datetime.now().strftime('%d.%m.%Y %H:%M')}"
                 save_project(
                     brand_id      = brand['brand_id'],
