@@ -26,6 +26,9 @@ def process_text_to_html(text):
             processed_lines.append(item)
     return "<br>".join(processed_lines)
 
+def get_stored(key, default=""):
+    return st.session_state.data.get(key, "")
+
 # ---- ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ ЗНАЧКОВ ----
 def make_badges(items, font_size="11px", padding="3px 8px"):
     span_style = (
@@ -71,6 +74,10 @@ SIZE_PRESETS = {
 # 1. КОНФИГУРАЦИЯ СТРАНИЦЫ
 # ==========================================
 st.set_page_config(layout="wide", page_title="Стальметурал | Конструктор", initial_sidebar_state="expanded")
+
+# Инициализируем хранилище данных, если его еще нет
+if 'data' not in st.session_state:
+    st.session_state.data = {}
 
 if 'mode' not in st.session_state: st.session_state.mode = None
 if 'cute_img' not in st.session_state: st.session_state.cute_img = None
@@ -287,18 +294,22 @@ else:
     with tabs[0]:
         c1, c2 = st.columns(2)
         d_email = "msk@stalmetural.ru"
-        data['EMAIL'] = c1.text_input("Email филиала", placeholder=d_email) or d_email
+        # key='EMAIL' заставляет Streamlit сохранять значение в session_state автоматически
+        st.session_state.data['EMAIL'] = c1.text_input("Email филиала", value=get_stored('EMAIL'), placeholder=d_email, key='EMAIL')
+        data['EMAIL'] = st.session_state.data['EMAIL'] or d_email
         
         d_phone = "+7 (499) 130-60-28"
-        data['PHONE'] = c1.text_input("Телефон филиала", placeholder=d_phone) or d_phone
+        st.session_state.data['PHONE'] = c1.text_input("Телефон филиала", value=get_stored('PHONE'), placeholder=d_phone, key='PHONE')
+        data['PHONE'] = st.session_state.data['PHONE'] or d_phone
         
+        # Ссылки и прочее считаем на лету
         data['PHONE_DIGITS'] = "".join(filter(str.isdigit, data['PHONE']))
-        if not data['PHONE_DIGITS'].startswith('+'):
-            data['PHONE_DIGITS'] = "+" + data['PHONE_DIGITS']
+        if not data['PHONE_DIGITS'].startswith('+'): data['PHONE_DIGITS'] = "+" + data['PHONE_DIGITS']
         data['PHONE_LINK'] = f"tel:{data['PHONE_DIGITS']}"
         
         d_city = "в Москве"
-        data['CITY_IN'] = c2.text_input("Город (в чем? где?)", placeholder=d_city) or d_city
+        st.session_state.data['CITY_IN'] = c2.text_input("Город", value=get_stored('CITY_IN'), placeholder=d_city, key='CITY_IN')
+        data['CITY_IN'] = st.session_state.data['CITY_IN'] or d_city
         
         d_logo = "https://stalmetural.ru/"
         data['LINK_LOGO'] = c2.text_input("Ссылка при клике на логотип", placeholder=d_logo) or d_logo
@@ -342,8 +353,10 @@ else:
             d_hi = "https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6uyisxkcb9z7eaauf9n3p3mtxknbsdqxp466f8gerep3qqo3qg9gbanpmbuqopttjmnzyzspdqyqxfm55dgtdc1xhua6ni8nrnmqq1qo538z6idf768zyjwfpoohe8gbci4z3phict9wqfg496t8gqbqy5r6b3tjcs34m6na"
             data['HERO_IMG'] = st.text_input("Картинка справа", placeholder=d_hi) or d_hi
             data['HERO_BTN_LINK'] = st.text_input("Ссылка кнопки", placeholder=data.get('LINK_CATALOG', '')) or data.get('LINK_CATALOG', '')
+        
         else:
             data['HERO_TITLE'] = st.text_input('Заголовок баннера', placeholder="МЕТАЛЛОПРОКАТ ОТ ПРОИЗВОДИТЕЛЯ") or "МЕТАЛЛОПРОКАТ ОТ ПРОИЗВОДИТЕЛЯ"
+        
 
     with tabs[2]:
         st.markdown("""
@@ -457,7 +470,10 @@ else:
             st.subheader("Основной текстовый блок")
             
             d_title = "Больше, чем просто продажа металла"
-            data['TEXT_TITLE'] = st.text_input("Заголовок раздела", placeholder=d_title) or d_title
+            # Сохраняем заголовок конкретно для этого режима
+            key_t = f"{mode}_text_title"
+            st.session_state.data[key_t] = st.text_input("Заголовок раздела", value=get_stored(key_t), placeholder=d_title, key=key_t)
+            data['TEXT_TITLE'] = st.session_state.data[key_t] or d_title
 
             d_body = (
                 "Закупка металла «с запасом» и ручная подрезка на объекте — это **скрытые убытки вашего проекта**. "
@@ -470,8 +486,9 @@ else:
                 "- **Заводская точность:** лазерная и плазменная резка исключают брак.\n\n"
                 "Из-за высокого спроса производственные мощности цеха **ограничены**. Свяжитесь с нами сегодня."
             )
-            text_body_raw = st.text_area("Основной текст письма", height=300, placeholder=d_body) or d_body
-            data['TEXT_BODY'] = process_text_to_html(text_body_raw)
+            key_b = f"{mode}_text_body"
+            st.session_state.data[key_b] = st.text_area("Основной текст", value=get_stored(key_b), height=300, placeholder=d_body, key=key_b)
+            data['TEXT_BODY'] = process_text_to_html(st.session_state.data[key_b] or d_body)
 
         
         else:
@@ -490,10 +507,14 @@ else:
                 for i in range(1, 5):
                     st.markdown(f"**Товар №{i}**")
                     col1, col2 = st.columns(2)
-                    d_name = f"Труба №{i}"
-                    data[f'PROD_{i}_TITLE'] = col1.text_input("Название", placeholder=d_name, key=f"pr_t{i}") or d_name
-                    d_price = "39 500₽/т"
-                    data[f'PROD_{i}_PRICE'] = col2.text_input("Цена", placeholder=d_price, key=f"pr_p{i}") or d_price
+                    k_t = f"{mode}_prod_{i}_title"
+                    d_t = f"Труба №{i}"
+                    st.session_state.data[k_t] = col1.text_input("Название", value=get_stored(k_t), placeholder=d_t, key=k_t)
+                    data[f'PROD_{i}_TITLE'] = st.session_state.data[k_t] or d_t
+                    k_p = f"{mode}_prod_{i}_price"
+                    d_p = "39 500₽/т"
+                    st.session_state.data[k_p] = col2.text_input("Цена", value=get_stored(k_p), placeholder=d_p, key=k_p)
+                    data[f'PROD_{i}_PRICE'] = st.session_state.data[k_p] or d_p
                     d_desc = "ГОСТ 8639-82, сталь 3пс"
                     data[f'PROD_{i}_DESC'] = st.text_area("Описание", placeholder=d_desc, key=f"pr_d{i}", height=70) or d_desc
                     
