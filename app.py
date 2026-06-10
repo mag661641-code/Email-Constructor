@@ -342,16 +342,17 @@ base_styles = f"""
     html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
     .stButton > button {{
         height: 90px !important; border-radius: 12px !important;
-        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+        transition: all 0.2s ease !important;
         display: flex !important; flex-direction: column !important;
         align-items: center !important; justify-content: center !important;
         gap: 5px !important; white-space: pre-wrap !important;
-        text-align: center !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        text-align: center !important; box-shadow: 0 2px 4px rgba(0,0,0,0.04);
     }}
-    .stButton > button:hover {{ transform: translateY(-5px) !important; border-color: {accent} !important; box-shadow: 0 10px 15px rgba(0,0,0,0.1) !important; }}
+    .stButton > button:hover {{ transform: translateY(-2px) !important; box-shadow: 0 6px 12px rgba(0,0,0,0.08) !important; }}
     .stButton > button div p {{ font-size: 14px !important; font-weight: 700 !important; }}
     [data-testid="column"]:last-child button {{ height: 25px !important; line-height: 1 !important; padding: 0 !important; }}
     div.stButton > button[kind="primary"] {{ background-color: {accent} !important; color: white !important; height: 55px !important; border: none !important; font-weight: 700 !important; text-transform: uppercase; transform: none !important; }}
+    div.stButton > button[kind="primary"]:hover {{ filter: brightness(.88) !important; transform: none !important; }}
     button[data-baseweb="tab"][aria-selected="true"] p {{ color: {accent} !important; }}
     button[data-baseweb="tab"][aria-selected="true"] {{ border-bottom-color: {accent} !important; }}
 </style>
@@ -379,8 +380,6 @@ if st.session_state.theme == "light":
         box-shadow: 0 2px 8px rgba(0,0,0,.10) !important;
         transform: translateY(-1px) !important;
     }}
-    .stButton > button:hover p, .stButton > button:hover div p,
-    .stButton > button:hover span {{ color: #111827 !important; }}
     /* primary — всегда акцент, текст белый */
     div.stButton > button[kind="primary"] {{
         color: #ffffff !important;
@@ -754,30 +753,11 @@ with _top_theme:
         st.rerun()
 
 with _top_acc:
-    # Кнопка-аватарка: открывает/закрывает дропдаун
-    if st.button("👤", key="acc_menu_btn"):
+    # Кнопка — короткое имя бренда (первые 3 буквы)
+    _btn_label = user['brand_name'][:3].upper()
+    if st.button(_btn_label, key="acc_menu_btn"):
         st.session_state.show_account_menu = not st.session_state.show_account_menu
         st.rerun()
-    # Аватарка поверх кнопки через HTML
-    st.markdown(f"""
-    <style>
-    div[data-testid="stButton"][id="acc_menu_btn_wrap"] button,
-    [data-testid="element-container"]:has(button[data-testid="acc_menu_btn"]) button {{
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        width: 38px !important; height: 38px !important;
-        border-radius: 50% !important;
-        overflow: hidden !important;
-    }}
-    </style>
-    <div style="position:relative;top:-42px;left:0;width:38px;height:38px;
-         border-radius:50%;overflow:hidden;border:2px solid {accent};
-         pointer-events:none;z-index:5;">
-        <img src="{_cur_avatar}" style="width:100%;height:100%;object-fit:cover;display:block;">
-    </div>
-    """, unsafe_allow_html=True)
 
 # Дропдаун — рендерим под верхней панелью если открыт
 if st.session_state.show_account_menu:
@@ -796,7 +776,7 @@ if st.session_state.show_account_menu:
     </div>
     """, unsafe_allow_html=True)
 
-    # Невидимые кнопки для клика по аккаунтам
+    # Кнопки переключения аккаунтов
     for _a in _all_accounts:
         if _a['login'] != user['login']:
             if st.button(_a['name'], key=f"dd_sw_{_a['login']}"):
@@ -822,8 +802,7 @@ if st.session_state.show_account_menu:
                     st.session_state.show_account_menu = False
                     st.query_params["u"] = _a['login']
                     st.rerun()
-    # Кнопка закрыть
-    if st.button("✕ Закрыть", key="dd_close"):
+    if st.button("Закрыть", key="dd_close"):
         st.session_state.show_account_menu = False
         st.rerun()
 
@@ -1383,26 +1362,30 @@ else:
     # ==========================================
     # 10. СОХРАНЕНИЕ И СБОРКА
     # ==========================================
+    st.markdown('<div style="height:8px"></div>', unsafe_allow_html=True)
     st.write("---")
-    save_col, build_col = st.columns([1, 2])
 
-    with save_col:
-        with st.expander("💾 Сохранить проект"):
-            proj_name = st.text_input("Название проекта", placeholder="Например: Труба профильная июнь 2024", key="save_project_name")
-            if st.button("✅ Сохранить", use_container_width=True):
-                name = proj_name.strip() or f"{menu_items[mode]['title']} {datetime.now().strftime('%d.%m.%Y %H:%M')}"
-                save_project(
-                    brand_id      = brand['brand_id'],
-                    template_mode = mode,
-                    project_name  = name,
-                    data_dict     = {k: v for k, v in st.session_state.data.items()},
-                    gost_tags     = st.session_state.gost_tags,
-                    size_tags     = st.session_state.size_tags
-                )
-                st.success(f"Проект «{name}» сохранён!")
-
-    with build_col:
-        if st.button("СОБРАТЬ ФИНАЛЬНЫЙ HTML", type="primary", use_container_width=True):
+    # Одна строка: поле названия + Сохранить + Собрать HTML
+    _sv_c1, _sv_c2, _sv_c3 = st.columns([3, 1, 2])
+    with _sv_c1:
+        proj_name = st.text_input(
+            "", placeholder="Название проекта (оставьте пустым для авто)",
+            key="save_project_name", label_visibility="collapsed"
+        )
+    with _sv_c2:
+        if st.button("Сохранить", use_container_width=True, key="save_btn"):
+            name = proj_name.strip() or f"{menu_items[mode]['title']} {datetime.now().strftime('%d.%m %H:%M')}"
+            save_project(
+                brand_id      = brand['brand_id'],
+                template_mode = mode,
+                project_name  = name,
+                data_dict     = {k: v for k, v in st.session_state.data.items()},
+                gost_tags     = st.session_state.gost_tags,
+                size_tags     = st.session_state.size_tags
+            )
+            st.success(f"Сохранено: «{name}»")
+    with _sv_c3:
+        if st.button("Собрать HTML", type="primary", use_container_width=True):
             file_name = f"template_{mode}.html"
             file_path = os.path.join("templates", file_name)
             if not os.path.exists(file_path): file_path = file_name
