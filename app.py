@@ -291,7 +291,7 @@ else:
         d_logo = "https://stalmetural.ru/"
         data['LINK_LOGO'] = c2.text_input("Ссылка при клике на логотип", placeholder=d_logo) or d_logo
         
-         col_m1, col_m2, col_m3 = st.columns(3)
+        col_m1, col_m2, col_m3 = st.columns(3)
         d_cat = "https://stalmetural.ru/catalog/"
         data['LINK_CATALOG'] = col_m1.text_input("Ссылка 'Каталог'", placeholder=d_cat) or d_cat
         
