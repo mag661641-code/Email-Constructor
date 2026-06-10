@@ -369,31 +369,40 @@ if st.session_state.theme == "light":
         background-color: #FFFFFF !important;
         border: 1px solid #D1D5DB !important;
         color: #111827 !important;
-        transition: background-color .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease !important;
+        transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease !important;
     }}
     .stButton > button p, .stButton > button div p,
     .stButton > button span {{ color: #111827 !important; }}
     .stButton > button:hover {{
-        background-color: {accent} !important;
-        border-color: {accent} !important;
-        color: #ffffff !important;
-        box-shadow: 0 4px 14px rgba(0,0,0,.12) !important;
-        transform: translateY(-2px) !important;
+        background-color: #E5E7EB !important;
+        border-color: #9CA3AF !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,.10) !important;
+        transform: translateY(-1px) !important;
     }}
     .stButton > button:hover p, .stButton > button:hover div p,
-    .stButton > button:hover span {{ color: #ffffff !important; }}
+    .stButton > button:hover span {{ color: #111827 !important; }}
+    /* primary — всегда акцент, текст белый */
+    div.stButton > button[kind="primary"] {{
+        color: #ffffff !important;
+    }}
+    div.stButton > button[kind="primary"] p,
+    div.stButton > button[kind="primary"] div p,
+    div.stButton > button[kind="primary"] span {{ color: #ffffff !important; }}
+    div.stButton > button[kind="primary"]:hover {{
+        filter: brightness(.88) !important;
+        box-shadow: 0 4px 14px rgba(0,0,0,.18) !important;
+        transform: translateY(-1px) !important;
+    }}
 
     /* Глазок пароля — светлая тема */
-    [data-testid="stTextInput"] button,
-    [data-testid="stTextInput"] button svg {{ color: #6B7280 !important; fill: #6B7280 !important; }}
-    [data-testid="stTextInput"] button:hover,
-    [data-testid="stTextInput"] button:hover svg {{ color: {accent} !important; fill: {accent} !important; }}
+    [data-testid="stTextInput"] button svg {{ fill: #6B7280 !important; }}
+    [data-testid="stTextInput"] button:hover svg {{ fill: #374151 !important; }}
 
+    .stTextInput input::placeholder, .stTextArea textarea::placeholder {{ color: #9CA3AF !important; opacity: 1 !important; }}
     .stTextInput input, .stTextArea textarea {{
         background-color: #FFFFFF !important; color: #111827 !important;
         caret-color: #111827 !important; border: 1px solid #D1D5DB !important;
     }}
-    .stTextInput input::placeholder, .stTextArea textarea::placeholder {{ color: #9CA3AF !important; opacity: 1 !important; }}
     [data-testid="stExpander"] {{ border: 1px solid #D1D5DB !important; border-radius: 8px !important; background-color: #FFFFFF !important; }}
     [data-testid="stExpander"] details summary,
     [data-testid="stExpander"] details summary:hover,
@@ -422,25 +431,32 @@ else:
         background-color: #1A1C24 !important;
         border: 1px solid #3e4452 !important;
         color: #F3F4F6 !important;
-        transition: background-color .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease !important;
+        transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease !important;
     }}
     .stButton > button p, .stButton > button div p,
     .stButton > button span {{ color: #F3F4F6 !important; }}
     .stButton > button:hover {{
-        background-color: {accent} !important;
-        border-color: {accent} !important;
-        color: #ffffff !important;
-        box-shadow: 0 4px 18px rgba(0,0,0,.35) !important;
-        transform: translateY(-2px) !important;
+        background-color: #2D3140 !important;
+        border-color: #5a627a !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,.35) !important;
+        transform: translateY(-1px) !important;
     }}
     .stButton > button:hover p, .stButton > button:hover div p,
-    .stButton > button:hover span {{ color: #ffffff !important; }}
+    .stButton > button:hover span {{ color: #F3F4F6 !important; }}
+    /* primary — всегда акцент, текст белый */
+    div.stButton > button[kind="primary"] {{ color: #ffffff !important; }}
+    div.stButton > button[kind="primary"] p,
+    div.stButton > button[kind="primary"] div p,
+    div.stButton > button[kind="primary"] span {{ color: #ffffff !important; }}
+    div.stButton > button[kind="primary"]:hover {{
+        filter: brightness(.85) !important;
+        box-shadow: 0 4px 18px rgba(0,0,0,.4) !important;
+        transform: translateY(-1px) !important;
+    }}
 
     /* Глазок пароля — тёмная тема */
-    [data-testid="stTextInput"] button,
-    [data-testid="stTextInput"] button svg {{ color: #9CA3AF !important; fill: #9CA3AF !important; }}
-    [data-testid="stTextInput"] button:hover,
-    [data-testid="stTextInput"] button:hover svg {{ color: {accent} !important; fill: {accent} !important; }}
+    [data-testid="stTextInput"] button svg {{ fill: #9CA3AF !important; }}
+    [data-testid="stTextInput"] button:hover svg {{ fill: #D1D5DB !important; }}
 
     .stTextInput input, .stTextArea textarea {{
         background-color: #1F2937 !important; color: #F3F4F6 !important;
@@ -1300,9 +1316,9 @@ else:
     save_col, build_col = st.columns([1, 2])
 
     with save_col:
-        with st.expander("💾 Сохранить проект"):
+        with st.expander("Сохранить проект"):
             proj_name = st.text_input("Название проекта", placeholder="Например: Труба профильная июнь 2024", key="save_project_name")
-            if st.button("✅ Сохранить", use_container_width=True):
+            if st.button("Сохранить", use_container_width=True):
                 name = proj_name.strip() or f"{menu_items[mode]['title']} {datetime.now().strftime('%d.%m.%Y %H:%M')}"
                 save_project(
                     brand_id      = brand['brand_id'],
