@@ -255,17 +255,23 @@ menu_items = {
 # ==========================================
 def cached_input(label, key, default="", placeholder="", col=None, area=False, height=100):
     """
-    Рендерит text_input или text_area с key= и value=get_stored().
-    Автоматически сохраняет введённое значение в st.session_state.data[key].
+    Рендерит text_input или text_area.
+    - value= подставляется только если пользователь сам что-то вводил (хранится в st.session_state.data[key]).
+    - Если пользователь ничего не вводил — поле пустое, виден placeholder.
+    - При сборке HTML возвращает введённое значение или default (плейсхолдер как запасное).
     """
-    current = get_stored(key, default)
+    # Берём только явно сохранённое пользователем значение, без дефолта
+    current = st.session_state.data.get(key, "")
+    ph = placeholder or default
     widget = (col if col else st)
     if area:
-        val = widget.text_area(label, value=current, placeholder=placeholder or default, key=key, height=height)
+        val = widget.text_area(label, value=current, placeholder=ph, key=key, height=height)
     else:
-        val = widget.text_input(label, value=current, placeholder=placeholder or default, key=key)
+        val = widget.text_input(label, value=current, placeholder=ph, key=key)
+    # Сохраняем только то, что ввёл пользователь (пустая строка тоже валидна)
     st.session_state.data[key] = val
-    return val or default
+    # Для сборки HTML: если пусто — подставляем default
+    return val if val else default
 
 # ==========================================
 # 4. ВЕРХНЯЯ ПАНЕЛЬ
