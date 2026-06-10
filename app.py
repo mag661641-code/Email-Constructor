@@ -404,7 +404,7 @@ B64_METPROMENERGO = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4gHbSUND
 if not st.session_state.authenticated:
     st.markdown("""
     <div style="max-width:420px; margin:80px auto 0;">
-        <h1 style="text-align:center; margin-bottom:8px;">🔐 Вход в конструктор</h1>
+        <h1 style="text-align:center; margin-bottom:8px;">Вход в конструктор</h1>
         <p style="text-align:center; opacity:.6; margin-bottom:32px;">Введите логин и пароль вашего бренда</p>
     </div>
     """, unsafe_allow_html=True)
