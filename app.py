@@ -303,6 +303,30 @@ for key, val in [
     if key not in st.session_state:
         st.session_state[key] = val
 
+# ── Автовосстановление сессии из query_params ──────────────────────────────
+# При первой загрузке (authenticated=False) пытаемся восстановить логин
+# из ?u=login, который сохранялся при предыдущем входе.
+if not st.session_state.authenticated:
+    _saved_login = st.query_params.get("u", "")
+    if _saved_login:
+        conn = get_db()
+        _c = conn.cursor()
+        _c.execute("""
+            SELECT u.id, u.login, u.brand_id, b.name as brand_name,
+                   b.logo_url, b.accent_color, b.site_url, b.catalog_url,
+                   b.about_url, b.delivery_url, b.contacts_url,
+                   b.vk_url, b.tg_url, b.footer_address,
+                   b.default_email, b.default_phone, b.default_city
+            FROM users u JOIN brands b ON u.brand_id = b.id
+            WHERE u.login = ?
+        """, (_saved_login,))
+        _row = _c.fetchone()
+        conn.close()
+        if _row:
+            st.session_state.authenticated = True
+            st.session_state.user = dict(_row)
+# ───────────────────────────────────────────────────────────────────────────
+
 # ==========================================
 # 3. CSS — ДИНАМИЧЕСКИЙ АКЦЕНТНЫЙ ЦВЕТ
 # ==========================================
@@ -426,6 +450,7 @@ if not st.session_state.authenticated:
             if user:
                 st.session_state.authenticated = True
                 st.session_state.user = user
+                st.query_params["u"] = user['login']
                 st.rerun()
             else:
                 st.error("Неверный логин или пароль")
@@ -507,71 +532,45 @@ with st.sidebar:
     section[data-testid="stSidebar"] {{
         background: {_sb_bg} !important;
     }}
-    .sb-brand-block {{
-        padding: 20px 4px 4px;
+    /* Все кнопки в сайдбаре — одинаковая ширина и высота */
+    section[data-testid="stSidebar"] .stButton > button {{
+        width: 100% !important;
+        height: 44px !important;
+        border-radius: 10px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        letter-spacing: -.1px !important;
+        background: {_sb_btn_bg} !important;
+        color: {_sb_txt} !important;
+        border: 1px solid {_sb_div} !important;
+        margin-bottom: 0 !important;
+        text-align: left !important;
+        padding: 0 16px !important;
+        box-shadow: none !important;
+        transform: none !important;
+        white-space: nowrap !important;
     }}
-    .sb-brand-label {{
-        font-size: 10px;
-        font-weight: 600;
-        letter-spacing: 1.4px;
-        text-transform: uppercase;
-        color: {_sb_sub};
-        margin-bottom: 4px;
+    section[data-testid="stSidebar"] .stButton > button:hover {{
+        background: {accent} !important;
+        color: #fff !important;
+        border-color: {accent} !important;
     }}
-    .sb-brand-name {{
-        font-size: 20px;
-        font-weight: 700;
-        letter-spacing: -.4px;
-        color: {_sb_txt};
-        line-height: 1.2;
+    /* Кнопка Выйти — особый стиль */
+    section[data-testid="stSidebar"] .stButton:last-of-type > button {{
+        background: transparent !important;
+        color: {_sb_sub} !important;
+        border: 1px solid {_sb_div} !important;
     }}
-    .sb-brand-login {{
-        font-size: 12px;
-        color: {_sb_sub};
-        margin-top: 2px;
+    section[data-testid="stSidebar"] .stButton:last-of-type > button:hover {{
+        background: rgba(255,59,48,.12) !important;
+        color: #FF3B30 !important;
+        border-color: rgba(255,59,48,.3) !important;
     }}
-    .sb-divider {{
-        height: 1px;
-        background: {_sb_div};
-        margin: 16px 0;
-        border: none;
-    }}
-    .sb-nav-btn {{
-        display: block;
-        width: fit-content;
-        min-width: 148px;
-        padding: 9px 18px;
-        margin-bottom: 8px;
-        background: {_sb_btn_bg};
-        color: {_sb_txt};
-        font-size: 14px;
-        font-weight: 500;
-        border-radius: 10px;
-        border: none;
-        cursor: pointer;
-        letter-spacing: -.1px;
-        transition: background .15s, color .15s;
-        text-align: left;
-    }}
-    .sb-nav-btn:hover {{ background: {_sb_btn_hov}; color: #fff; }}
-    .sb-logout-btn {{
-        display: block;
-        width: fit-content;
-        min-width: 148px;
-        padding: 9px 18px;
-        margin-bottom: 8px;
-        background: transparent;
-        color: {_sb_sub};
-        font-size: 13px;
-        font-weight: 400;
-        border-radius: 10px;
-        border: 1px solid {_sb_div};
-        cursor: pointer;
-        letter-spacing: -.1px;
-        transition: background .15s, color .15s, border-color .15s;
-        text-align: left;
-    }}
-    .sb-logout-btn:hover {{ background: rgba(255,59,48,.12); color: #FF3B30; border-color: rgba(255,59,48,.3); }}
+    .sb-brand-block {{ padding: 20px 4px 4px; }}
+    .sb-brand-label {{ font-size:10px; font-weight:600; letter-spacing:1.4px; text-transform:uppercase; color:{_sb_sub}; margin-bottom:4px; }}
+    .sb-brand-name  {{ font-size:20px; font-weight:700; letter-spacing:-.4px; color:{_sb_txt}; line-height:1.2; }}
+    .sb-brand-login {{ font-size:12px; color:{_sb_sub}; margin-top:2px; }}
+    .sb-divider     {{ height:1px; background:{_sb_div}; margin:14px 0; border:none; }}
     </style>
     <div class="sb-brand-block">
         <div class="sb-brand-label">Бренд</div>
@@ -582,28 +581,47 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     if st.session_state.mode is not None:
-        if st.button("← Главное меню", key="sb_back", use_container_width=False):
+        if st.button("← Главное меню", key="sb_back", use_container_width=True):
             set_mode(None)
             st.rerun()
 
-    hist_label = "История проектов" if not st.session_state.show_history else "Конструктор"
-    if st.button(hist_label, key="sb_hist", use_container_width=False):
+    hist_label = "История проектов" if not st.session_state.show_history else "← Конструктор"
+    if st.button(hist_label, key="sb_hist", use_container_width=True):
         st.session_state.show_history = not st.session_state.show_history
         st.rerun()
+
+    # Переключение аккаунта
+    st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+    with st.expander("Сменить аккаунт"):
+        sw_login = st.text_input("Логин", key="sw_login", placeholder="inmetprom")
+        sw_pass  = st.text_input("Пароль", type="password", key="sw_pass", placeholder="••••••••")
+        if st.button("Войти", key="sw_submit", use_container_width=True):
+            sw_user = check_login(sw_login, sw_pass)
+            if sw_user:
+                st.session_state.user          = sw_user
+                st.session_state.authenticated = True
+                st.session_state.data          = {}
+                st.session_state.mode          = None
+                st.session_state.show_history  = False
+                st.query_params["u"] = sw_user['login']
+                st.rerun()
+            else:
+                st.error("Неверный логин или пароль")
 
     # Психологическая поддержка
     if st.session_state.cute_img and not st.session_state.show_history:
         st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
         st.image(st.session_state.cute_img, use_container_width=True)
-        st.markdown(f'<div style="font-size:11px; color:{_sb_sub}; margin-top:4px;">Психологическая поддержка</div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="font-size:11px; color:{_sb_sub}; margin-top:4px; margin-bottom:8px;">Психологическая поддержка</div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="sb-divider" style="margin-top:auto;"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
 
-    if st.button("Выйти", key="sb_logout", use_container_width=False):
+    if st.button("Выйти", key="sb_logout", use_container_width=True):
         for k in ['authenticated', 'user', 'data', 'mode', 'cute_img',
                   'gost_tags', 'size_tags', 'show_history']:
             if k in st.session_state:
                 del st.session_state[k]
+        st.query_params.clear()
         st.rerun()
 
 # ==========================================
