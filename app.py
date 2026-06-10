@@ -363,8 +363,32 @@ if st.session_state.theme == "light":
     [data-testid="stSidebar"] {{ background-color: #FFFFFF; border-right: 1px solid #E5E7EB; }}
     h1, h2, h3, label, p, .stMarkdown {{ color: #111827 !important; }}
     button[data-baseweb="tab"] p {{ color: #6B7280 !important; font-weight: 600 !important; }}
-    .stButton > button {{ background-color: #FFFFFF !important; border: 1px solid #D1D5DB !important; color: #111827 !important; }}
-    .stButton > button:hover {{ color: {accent} !important; background-color: #F3F4F6 !important; }}
+
+    /* Кнопки — светлая тема */
+    .stButton > button {{
+        background-color: #FFFFFF !important;
+        border: 1px solid #D1D5DB !important;
+        color: #111827 !important;
+        transition: background-color .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease !important;
+    }}
+    .stButton > button p, .stButton > button div p,
+    .stButton > button span {{ color: #111827 !important; }}
+    .stButton > button:hover {{
+        background-color: {accent} !important;
+        border-color: {accent} !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(0,0,0,.12) !important;
+        transform: translateY(-2px) !important;
+    }}
+    .stButton > button:hover p, .stButton > button:hover div p,
+    .stButton > button:hover span {{ color: #ffffff !important; }}
+
+    /* Глазок пароля — светлая тема */
+    [data-testid="stTextInput"] button,
+    [data-testid="stTextInput"] button svg {{ color: #6B7280 !important; fill: #6B7280 !important; }}
+    [data-testid="stTextInput"] button:hover,
+    [data-testid="stTextInput"] button:hover svg {{ color: {accent} !important; fill: {accent} !important; }}
+
     .stTextInput input, .stTextArea textarea {{
         background-color: #FFFFFF !important; color: #111827 !important;
         caret-color: #111827 !important; border: 1px solid #D1D5DB !important;
@@ -392,7 +416,32 @@ else:
     [data-testid="stSidebar"] {{ background-color: #161922; border-right: 1px solid #2D3748; }}
     h1, h2, h3, label, p {{ color: #F3F4F6 !important; }}
     button[data-baseweb="tab"] p {{ color: #9CA3AF !important; font-weight: 600 !important; }}
-    .stButton > button {{ background-color: #1A1C24 !important; border: 1px solid #3e4452 !important; color: #F3F4F6 !important; }}
+
+    /* Кнопки — тёмная тема */
+    .stButton > button {{
+        background-color: #1A1C24 !important;
+        border: 1px solid #3e4452 !important;
+        color: #F3F4F6 !important;
+        transition: background-color .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease !important;
+    }}
+    .stButton > button p, .stButton > button div p,
+    .stButton > button span {{ color: #F3F4F6 !important; }}
+    .stButton > button:hover {{
+        background-color: {accent} !important;
+        border-color: {accent} !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 18px rgba(0,0,0,.35) !important;
+        transform: translateY(-2px) !important;
+    }}
+    .stButton > button:hover p, .stButton > button:hover div p,
+    .stButton > button:hover span {{ color: #ffffff !important; }}
+
+    /* Глазок пароля — тёмная тема */
+    [data-testid="stTextInput"] button,
+    [data-testid="stTextInput"] button svg {{ color: #9CA3AF !important; fill: #9CA3AF !important; }}
+    [data-testid="stTextInput"] button:hover,
+    [data-testid="stTextInput"] button:hover svg {{ color: {accent} !important; fill: {accent} !important; }}
+
     .stTextInput input, .stTextArea textarea {{
         background-color: #1F2937 !important; color: #F3F4F6 !important;
         caret-color: #F3F4F6 !important; border: 1px solid #374151 !important;
