@@ -337,7 +337,11 @@ else:
             with ps_c[0]: n1 = st.text_input("Товар 1", "чугунные круги")
             with ps_c[1]: n2 = st.text_input("Товар 2", "втулки")
             with ps_c[2]: n3 = st.text_input("Товар 3", "услуги")
-            data['PS_BLOCK'] = f'P.S. Также в наличии <a href="{data["LINK_CATALOG"]}">{n1}</a>, <a href="{data["LINK_CATALOG"]}">{n2}</a> и <a href="{data["LINK_CATALOG"]}">{n3}</a>. Напишите нам.'
+            
+            # Добавляем жесткий inline-стиль для ссылок, чтобы почтовики их не ломали
+            link_style = "color: #1e69da; text-decoration: none; font-weight: bold;"
+            
+            data['PS_BLOCK'] = f'P.S. Также в наличии <a href="{data["LINK_CATALOG"]}" style="{link_style}">{n1}</a>, <a href="{data["LINK_CATALOG"]}" style="{link_style}">{n2}</a> и <a href="{data["LINK_CATALOG"]}" style="{link_style}">{n3}</a>. Напишите нам в ответ на это письмо – подберем решение.'
        
         elif mode == "expert":
             st.subheader("Основная статья блога")
