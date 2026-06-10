@@ -304,7 +304,6 @@ else:
             data['HERO_TITLE'] = st.text_input('Заголовок на баннере', "ТРУБА ПРОФИЛЬНАЯ")
         elif mode == "cases":
             data['HERO_TITLE'] = st.text_input('Заголовок на баннере', "НУЖЕН МЕТАЛЛ ТОЧНО В СРОК И ПО ГОСТУ?")
-            data['HERO_BG_IMG'] = st.text_input("Фоновая картинка всей шапки", "https://cp.unisender.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6onoffr9spwg3rauf9n3p3mtxkb98nhpzugtp36yr4smm1mnuid9xzaqh6qaw8wyyxn6ircwydoatz4yhkeno9cb5u3mum5c3c8j5f9pxcd4q95izr51ecpifdwzh6n19h4rnygkteo34fcmjp5hwypi1hh")
             data['HERO_IMG'] = st.text_input("Картинка отгрузки (справа)", "https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=633kxjmua5h3e6auf9n3p3mtxkbqyuz5g9t4bxmiwacn4se1m7mm8f3xb9kfj4sdqs7u6wy3p67hniwanz5qzpz6e3oafgod1gfpiyt35tefhp8sjg7t3fqc9p5i93btrk54ju1mbjtetk")
             data['HERO_BTN_LINK'] = st.text_input("Ссылка кнопки 'Рассчитать проект'", data.get('LINK_CATALOG', ''))        
         elif mode == "expert":
