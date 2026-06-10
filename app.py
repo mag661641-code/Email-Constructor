@@ -650,7 +650,6 @@ else:
                     data[f'T_{i}'] = st.text_input("Название", placeholder=d_t, key=f"st_t{i}") or d_t
                     data[f'D_{i}'] = st.text_input("Описание", placeholder=d_d, key=f"st_d{i}") or d_d
                     data[f'P_{i}'] = st.text_input("Цена", placeholder=d_p, key=f"st_p{i}") or d_p
-                    data[f'OLD_P_{i}'] = st.text_input("Старая цена", placeholder=d_op, key=f"st_op{i}") or d_op
                     data[f'I_{i}'] = st.text_input("URL картинки", placeholder="https://...", key=f"st_i{i}") or ""
                     data[f'L_{i}'] = st.text_input("Ссылка", placeholder=data['LINK_CATALOG'], key=f"st_l{i}") or data['LINK_CATALOG']
 
