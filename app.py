@@ -126,6 +126,12 @@ if st.session_state.theme == "light":
         caret-color: #111827 !important; 
         border: 1px solid #D1D5DB !important; 
     }
+
+    /* !!! ИСПРАВЛЕНИЕ ДЛЯ ПЛЕЙСХОЛДЕРА В СВЕТЛОЙ ТЕМЕ !!! */
+    .stTextInput input::placeholder, .stTextArea textarea::placeholder {
+        color: #9CA3AF !important; /* Серый цвет, который будет видно на белом */
+        opacity: 1 !important;
+    }
     
     /* --- ФИКС АККОРДЕОНОВ (st.expander) --- */
     [data-testid="stExpander"] { border: 1px solid #D1D5DB !important; border-radius: 8px !important; background-color: #FFFFFF !important; }
@@ -175,6 +181,12 @@ else:
         color: #F3F4F6 !important; 
         caret-color: #F3F4F6 !important; 
         border: 1px solid #374151 !important; 
+    }
+
+    /* !!! ИСПРАВЛЕНИЕ ДЛЯ ПЛЕЙСХОЛДЕРА В ТЕМНОЙ ТЕМЕ !!! */
+    .stTextInput input::placeholder, .stTextArea textarea::placeholder {
+        color: #6B7280 !important; /* Приглушенный серый для темной темы */
+        opacity: 1 !important;
     }
     
     /* --- ФИКС АККОРДЕОНОВ (st.expander) --- */
