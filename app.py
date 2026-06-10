@@ -27,7 +27,7 @@ def process_text_to_html(text):
     return "<br>".join(processed_lines)
 
 def get_stored(key, default=""):
-    return st.session_state.data.get(key, "")
+    return st.session_state.data.get(key, default)
 
 # ---- ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ ЗНАЧКОВ ----
 def make_badges(items, font_size="11px", padding="3px 8px"):
@@ -251,6 +251,23 @@ menu_items = {
 }
 
 # ==========================================
+# ХЕЛПЕР: сохраняет значение в data и возвращает его
+# ==========================================
+def cached_input(label, key, default="", placeholder="", col=None, area=False, height=100):
+    """
+    Рендерит text_input или text_area с key= и value=get_stored().
+    Автоматически сохраняет введённое значение в st.session_state.data[key].
+    """
+    current = get_stored(key, default)
+    widget = (col if col else st)
+    if area:
+        val = widget.text_area(label, value=current, placeholder=placeholder or default, key=key, height=height)
+    else:
+        val = widget.text_input(label, value=current, placeholder=placeholder or default, key=key)
+    st.session_state.data[key] = val
+    return val or default
+
+# ==========================================
 # 4. ВЕРХНЯЯ ПАНЕЛЬ
 # ==========================================
 t_col1, t_col2 = st.columns([12, 1])
@@ -291,73 +308,82 @@ else:
     st.title(f"Шаблон: {menu_items[mode]['title']}")
     tabs = st.tabs(["Контакты", "Баннер", "Тексты", "Блоки", "Эксперт"])
 
+    # ==========================================
+    # ТАБ 0: КОНТАКТЫ
+    # ==========================================
     with tabs[0]:
         c1, c2 = st.columns(2)
+
         d_email = "msk@stalmetural.ru"
-        # key='EMAIL' заставляет Streamlit сохранять значение в session_state автоматически
-        st.session_state.data['EMAIL'] = c1.text_input("Email филиала", value=get_stored('EMAIL'), placeholder=d_email, key='EMAIL')
-        data['EMAIL'] = st.session_state.data['EMAIL'] or d_email
-        
+        data['EMAIL'] = cached_input("Email филиала", "EMAIL", d_email, d_email, col=c1) or d_email
+
         d_phone = "+7 (499) 130-60-28"
-        st.session_state.data['PHONE'] = c1.text_input("Телефон филиала", value=get_stored('PHONE'), placeholder=d_phone, key='PHONE')
-        data['PHONE'] = st.session_state.data['PHONE'] or d_phone
-        
-        # Ссылки и прочее считаем на лету
+        data['PHONE'] = cached_input("Телефон филиала", "PHONE", d_phone, d_phone, col=c1) or d_phone
+
         data['PHONE_DIGITS'] = "".join(filter(str.isdigit, data['PHONE']))
         if not data['PHONE_DIGITS'].startswith('+'): data['PHONE_DIGITS'] = "+" + data['PHONE_DIGITS']
         data['PHONE_LINK'] = f"tel:{data['PHONE_DIGITS']}"
-        
+
         d_city = "в Москве"
-        st.session_state.data['CITY_IN'] = c2.text_input("Город", value=get_stored('CITY_IN'), placeholder=d_city, key='CITY_IN')
-        data['CITY_IN'] = st.session_state.data['CITY_IN'] or d_city
-        
+        data['CITY_IN'] = cached_input("Город", "CITY_IN", d_city, d_city, col=c2) or d_city
+
         d_logo = "https://stalmetural.ru/"
-        data['LINK_LOGO'] = c2.text_input("Ссылка при клике на логотип", placeholder=d_logo) or d_logo
-        
+        data['LINK_LOGO'] = cached_input("Ссылка при клике на логотип", "LINK_LOGO", d_logo, d_logo, col=c2) or d_logo
+
         col_m1, col_m2, col_m3 = st.columns(3)
         d_cat = "https://stalmetural.ru/catalog/"
-        data['LINK_CATALOG'] = col_m1.text_input("Ссылка 'Каталог'", placeholder=d_cat) or d_cat
-        
+        data['LINK_CATALOG'] = cached_input("Ссылка 'Каталог'", "LINK_CATALOG", d_cat, d_cat, col=col_m1) or d_cat
+
         d_about = "https://stalmetural.ru/about/"
-        data['LINK_COMPANY'] = col_m2.text_input("Ссылка 'О компании/Кейсы'", placeholder=d_about) or d_about
-        
+        data['LINK_COMPANY'] = cached_input("Ссылка 'О компании/Кейсы'", "LINK_COMPANY", d_about, d_about, col=col_m2) or d_about
+
         d_deliv = "https://stalmetural.ru/delivery/"
-        data['LINK_DELIVERY'] = col_m3.text_input("Ссылка 'Доставка'", placeholder=d_deliv) or d_deliv
-        
+        data['LINK_DELIVERY'] = cached_input("Ссылка 'Доставка'", "LINK_DELIVERY", d_deliv, d_deliv, col=col_m3) or d_deliv
+
         d_addr = "ООО \"СМУ\", г. Екатеринбург, ул. Машиностроителей 10"
-        data['FOOTER_ADDRESS'] = st.text_input("Адрес в футере", placeholder=d_addr) or d_addr
+        data['FOOTER_ADDRESS'] = cached_input("Адрес в футере", "FOOTER_ADDRESS", d_addr, d_addr) or d_addr
+
         data['UnsubscribeUrl'], data['webversion'], data['email'] = "{{UnsubscribeUrl}}", "{{webversion}}", "{{email}}"
 
+    # ==========================================
+    # ТАБ 1: БАННЕР
+    # ==========================================
     with tabs[1]:
         d_pre = "Узнайте подробности в письме..."
-        data['PREHEADER_TEXT'] = st.text_input("Прехедер", placeholder=d_pre) or d_pre
+        data['PREHEADER_TEXT'] = cached_input("Прехедер", "PREHEADER_TEXT", d_pre, d_pre) or d_pre
         st.markdown("---")
-        
+
         if mode == "promo":
             d_ht = "НА КВАДРАТ ЧУГУННЫЙ"
-            data['HERO_TITLE'] = st.text_input('Заголовок на баннере', placeholder=d_ht) or d_ht
+            data['HERO_TITLE'] = cached_input("Заголовок на баннере", f"{mode}_HERO_TITLE", d_ht, d_ht) or d_ht
             d_dl = "СКИДКА 10%"
-            data['DISCOUNT_LABEL'] = st.text_input("Метка скидки", placeholder=d_dl) or d_dl
+            data['DISCOUNT_LABEL'] = cached_input("Метка скидки", f"{mode}_DISCOUNT_LABEL", d_dl, d_dl) or d_dl
+
         elif mode == "stock":
             d_ht = "ТРУБА ПРОФИЛЬНАЯ"
-            data['HERO_TITLE'] = st.text_input('Заголовок на баннере', placeholder=d_ht) or d_ht
+            data['HERO_TITLE'] = cached_input("Заголовок на баннере", f"{mode}_HERO_TITLE", d_ht, d_ht) or d_ht
+
         elif mode == "cases":
             d_ht = "НУЖЕН МЕТАЛЛ ТОЧНО В СРОК И ПО ГОСТУ?"
-            data['HERO_TITLE'] = st.text_input('Заголовок на баннере', placeholder=d_ht) or d_ht
+            data['HERO_TITLE'] = cached_input("Заголовок на баннере", f"{mode}_HERO_TITLE", d_ht, d_ht) or d_ht
             d_hi = "https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=633kxjmua5h3e6auf9n3p3mtxkbqyuz5g9t4bxmiwacn4se1m7mm8f3xb9kfj4sdqs7u6wy3p67hniwanz5qzpz6e3oafgod1gfpiyt35tefhp8sjg7t3fqc9p5i93btrk54ju1mbjtetk"
-            data['HERO_IMG'] = st.text_input("Картинка отгрузки", placeholder=d_hi) or d_hi
-            data['HERO_BTN_LINK'] = st.text_input("Ссылка кнопки", placeholder=data.get('LINK_CATALOG', '')) or data.get('LINK_CATALOG', '')    
+            data['HERO_IMG'] = cached_input("Картинка отгрузки", f"{mode}_HERO_IMG", d_hi, d_hi) or d_hi
+            data['HERO_BTN_LINK'] = cached_input("Ссылка кнопки", f"{mode}_HERO_BTN_LINK", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', '')) or data.get('LINK_CATALOG', '')
+
         elif mode == "expert":
             d_ht = "БЕСШОВНАЯ ИЛИ ЭЛЕКТРОСВАРНАЯ"
-            data['HERO_TITLE'] = st.text_input('Заголовок на баннере', placeholder=d_ht) or d_ht
+            data['HERO_TITLE'] = cached_input("Заголовок на баннере", f"{mode}_HERO_TITLE", d_ht, d_ht) or d_ht
             d_hi = "https://img.hiteml.com/en/v5/user-files?userId=8128470&resource=himg&disposition=inline&name=6uyisxkcb9z7eaauf9n3p3mtxknbsdqxp466f8gerep3qqo3qg9gbanpmbuqopttjmnzyzspdqyqxfm55dgtdc1xhua6ni8nrnmqq1qo538z6idf768zyjwfpoohe8gbci4z3phict9wqfg496t8gqbqy5r6b3tjcs34m6na"
-            data['HERO_IMG'] = st.text_input("Картинка справа", placeholder=d_hi) or d_hi
-            data['HERO_BTN_LINK'] = st.text_input("Ссылка кнопки", placeholder=data.get('LINK_CATALOG', '')) or data.get('LINK_CATALOG', '')
-        
-        else:
-            data['HERO_TITLE'] = st.text_input('Заголовок баннера', placeholder="МЕТАЛЛОПРОКАТ ОТ ПРОИЗВОДИТЕЛЯ") or "МЕТАЛЛОПРОКАТ ОТ ПРОИЗВОДИТЕЛЯ"
-        
+            data['HERO_IMG'] = cached_input("Картинка справа", f"{mode}_HERO_IMG", d_hi, d_hi) or d_hi
+            data['HERO_BTN_LINK'] = cached_input("Ссылка кнопки", f"{mode}_HERO_BTN_LINK", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', '')) or data.get('LINK_CATALOG', '')
 
+        else:
+            d_ht = "МЕТАЛЛОПРОКАТ ОТ ПРОИЗВОДИТЕЛЯ"
+            data['HERO_TITLE'] = cached_input("Заголовок баннера", f"{mode}_HERO_TITLE", d_ht, d_ht) or d_ht
+
+    # ==========================================
+    # ТАБ 2: ТЕКСТЫ
+    # ==========================================
     with tabs[2]:
         st.markdown("""
         <div style="background-color: #1e69da33; padding: 10px; border-radius: 5px; border: 1px solid #1e69da; margin-bottom: 15px;">
@@ -368,54 +394,45 @@ else:
 
         if mode == "promo":
             st.subheader("📝 Главная статья")
-            
-            # Заголовок
+
             title_def = "Снижаем стоимость на партию"
-            data['TEXT_TITLE'] = st.text_input("Заголовок статьи", placeholder=title_def) or title_def
-            
-            # Текст ДО ссылки
+            data['TEXT_TITLE'] = cached_input("Заголовок статьи", f"{mode}_TEXT_TITLE", title_def, title_def) or title_def
+
             pre_def = "Мы открываем **спецпредложение**..."
-            t_pre_raw = st.text_area("Текст ДО ссылки", placeholder=pre_def) or pre_def
-            
-            # Ссылка
+            t_pre_raw = cached_input("Текст ДО ссылки", f"{mode}_TEXT_PRE", pre_def, pre_def, area=True, height=100) or pre_def
+
             col_a1, col_a2 = st.columns(2)
             word_def = "партию квадрата"
-            a_word = col_a1.text_input("Слово-ссылка", placeholder=word_def) or word_def
-            
+            a_word = cached_input("Слово-ссылка", f"{mode}_LINK_WORD", word_def, word_def, col=col_a1) or word_def
+
             link_def = "https://stalmetural.ru/catalog/"
-            a_link = col_a2.text_input("Куда ведет", placeholder=link_def) or link_def
-            
-            # Текст ПОСЛЕ ссылки
+            a_link = cached_input("Куда ведет", f"{mode}_LINK_HREF", link_def, link_def, col=col_a2) or link_def
+
             post_def = "из наличия."
-            t_post_raw = st.text_area("Текст ПОСЛЕ ссылки", placeholder=post_def) or post_def
-            
+            t_post_raw = cached_input("Текст ПОСЛЕ ссылки", f"{mode}_TEXT_POST", post_def, post_def, area=True, height=80) or post_def
+
             data['TEXT_BODY'] = f'{process_text_to_html(t_pre_raw)} <a href="{a_link}" style="text-decoration:none; color:#1e69da; font-weight:bold;">{a_word}</a> {process_text_to_html(t_post_raw)}'
-            
+
             st.markdown("---")
             st.subheader("📎 Блок P.S.")
             ps_c = st.columns(3)
-            
-            # Настройка товаров в P.S. с использованием placeholder
-            with ps_c[0]: 
-                n1_def = "профнастил"
-                n1 = st.text_input("Товар 1", placeholder=n1_def) or n1_def
-            with ps_c[1]: 
-                n2_def = "втулки"
-                n2 = st.text_input("Товар 2", placeholder=n2_def) or n2_def
-            with ps_c[2]: 
-                n3_def = "услуги"
-                n3 = st.text_input("Товар 3", placeholder=n3_def) or n3_def
-            
+
+            n1_def = "профнастил"
+            n1 = cached_input("Товар 1", f"{mode}_PS_N1", n1_def, n1_def, col=ps_c[0]) or n1_def
+            n2_def = "втулки"
+            n2 = cached_input("Товар 2", f"{mode}_PS_N2", n2_def, n2_def, col=ps_c[1]) or n2_def
+            n3_def = "услуги"
+            n3 = cached_input("Товар 3", f"{mode}_PS_N3", n3_def, n3_def, col=ps_c[2]) or n3_def
+
             link_style = "color: #1e69da; text-decoration: none; font-weight: bold;"
             data['PS_BLOCK'] = f'P.S. Также в наличии <a href="{data["LINK_CATALOG"]}" style="{link_style}">{n1}</a>, <a href="{data["LINK_CATALOG"]}" style="{link_style}">{n2}</a> и <a href="{data["LINK_CATALOG"]}" style="{link_style}">{n3}</a>. Напишите нам в ответ на это письмо – подберем решение.'
+
         elif mode == "expert":
             st.subheader("Основная статья блога")
-            
-            # Заголовок
+
             d_title = "Выбираем трубу без переплат"
-            data['TEXT_TITLE'] = st.text_input("Заголовок статьи", placeholder=d_title) or d_title
-            
-            # Основной текст (выносим пример в переменную, чтобы код был чистым)
+            data['TEXT_TITLE'] = cached_input("Заголовок статьи", f"{mode}_TEXT_TITLE", d_title, d_title) or d_title
+
             d_body = (
                 "Часто в смету закладывают дорогую бесшовную трубу там, где можно безопасно использовать электросварную.\n\n"
                 "**Где можно сэкономить до 40%?**\n"
@@ -423,57 +440,52 @@ else:
                 "**Где рисковать нельзя?**\n"
                 "В нефтегазовой промышленности необходима только бесшовная труба (БШ)."
             )
-            
-            # Используем placeholder вместо value
-            text_body_raw = st.text_area(
-                "Текст статьи (используйте ** для жирного и - для списков)", 
-                height=250, 
-                placeholder=d_body
-            ) or d_body
-            
+            text_body_raw = cached_input("Текст статьи (используйте ** для жирного и - для списков)", f"{mode}_TEXT_BODY_RAW", d_body, d_body, area=True, height=250) or d_body
             data['TEXT_BODY'] = process_text_to_html(text_body_raw)
-            
-            # Ссылка
+
             d_link = "https://stalmetural.ru/contacts/"
-            data['TEXT_BTN_LINK'] = st.text_input("Ссылка для кнопки 'Связаться с нами'", placeholder=d_link) or d_link
+            data['TEXT_BTN_LINK'] = cached_input("Ссылка для кнопки 'Связаться с нами'", f"{mode}_TEXT_BTN_LINK", d_link, d_link) or d_link
 
         elif mode == "stock":
             st.subheader("Вводная статья и преимущества")
-            
-            # Убрали "Склад пополнен:" из дефолтного значения, чтобы не было дубля!
+
             d_tt = "Профильная труба всех типоразмеров"
-            data['TEXT_TITLE'] = st.text_input("Главный заголовок", placeholder=d_tt) or d_tt
-            
+            data['TEXT_TITLE'] = cached_input("Главный заголовок", f"{mode}_TEXT_TITLE", d_tt, d_tt) or d_tt
+
             d_tb = "Обновили складской запас профильного проката. В наличии все позиции..."
-            data['TEXT_BODY'] = process_text_to_html(st.text_area("Вводный абзац", placeholder=d_tb) or d_tb)
-            
+            raw_tb = cached_input("Вводный абзац", f"{mode}_TEXT_BODY_RAW", d_tb, d_tb, area=True, height=100) or d_tb
+            data['TEXT_BODY'] = process_text_to_html(raw_tb)
+
             st.markdown("**Ключевые пункты (Буллиты):**")
             for i in range(1, 4):
                 col_b1, col_b2 = st.columns([1, 2])
                 d_bt = f"Заголовок {i}"
                 d_bd = f"Описание пункта {i}"
-                data[f'BULLET_TITLE_{i}'] = col_b1.text_input(f"Заголовок {i}", placeholder=d_bt, key=f"bt{i}") or d_bt
-                data[f'BULLET_TEXT_{i}'] = col_b2.text_input(f"Текст {i}", placeholder=d_bd, key=f"bd{i}") or d_bd
+                data[f'BULLET_TITLE_{i}'] = cached_input(f"Заголовок {i}", f"{mode}_BULLET_TITLE_{i}", d_bt, d_bt, col=col_b1) or d_bt
+                data[f'BULLET_TEXT_{i}'] = cached_input(f"Текст {i}", f"{mode}_BULLET_TEXT_{i}", d_bd, d_bd, col=col_b2) or d_bd
 
         elif mode == "cases":
             st.subheader("Текст кейса (История успеха)")
+
             d_ct = "Металл с гарантией: проверка по ГОСТ и полный пакет документов"
-            data['CASE_MAIN_TITLE'] = st.text_input("Заголовок статьи", placeholder=d_ct) or d_ct
+            data['CASE_MAIN_TITLE'] = cached_input("Заголовок статьи", f"{mode}_CASE_MAIN_TITLE", d_ct, d_ct) or d_ct
+
             d_ctask = "Недостаточная толщина стенки может остановить стройку..."
-            data['CASE_TASK'] = process_text_to_html(st.text_area("Задача", placeholder=d_ctask) or d_ctask)
+            raw_task = cached_input("Задача", f"{mode}_CASE_TASK_RAW", d_ctask, d_ctask, area=True, height=100) or d_ctask
+            data['CASE_TASK'] = process_text_to_html(raw_task)
+
             d_csteps = "- **Замеры перед погрузкой**\n- **Полная документация**"
-            data['CASE_STEPS'] = process_text_to_html(st.text_area("Что сделали", placeholder=d_csteps) or d_csteps)
+            raw_steps = cached_input("Что сделали", f"{mode}_CASE_STEPS_RAW", d_csteps, d_csteps, area=True, height=100) or d_csteps
+            data['CASE_STEPS'] = process_text_to_html(raw_steps)
+
             d_cres = "Ваш объект не будет простаивать из-за брака."
-            data['CASE_RESULT'] = st.text_input("Результат", placeholder=d_cres) or d_cres
+            data['CASE_RESULT'] = cached_input("Результат", f"{mode}_CASE_RESULT", d_cres, d_cres) or d_cres
 
         elif mode == "services":
             st.subheader("Основной текстовый блок")
-            
+
             d_title = "Больше, чем просто продажа металла"
-            # Сохраняем заголовок конкретно для этого режима
-            key_t = f"{mode}_text_title"
-            st.session_state.data[key_t] = st.text_input("Заголовок раздела", value=get_stored(key_t), placeholder=d_title, key=key_t)
-            data['TEXT_TITLE'] = st.session_state.data[key_t] or d_title
+            data['TEXT_TITLE'] = cached_input("Заголовок раздела", f"{mode}_TEXT_TITLE", d_title, d_title) or d_title
 
             d_body = (
                 "Закупка металла «с запасом» и ручная подрезка на объекте — это **скрытые убытки вашего проекта**. "
@@ -486,120 +498,112 @@ else:
                 "- **Заводская точность:** лазерная и плазменная резка исключают брак.\n\n"
                 "Из-за высокого спроса производственные мощности цеха **ограничены**. Свяжитесь с нами сегодня."
             )
-            key_b = f"{mode}_text_body"
-            st.session_state.data[key_b] = st.text_area("Основной текст", value=get_stored(key_b), height=300, placeholder=d_body, key=key_b)
-            data['TEXT_BODY'] = process_text_to_html(st.session_state.data[key_b] or d_body)
+            raw_body = cached_input("Основной текст", f"{mode}_TEXT_BODY_RAW", d_body, d_body, area=True, height=300) or d_body
+            data['TEXT_BODY'] = process_text_to_html(raw_body)
 
-        
         else:
             d_tt = "Заголовок статьи"
-            data['TEXT_TITLE'] = st.text_input("Заголовок статьи", placeholder=d_tt) or d_tt
+            data['TEXT_TITLE'] = cached_input("Заголовок статьи", f"{mode}_TEXT_TITLE", d_tt, d_tt) or d_tt
             d_tb = "Основной текст письма..."
-            data['TEXT_BODY'] = process_text_to_html(st.text_area("Текст", placeholder=d_tb) or d_tb)
+            raw_tb = cached_input("Текст", f"{mode}_TEXT_BODY_RAW", d_tb, d_tb, area=True, height=100) or d_tb
+            data['TEXT_BODY'] = process_text_to_html(raw_tb)
             d_tl = "https://stalmetural.ru/contacts/"
-            data['TEXT_BTN_LINK'] = st.text_input("Ссылка для кнопки", placeholder=d_tl) or d_tl
+            data['TEXT_BTN_LINK'] = cached_input("Ссылка для кнопки", f"{mode}_TEXT_BTN_LINK", d_tl, d_tl) or d_tl
 
+    # ==========================================
+    # ТАБ 3: БЛОКИ
+    # ==========================================
     with tabs[3]:
-                # --- ВСЕ НАСТРОЙКИ БЛОКОВ ---
         if mode == "cases":
             st.subheader("Настройка блоков")
             with st.expander("1. Участвовали в отгрузке (4 товара)"):
                 for i in range(1, 5):
                     st.markdown(f"**Товар №{i}**")
                     col1, col2 = st.columns(2)
-                    k_t = f"{mode}_prod_{i}_title"
                     d_t = f"Труба №{i}"
-                    st.session_state.data[k_t] = col1.text_input("Название", value=get_stored(k_t), placeholder=d_t, key=k_t)
-                    data[f'PROD_{i}_TITLE'] = st.session_state.data[k_t] or d_t
-                    k_p = f"{mode}_prod_{i}_price"
+                    data[f'PROD_{i}_TITLE'] = cached_input("Название", f"{mode}_prod_{i}_title", d_t, d_t, col=col1) or d_t
                     d_p = "39 500₽/т"
-                    st.session_state.data[k_p] = col2.text_input("Цена", value=get_stored(k_p), placeholder=d_p, key=k_p)
-                    data[f'PROD_{i}_PRICE'] = st.session_state.data[k_p] or d_p
+                    data[f'PROD_{i}_PRICE'] = cached_input("Цена", f"{mode}_prod_{i}_price", d_p, d_p, col=col2) or d_p
                     d_desc = "ГОСТ 8639-82, сталь 3пс"
-                    data[f'PROD_{i}_DESC'] = st.text_area("Описание", placeholder=d_desc, key=f"pr_d{i}", height=70) or d_desc
-                    
+                    data[f'PROD_{i}_DESC'] = cached_input("Описание", f"{mode}_prod_{i}_desc", d_desc, d_desc, area=True, height=70) or d_desc
+
                     col3, col4 = st.columns(2)
                     d_img = "https://img.hiteml.com/example.jpg"
-                    data[f'PROD_{i}_IMG'] = col3.text_input("URL картинки", placeholder=d_img, key=f"pr_i{i}") or d_img
-                    data[f'PROD_{i}_LINK'] = col4.text_input("Ссылка на каталог", placeholder=data.get('LINK_CATALOG', ''), key=f"pr_l{i}") or data.get('LINK_CATALOG', '')
-                
+                    data[f'PROD_{i}_IMG'] = cached_input("URL картинки", f"{mode}_prod_{i}_img", d_img, d_img, col=col3) or d_img
+                    data[f'PROD_{i}_LINK'] = cached_input("Ссылка на каталог", f"{mode}_prod_{i}_link", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', ''), col=col4) or data.get('LINK_CATALOG', '')
+
                 d_extra = "+ еще 8 позиций сопутствующего проката..."
-                data['PROD_EXTRA_TEXT'] = st.text_input("Текст под товарами", placeholder=d_extra) or d_extra
-                data['ALL_PROD_LINK'] = st.text_input("Ссылка кнопки 'Весь сортамент'", placeholder=data.get('LINK_CATALOG', '')) or data.get('LINK_CATALOG', '')
+                data['PROD_EXTRA_TEXT'] = cached_input("Текст под товарами", f"{mode}_prod_extra_text", d_extra, d_extra) or d_extra
+                data['ALL_PROD_LINK'] = cached_input("Ссылка кнопки 'Весь сортамент'", f"{mode}_all_prod_link", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', '')) or data.get('LINK_CATALOG', '')
 
             with st.expander("2. Не тратьте время на подгонку (3 Услуги)"):
                 d_st = "Не тратьте время на подгонку на объекте"
-                data['SERVICES_TITLE'] = st.text_input("Главный заголовок услуг", placeholder=d_st) or d_st
+                data['SERVICES_TITLE'] = cached_input("Главный заголовок услуг", f"{mode}_services_title", d_st, d_st) or d_st
                 for i in range(1, 4):
                     st.markdown(f"**Услуга №{i}**")
                     col1, col2 = st.columns(2)
                     d_sv_t = "Резка в размер"
-                    data[f'SERV_{i}_TITLE'] = col1.text_input("Название услуги", placeholder=d_sv_t, key=f"srv_t{i}") or d_sv_t
+                    data[f'SERV_{i}_TITLE'] = cached_input("Название услуги", f"{mode}_serv_{i}_title", d_sv_t, d_sv_t, col=col1) or d_sv_t
                     d_sv_d = "Точность до 1 мм"
-                    data[f'SERV_{i}_DESC'] = col2.text_input("Краткое описание", placeholder=d_sv_d, key=f"srv_d{i}") or d_sv_d
+                    data[f'SERV_{i}_DESC'] = cached_input("Краткое описание", f"{mode}_serv_{i}_desc", d_sv_d, d_sv_d, col=col2) or d_sv_d
                     col3, col4 = st.columns(2)
                     d_sv_i = "https://img.hiteml.com/service.jpg"
-                    data[f'SERV_{i}_IMG'] = col3.text_input("URL картинки", placeholder=d_sv_i, key=f"srv_i{i}") or d_sv_i
-                    data[f'SERV_{i}_LINK'] = col4.text_input("Ссылка", placeholder=data.get('LINK_CATALOG', ''), key=f"srv_l{i}") or data.get('LINK_CATALOG', '')
+                    data[f'SERV_{i}_IMG'] = cached_input("URL картинки", f"{mode}_serv_{i}_img", d_sv_i, d_sv_i, col=col3) or d_sv_i
+                    data[f'SERV_{i}_LINK'] = cached_input("Ссылка", f"{mode}_serv_{i}_link", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', ''), col=col4) or data.get('LINK_CATALOG', '')
                     st.markdown("---")
 
         elif mode == "expert":
             st.subheader("Настройка блоков")
             with st.expander("1. Какой товар подходит?"):
                 d_ps_t = "Какой товар подходит под ваши задачи?"
-                data['PIPE_SECTION_TITLE'] = st.text_input("Заголовок", placeholder=d_ps_t) or d_ps_t
+                data['PIPE_SECTION_TITLE'] = cached_input("Заголовок", f"{mode}_pipe_section_title", d_ps_t, d_ps_t) or d_ps_t
                 for i in range(1, 3):
                     col1, col2 = st.columns(2)
                     d_p_t = f"Труба №{i}"
-                    data[f'PIPE_{i}_TITLE'] = col1.text_input("Название", placeholder=d_p_t, key=f"expt_t{i}") or d_p_t
+                    data[f'PIPE_{i}_TITLE'] = cached_input("Название", f"{mode}_pipe_{i}_title", d_p_t, d_p_t, col=col1) or d_p_t
                     d_p_p = "100 000₽/т"
-                    data[f'PIPE_{i}_PRICE'] = col2.text_input("Цена", placeholder=d_p_p, key=f"expt_p{i}") or d_p_p
+                    data[f'PIPE_{i}_PRICE'] = cached_input("Цена", f"{mode}_pipe_{i}_price", d_p_p, d_p_p, col=col2) or d_p_p
                     d_p_d = "- Преимущество 1\n- Преимущество 2"
-                    data[f'PIPE_{i}_DESC'] = process_text_to_html(st.text_area("Описания", placeholder=d_p_d, key=f"expt_d{i}") or d_p_d)
+                    raw_pd = cached_input("Описания", f"{mode}_pipe_{i}_desc_raw", d_p_d, d_p_d, area=True, height=80) or d_p_d
+                    data[f'PIPE_{i}_DESC'] = process_text_to_html(raw_pd)
                     col3, col4 = st.columns(2)
                     d_p_i = "https://img.hiteml.com/pipe.jpg"
-                    data[f'PIPE_{i}_IMG'] = col3.text_input("URL картинки", placeholder=d_p_i, key=f"expt_i{i}") or d_p_i
-                    data[f'PIPE_{i}_LINK'] = col4.text_input("Ссылка", placeholder=data.get('LINK_CATALOG', ''), key=f"expt_l{i}") or data.get('LINK_CATALOG', '')
+                    data[f'PIPE_{i}_IMG'] = cached_input("URL картинки", f"{mode}_pipe_{i}_img", d_p_i, d_p_i, col=col3) or d_p_i
+                    data[f'PIPE_{i}_LINK'] = cached_input("Ссылка", f"{mode}_pipe_{i}_link", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', ''), col=col4) or data.get('LINK_CATALOG', '')
 
             with st.expander("2. Также в наличии на складе"):
                 d_ss_t = "Также в наличии на складе"
-                data['STOCK_SECTION_TITLE'] = st.text_input("Заголовок", placeholder=d_ss_t) or d_ss_t
+                data['STOCK_SECTION_TITLE'] = cached_input("Заголовок", f"{mode}_stock_section_title", d_ss_t, d_ss_t) or d_ss_t
                 for i in range(1, 4):
                     col1, col2 = st.columns(2)
                     d_s_t = f"Товар №{i}"
-                    data[f'STOCK_{i}_TITLE'] = col1.text_input("Название", placeholder=d_s_t, key=f"exst_t{i}") or d_s_t
+                    data[f'STOCK_{i}_TITLE'] = cached_input("Название", f"{mode}_stock_{i}_title", d_s_t, d_s_t, col=col1) or d_s_t
                     d_s_p = "50 000₽/т"
-                    data[f'STOCK_{i}_PRICE'] = col2.text_input("Цена", placeholder=d_s_p, key=f"exst_p{i}") or d_s_p
+                    data[f'STOCK_{i}_PRICE'] = cached_input("Цена", f"{mode}_stock_{i}_price", d_s_p, d_s_p, col=col2) or d_s_p
                     d_s_d = "В наличии 20 тонн"
-                    data[f'STOCK_{i}_DESC'] = st.text_input("Описание", placeholder=d_s_d, key=f"exst_d{i}") or d_s_d
+                    data[f'STOCK_{i}_DESC'] = cached_input("Описание", f"{mode}_stock_{i}_desc", d_s_d, d_s_d) or d_s_d
                     col3, col4 = st.columns(2)
                     d_s_i = "https://img.hiteml.com/stock.jpg"
-                    data[f'STOCK_{i}_IMG'] = col3.text_input("URL картинки", placeholder=d_s_i, key=f"exst_i{i}") or d_s_i
-                    data[f'STOCK_{i}_LINK'] = col4.text_input("Ссылка", placeholder=data.get('LINK_CATALOG', ''), key=f"exst_l{i}") or data.get('LINK_CATALOG', '')
+                    data[f'STOCK_{i}_IMG'] = cached_input("URL картинки", f"{mode}_stock_{i}_img", d_s_i, d_s_i, col=col3) or d_s_i
+                    data[f'STOCK_{i}_LINK'] = cached_input("Ссылка", f"{mode}_stock_{i}_link", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', ''), col=col4) or data.get('LINK_CATALOG', '')
                     st.markdown("---")
 
         elif mode == "stock":
-            st.subheader("Настройка технических блоков и товаров") 
+            st.subheader("Настройка технических блоков и товаров")
 
-           # ===================================================
-            # БЛОК 2: ГОСТЫ И РАЗМЕРЫ
-            # ===================================================
             with st.expander("1. Технический блок (ГОСТы и Размеры)"):
- 
-                # ========== БЛОК ГОСТОВ ==========
                 st.markdown("##### Стандарты производства (ГОСТ / ТУ)")
- 
+
                 gost_preset = st.selectbox(
                     "Быстрый выбор по типу металла",
                     options=list(GOST_PRESETS.keys()),
                     key="gost_preset_select"
                 )
- 
                 if gost_preset != "Своя настройка":
                     if st.button("↺ Загрузить стандарты для выбранного типа", key="load_gost"):
                         st.session_state.gost_tags = GOST_PRESETS[gost_preset].copy()
                         st.rerun()
- 
+
                 if st.session_state.gost_tags:
                     st.markdown("**Текущие стандарты** (кликните на ячейку с ✕ , чтобы удалить):")
                     cols_g = st.columns(4)
@@ -613,32 +617,29 @@ else:
                         st.rerun()
                 else:
                     st.info("Список стандартов пуст. Добавьте вручную ниже.")
- 
+
                 col_g1, col_g2 = st.columns([3, 1])
                 new_gost = col_g1.text_input("Добавить стандарт вручную", placeholder="Например: ГОСТ 8639-82 или EN 10219", key="new_gost_input")
                 if col_g2.button("＋ Добавить", key="add_gost_btn", use_container_width=True):
                     if new_gost.strip() and new_gost.strip() not in st.session_state.gost_tags:
                         st.session_state.gost_tags.append(new_gost.strip())
                         st.rerun()
- 
+
                 data['GOST_BLOCK'] = make_badges(st.session_state.gost_tags, font_size="11px", padding="3px 8px")
- 
+
                 st.markdown("---")
- 
-                # ========== БЛОК РАЗМЕРОВ ==========
                 st.markdown("##### Ходовые размеры в наличии (мм)")
- 
+
                 size_preset = st.selectbox(
                     "Быстрый выбор размеров по типу",
                     options=list(SIZE_PRESETS.keys()),
                     key="size_preset_select"
                 )
- 
                 if size_preset != "Своя настройка":
                     if st.button("↺ Загрузить размеры для выбранного типа", key="load_size"):
                         st.session_state.size_tags = SIZE_PRESETS[size_preset].copy()
                         st.rerun()
- 
+
                 if st.session_state.size_tags:
                     st.markdown("**Текущие размеры** (кликните на ячейку с ✕ , чтобы удалить):")
                     cols_s = st.columns(5)
@@ -652,17 +653,16 @@ else:
                         st.rerun()
                 else:
                     st.info("Список размеров пуст. Добавьте вручную ниже.")
- 
+
                 col_s1, col_s2 = st.columns([3, 1])
                 new_size = col_s1.text_input("Добавить размер вручную", placeholder="Например: 80×80 или Ø 57", key="new_size_input")
                 if col_s2.button("＋ Добавить", key="add_size_btn", use_container_width=True):
                     if new_size.strip() and new_size.strip() not in st.session_state.size_tags:
                         st.session_state.size_tags.append(new_size.strip())
                         st.rerun()
- 
+
                 data['SIZE_BLOCK'] = make_badges(st.session_state.size_tags, font_size="12px", padding="4px 10px")
- 
-                # Предпросмотр
+
                 st.markdown("---")
                 st.markdown("**Предпросмотр блока в письме:**")
                 preview_html = f"""
@@ -679,154 +679,141 @@ else:
             with st.expander("2. Также в наличии (3 товара)"):
                 for i in range(1, 4):
                     st.markdown(f"**Товар №{i}**")
-                    d_t, d_d, d_p, d_op = f"Товар {i}", "ГОСТ, марка стали", "50 000₽", "60 000₽"
-                    data[f'T_{i}'] = st.text_input("Название", placeholder=d_t, key=f"st_t{i}") or d_t
-                    data[f'D_{i}'] = st.text_input("Описание", placeholder=d_d, key=f"st_d{i}") or d_d
-                    data[f'P_{i}'] = st.text_input("Цена", placeholder=d_p, key=f"st_p{i}") or d_p
-                    data[f'I_{i}'] = st.text_input("URL картинки", placeholder="https://...", key=f"st_i{i}") or ""
-                    data[f'L_{i}'] = st.text_input("Ссылка", placeholder=data['LINK_CATALOG'], key=f"st_l{i}") or data['LINK_CATALOG']
+                    d_t, d_d, d_p = f"Товар {i}", "ГОСТ, марка стали", "50 000₽"
+                    data[f'T_{i}'] = cached_input("Название", f"{mode}_also_t_{i}", d_t, d_t) or d_t
+                    data[f'D_{i}'] = cached_input("Описание", f"{mode}_also_d_{i}", d_d, d_d) or d_d
+                    data[f'P_{i}'] = cached_input("Цена", f"{mode}_also_p_{i}", d_p, d_p) or d_p
+                    data[f'I_{i}'] = cached_input("URL картинки", f"{mode}_also_i_{i}", "", "https://...") or ""
+                    data[f'L_{i}'] = cached_input("Ссылка", f"{mode}_also_l_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
 
             with st.expander("3. Наши отгрузки (2 кейса)"):
                 for i in range(1, 3):
                     st.markdown(f"**Кейс №{i}**")
                     d_ct, d_cd, d_cdt = "Партия труб", "Отгружено 20 тонн", "15.05.2024"
-                    data[f'CASE_TITLE_{i}'] = st.text_input("Заголовок кейса", placeholder=d_ct, key=f"st_ct{i}") or d_ct
-                    data[f'CASE_DESC_{i}'] = st.text_input("Описание кейса", placeholder=d_cd, key=f"st_cd{i}") or d_cd
-                    data[f'CASE_DATE_{i}'] = st.text_input("Дата", placeholder=d_cdt, key=f"st_cdt{i}") or d_cdt
-                    data[f'CASE_IMG_{i}'] = st.text_input("URL фото", placeholder="https://...", key=f"st_ci{i}") or ""
+                    data[f'CASE_TITLE_{i}'] = cached_input("Заголовок кейса", f"{mode}_case_title_{i}", d_ct, d_ct) or d_ct
+                    data[f'CASE_DESC_{i}'] = cached_input("Описание кейса", f"{mode}_case_desc_{i}", d_cd, d_cd) or d_cd
+                    data[f'CASE_DATE_{i}'] = cached_input("Дата", f"{mode}_case_date_{i}", d_cdt, d_cdt) or d_cdt
+                    data[f'CASE_IMG_{i}'] = cached_input("URL фото", f"{mode}_case_img_{i}", "", "https://...") or ""
 
         elif mode == "promo":
             st.subheader("Товарные и структурные блоки")
-            
-            # --- 1. ПЕРСОНАЛЬНЫЕ ЦЕНЫ (Сетка 2х2) ---
+
             with st.expander("1. Ваши персональные цены (Сетка 2x2)", expanded=True):
-                
                 for i in range(1, 5):
                     st.markdown(f"**Товар №{i}**")
                     col1, col2, col3 = st.columns([2, 1, 1])
                     d_t, d_p, d_op = f"Лист х/к {i}", "495₽/т", "550₽"
-                    data[f'T_{i}'] = col1.text_input("Название", placeholder=d_t, key=f"p_t{i}") or d_t
-                    data[f'P_{i}'] = col2.text_input("Цена со скидкой", placeholder=d_p, key=f"p_p{i}") or d_p
-                    data[f'OLD_P_{i}'] = col3.text_input("Старая цена", placeholder=d_op, key=f"p_op{i}") or d_op
-                    
+                    data[f'T_{i}'] = cached_input("Название", f"{mode}_t_{i}", d_t, d_t, col=col1) or d_t
+                    data[f'P_{i}'] = cached_input("Цена со скидкой", f"{mode}_p_{i}", d_p, d_p, col=col2) or d_p
+                    data[f'OLD_P_{i}'] = cached_input("Старая цена", f"{mode}_op_{i}", d_op, d_op, col=col3) or d_op
                     d_d = "ГОСТ 16523-97"
-                    data[f'D_{i}'] = st.text_input("Описание", placeholder=d_d, key=f"p_d{i}") or d_d
-                    data[f'I_{i}'] = st.text_input("URL картинки", placeholder="https://...", key=f"p_i{i}") or ""
-                    data[f'L_{i}'] = st.text_input("Ссылка", placeholder=data['LINK_CATALOG'], key=f"p_l{i}") or data['LINK_CATALOG']
+                    data[f'D_{i}'] = cached_input("Описание", f"{mode}_d_{i}", d_d, d_d) or d_d
+                    data[f'I_{i}'] = cached_input("URL картинки", f"{mode}_i_{i}", "", "https://...") or ""
+                    data[f'L_{i}'] = cached_input("Ссылка", f"{mode}_l_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
                     st.markdown("---")
 
-            # --- 2. ФИКСИРОВАННЫЕ ЦЕНЫ (Сетка 1х3 - малые) ---
             with st.expander("2. Также зафиксировали цены (Малые блоки 1x3)"):
-                
                 for i in range(1, 4):
                     st.markdown(f"**Малый товар №{i}**")
                     d_sm_t, d_sm_p, d_sm_d = "Сетка цинк", "305₽/т", "ГОСТ 23279-2012"
-                    data[f'SMALL_T_{i}'] = st.text_input("Название", placeholder=d_sm_t, key=f"sm_t{i}") or d_sm_t
-                    data[f'SMALL_P_{i}'] = st.text_input("Цена", placeholder=d_sm_p, key=f"sm_p{i}") or d_sm_p
-                    data[f'SMALL_D_{i}'] = st.text_input("Описание", placeholder=d_sm_d, key=f"sm_d{i}") or d_sm_d
-                    data[f'SMALL_I_{i}'] = st.text_input("URL фото", placeholder="https://...", key=f"sm_img{i}") or ""
-                    data[f'SMALL_L_{i}'] = st.text_input("Ссылка", placeholder=data['LINK_CATALOG'], key=f"sm_link{i}") or data['LINK_CATALOG']
+                    data[f'SMALL_T_{i}'] = cached_input("Название", f"{mode}_sm_t_{i}", d_sm_t, d_sm_t) or d_sm_t
+                    data[f'SMALL_P_{i}'] = cached_input("Цена", f"{mode}_sm_p_{i}", d_sm_p, d_sm_p) or d_sm_p
+                    data[f'SMALL_D_{i}'] = cached_input("Описание", f"{mode}_sm_d_{i}", d_sm_d, d_sm_d) or d_sm_d
+                    data[f'SMALL_I_{i}'] = cached_input("URL фото", f"{mode}_sm_img_{i}", "", "https://...") or ""
+                    data[f'SMALL_L_{i}'] = cached_input("Ссылка", f"{mode}_sm_link_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
                     st.markdown("---")
 
-            # --- 3. КАТЕГОРИИ (1х2) ---
             with st.expander("3. Категории товаров"):
                 d_sec_t = "Категории товаров"
-                data['CAT_SECTION_TITLE'] = st.text_input("Заголовок раздела", placeholder=d_sec_t) or d_sec_t
+                data['CAT_SECTION_TITLE'] = cached_input("Заголовок раздела", f"{mode}_cat_section_title", d_sec_t, d_sec_t) or d_sec_t
                 for i in range(1, 3):
                     st.markdown(f"**Категория №{i}**")
                     d_ct_t = "Трубный прокат"
-                    data[f'CAT_TITLE_{i}'] = st.text_input("Заголовок", placeholder=d_ct_t, key=f"ct_t{i}") or d_ct_t
+                    data[f'CAT_TITLE_{i}'] = cached_input("Заголовок", f"{mode}_cat_title_{i}", d_ct_t, d_ct_t) or d_ct_t
                     d_ct_d = "Огромный выбор диаметров и стенок"
-                    data[f'CAT_DESC_{i}'] = st.text_area("Описание", placeholder=d_ct_d, key=f"ct_d{i}") or d_ct_d
-                    data[f'CAT_IMG_{i}'] = st.text_input("URL картинки", placeholder="https://...", key=f"ct_i{i}") or ""
-                    data[f'CAT_LINK_{i}'] = st.text_input("Ссылка", placeholder=data['LINK_CATALOG'], key=f"ct_l{i}") or data['LINK_CATALOG']
+                    data[f'CAT_DESC_{i}'] = cached_input("Описание", f"{mode}_cat_desc_{i}", d_ct_d, d_ct_d, area=True, height=80) or d_ct_d
+                    data[f'CAT_IMG_{i}'] = cached_input("URL картинки", f"{mode}_cat_img_{i}", "", "https://...") or ""
+                    data[f'CAT_LINK_{i}'] = cached_input("Ссылка", f"{mode}_cat_link_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
                     st.markdown("---")
 
-            # --- 4. ОТГРУЗКИ (1х2) ---
             with st.expander("4. Наши отгрузки за неделю"):
                 d_sec_title = "Наши отгрузки"
-                data['CASE_SECTION_TITLE'] = st.text_input("Заголовок раздела", placeholder=d_sec_title) or d_sec_title
-                
+                data['CASE_SECTION_TITLE'] = cached_input("Заголовок раздела", f"{mode}_case_section_title", d_sec_title, d_sec_title) or d_sec_title
                 for i in range(1, 3):
                     st.markdown(f"**Кейс №{i}**")
                     col_k1, col_k2 = st.columns([2, 1])
-                    
                     d_c_title = f"Отгрузка металлопроката {i}"
-                    data[f'CASE_TITLE_{i}'] = col_k1.text_input("Заголовок отгрузки", placeholder=d_c_title, key=f"cs_t{i}") or d_c_title
-                    
+                    data[f'CASE_TITLE_{i}'] = cached_input("Заголовок отгрузки", f"{mode}_case_title_{i}", d_c_title, d_c_title, col=col_k1) or d_c_title
                     d_c_date = "10.06.2024"
-                    data[f'CASE_DATE_{i}'] = col_k2.text_input("Дата", placeholder=d_c_date, key=f"cs_dt{i}") or d_c_date
-                    
+                    data[f'CASE_DATE_{i}'] = cached_input("Дата", f"{mode}_case_date_{i}", d_c_date, d_c_date, col=col_k2) or d_c_date
                     d_c_desc = "Укомплектовали и доставили заказ на объект"
-                    data[f'CASE_DESC_{i}'] = st.text_input("Описание (что отгрузили)", placeholder=d_c_desc, key=f"cs_d{i}") or d_c_desc
-                    
-                    data[f'CASE_IMG_{i}'] = st.text_input("URL фото отгрузки", placeholder="https://...", key=f"cs_i{i}") or ""
+                    data[f'CASE_DESC_{i}'] = cached_input("Описание (что отгрузили)", f"{mode}_case_desc_{i}", d_c_desc, d_c_desc) or d_c_desc
+                    data[f'CASE_IMG_{i}'] = cached_input("URL фото отгрузки", f"{mode}_case_img_{i}", "", "https://...") or ""
                     st.markdown("---")
 
         elif mode == "services":
             st.subheader("Настройка блоков")
 
-            # --- БЛОК 1: ТЕХНОЛОГИИ (3 карточки) ---
             with st.expander("1. Технологии (3 карточки)"):
                 d_tech_t = "Технологии, которые сэкономят ваше время"
-                data['TECH_SECTION_TITLE'] = st.text_input("Заголовок раздела", placeholder=d_tech_t) or d_tech_t
+                data['TECH_SECTION_TITLE'] = cached_input("Заголовок раздела", f"{mode}_tech_section_title", d_tech_t, d_tech_t) or d_tech_t
                 for i in range(1, 4):
                     st.markdown(f"**Услуга №{i}**")
                     d_sv_t, d_sv_d = "Лазерная резка", "Точность до микрона"
-                    data[f'T_{i}'] = st.text_input("Название", placeholder=d_sv_t, key=f"sv_t{i}") or d_sv_t
-                    data[f'D_{i}'] = st.text_input("Описание", placeholder=d_sv_d, key=f"sv_d{i}") or d_sv_d
-                    data[f'I_{i}'] = st.text_input("URL картинки", placeholder="https://...", key=f"sv_i{i}") or ""
-                    data[f'L_{i}'] = st.text_input("Ссылка", placeholder=data.get('LINK_CATALOG', ''), key=f"sv_l{i}") or data.get('LINK_CATALOG', '')
+                    data[f'T_{i}'] = cached_input("Название", f"{mode}_sv_t_{i}", d_sv_t, d_sv_t) or d_sv_t
+                    data[f'D_{i}'] = cached_input("Описание", f"{mode}_sv_d_{i}", d_sv_d, d_sv_d) or d_sv_d
+                    data[f'I_{i}'] = cached_input("URL картинки", f"{mode}_sv_i_{i}", "", "https://...") or ""
+                    data[f'L_{i}'] = cached_input("Ссылка", f"{mode}_sv_l_{i}", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', '')) or data.get('LINK_CATALOG', '')
                     st.markdown("---")
 
-            # --- БЛОК 2: СОРТАМЕНТ (2 товара) ---
             with st.expander("2. Сортамент под ваши чертежи"):
                 d_sort_t = "Сортамент под ваши чертежи"
-                data['SORT_SECTION_TITLE'] = st.text_input("Заголовок раздела", placeholder=d_sort_t) or d_sort_t
+                data['SORT_SECTION_TITLE'] = cached_input("Заголовок раздела", f"{mode}_sort_section_title", d_sort_t, d_sort_t) or d_sort_t
                 d_sort_i = "Поставляем прокат напрямую с заводов..."
-                data['SORT_INTRO'] = process_text_to_html(st.text_area("Вводный текст", placeholder=d_sort_i) or d_sort_i)
+                raw_sort_i = cached_input("Вводный текст", f"{mode}_sort_intro_raw", d_sort_i, d_sort_i, area=True, height=80) or d_sort_i
+                data['SORT_INTRO'] = process_text_to_html(raw_sort_i)
 
                 for i in range(1, 3):
                     st.markdown(f"**Товар №{i}**")
                     d_sr_t, d_sr_sp = "Труба БШ", "ГОСТ 8734-75"
-                    data[f'SORT_T_{i}'] = st.text_input("Название", placeholder=d_sr_t, key=f"sr_t{i}") or d_sr_t
-                    data[f'SORT_SPEC_{i}'] = st.text_input("Характеристика", placeholder=d_sr_sp, key=f"sr_sp{i}") or d_sr_sp
+                    data[f'SORT_T_{i}'] = cached_input("Название", f"{mode}_sr_t_{i}", d_sr_t, d_sr_t) or d_sr_t
+                    data[f'SORT_SPEC_{i}'] = cached_input("Характеристика", f"{mode}_sr_sp_{i}", d_sr_sp, d_sr_sp) or d_sr_sp
                     d_sr_d = "- Сталь 20\n- Любая нарезка"
-                    data[f'SORT_D_{i}'] = process_text_to_html(st.text_area("Описание", placeholder=d_sr_d, key=f"sr_d{i}") or d_sr_d)
-                    data[f'SORT_I_{i}'] = st.text_input("URL фото", placeholder="https://...", key=f"sr_i{i}") or ""
-                    data[f'SORT_L_{i}'] = st.text_input("Ссылка", placeholder=data.get('LINK_CATALOG', ''), key=f"sr_l{i}") or data.get('LINK_CATALOG', '')
+                    raw_sr_d = cached_input("Описание", f"{mode}_sr_d_{i}_raw", d_sr_d, d_sr_d, area=True, height=80) or d_sr_d
+                    data[f'SORT_D_{i}'] = process_text_to_html(raw_sr_d)
+                    data[f'SORT_I_{i}'] = cached_input("URL фото", f"{mode}_sr_i_{i}", "", "https://...") or ""
+                    data[f'SORT_L_{i}'] = cached_input("Ссылка", f"{mode}_sr_l_{i}", data.get('LINK_CATALOG', ''), data.get('LINK_CATALOG', '')) or data.get('LINK_CATALOG', '')
                     st.markdown("---")
 
-# --- БЛОК 3: ОТГРУЗКИ (2 кейса) ---
             with st.expander("3. Монтаж без задержек: отгружаем точно в срок"):
                 d_ship_sec_t = "Монтаж без задержек: отгружаем точно в срок"
-                data['SHIP_SECTION_TITLE'] = st.text_input("Заголовок раздела", placeholder=d_ship_sec_t) or d_ship_sec_t
-                
+                data['SHIP_SECTION_TITLE'] = cached_input("Заголовок раздела", f"{mode}_ship_section_title", d_ship_sec_t, d_ship_sec_t) or d_ship_sec_t
                 for i in range(1, 3):
                     st.markdown(f"**Отгрузка №{i}**")
                     col1, col2 = st.columns(2)
-                    
                     d_sh_t = f"Название товара {i}"
-                    data[f'SHIP_T_{i}'] = col1.text_input("Название товара", placeholder=d_sh_t, key=f"sh_t{i}") or d_sh_t
-                    
+                    data[f'SHIP_T_{i}'] = cached_input("Название товара", f"{mode}_sh_t_{i}", d_sh_t, d_sh_t, col=col1) or d_sh_t
                     d_sh_date = "12.06.2024"
-                    data[f'SHIP_DATE_{i}'] = col2.text_input("Дата", placeholder=d_sh_date, key=f"sh_dt{i}") or d_sh_date
-                    
+                    data[f'SHIP_DATE_{i}'] = cached_input("Дата", f"{mode}_sh_dt_{i}", d_sh_date, d_sh_date, col=col2) or d_sh_date
                     d_sh_d = "Описание процесса отгрузки или логистики"
-                    data[f'SHIP_D_{i}'] = st.text_input("Описание", placeholder=d_sh_d, key=f"sh_d{i}") or d_sh_d
-                    
-                    data[f'SHIP_I_{i}'] = st.text_input("URL фото отгрузки", placeholder="https://...", key=f"sh_i{i}") or ""
+                    data[f'SHIP_D_{i}'] = cached_input("Описание", f"{mode}_sh_d_{i}", d_sh_d, d_sh_d) or d_sh_d
+                    data[f'SHIP_I_{i}'] = cached_input("URL фото отгрузки", f"{mode}_sh_i_{i}", "", "https://...") or ""
                     st.markdown("---")
-
-
 
         else:
             st.info("Блоки для данного шаблона настраиваются индивидуально. Перейдите в другой шаблон.")
 
+    # ==========================================
+    # ТАБ 4: ЭКСПЕРТ
+    # ==========================================
     with tabs[4]:
         st.info("Блок Алины зафиксирован в дизайне. Здесь меняется только ссылка кнопки.")
-        data['ALINA_BTN_LINK'] = st.text_input("Ссылка для кнопки 'Рассчитать смету'", placeholder="https://stalmetural.ru/contacts/")  or "https://stalmetural.ru/contacts/"
+        d_alink = "https://stalmetural.ru/contacts/"
+        data['ALINA_BTN_LINK'] = cached_input("Ссылка для кнопки 'Рассчитать смету'", "ALINA_BTN_LINK", d_alink, d_alink) or d_alink
 
+    # ==========================================
+    # СБОРКА HTML
+    # ==========================================
     st.write("---")
     if st.button("СОБРАТЬ ФИНАЛЬНЫЙ HTML", type="primary", use_container_width=True):
         file_name = f"template_{mode}.html"
@@ -834,17 +821,16 @@ else:
         if not os.path.exists(file_path): file_path = file_name
         
         try:
-            with open(file_path, "r", encoding="utf-8") as f: 
+            with open(file_path, "r", encoding="utf-8") as f:
                 html = f.read()
             
-            # ЗАМЕНА ПЕРЕМЕННЫХ (Исправлен баг "if val", теперь заменяет даже пустые)
             for key, val in data.items():
                 replacement = str(val) if val else ""
                 html = html.replace(f"{{{{{key}}}}}", replacement)
             
             st.success("Готово!")
             components.html(html, height=800, scrolling=True)
-            with st.expander("Скопировать код"): 
+            with st.expander("Скопировать код"):
                 st.code(html, language="html")
-        except Exception as e: 
+        except Exception as e:
             st.error(f"Файл шаблона `{file_name}` не найден или произошла ошибка! {e}")
