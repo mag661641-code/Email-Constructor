@@ -1403,7 +1403,22 @@ else:
                 html = html.replace(f"{{{{{key}}}}}", replacement)
             st.success("Готово!")
             components.html(html, height=800, scrolling=True)
-            with st.expander("Скопировать код"):
-                st.code(html, language="html")
+            
+            # Проверяем, есть ли метка таймера в коде
+            if "<!-- TIMER_SPLIT -->" in html:
+                part1, part2 = html.split("<!-- TIMER_SPLIT -->")
+                st.info("⏱ В этом шаблоне предусмотрено место под таймер. Скопируйте код двумя частями, а между ними вставьте код таймера в рассыльщике.")
+                
+                tab_p1, tab_p2, tab_full = st.tabs(["Часть 1 (ДО таймера)", "Часть 2 (ПОСЛЕ таймера)", "Полный код"])
+                with tab_p1:
+                    st.code(part1.strip(), language="html")
+                with tab_p2:
+                    st.code(part2.strip(), language="html")
+                with tab_full:
+                    st.code(html, language="html")
+            else:
+                with st.expander("Скопировать код"):
+                    st.code(html, language="html")
+                    
         except Exception as e:
             st.error(f"Файл шаблона `{file_name}` не найден или произошла ошибка! {e}")
