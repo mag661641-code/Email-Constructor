@@ -355,6 +355,9 @@ base_styles = f"""
     div.stButton > button[kind="primary"]:hover {{ filter: brightness(.88) !important; transform: none !important; }}
     button[data-baseweb="tab"][aria-selected="true"] p {{ color: {accent} !important; }}
     button[data-baseweb="tab"][aria-selected="true"] {{ border-bottom-color: {accent} !important; }}
+    /* Внутренние отступы popover — поле не прижато к краю */
+    [data-baseweb="popover"] [data-testid="stVerticalBlock"] {{ padding: 6px 4px !important; gap: 12px !important; }}
+    [data-testid="stPopover"] [data-baseweb="popover"] > div > div {{ padding: 16px !important; }}
 </style>
 """
 
@@ -659,17 +662,18 @@ with st.sidebar:
         border-color: {_sb_btn_hover_bd} !important;
     }}
     section[data-testid="stSidebar"] .stButton > button:hover p {{ color: {_sb_txt} !important; }}
-    /* Кнопка Выйти — особый стиль */
-    section[data-testid="stSidebar"] .stButton:last-of-type > button {{
+    /* Кнопка Выйти — особый стиль (по ключу, чтобы не цеплять остальные) */
+    .st-key-sb_logout button {{
         background: transparent !important;
         color: {_sb_sub} !important;
         border: 1px solid {_sb_div} !important;
     }}
-    section[data-testid="stSidebar"] .stButton:last-of-type > button:hover {{
+    .st-key-sb_logout button:hover {{
         background: rgba(255,59,48,.12) !important;
         color: #FF3B30 !important;
         border-color: rgba(255,59,48,.3) !important;
     }}
+    .st-key-sb_logout button:hover p {{ color: #FF3B30 !important; }}
     .sb-brand-block {{ padding: 20px 4px 4px; }}
     .sb-brand-label {{ font-size:10px; font-weight:600; letter-spacing:1.4px; text-transform:uppercase; color:{_sb_sub}; margin-bottom:4px; }}
     .sb-brand-name  {{ font-size:20px; font-weight:700; letter-spacing:-.4px; color:{_sb_txt}; line-height:1.2; }}
@@ -695,34 +699,34 @@ with st.sidebar:
         st.session_state.show_history = not st.session_state.show_history
         st.rerun()
 
-    # --- Смена аккаунта (в сайдбаре, без слетающей верстки) ---
+    # --- Смена аккаунта (плавный раскрывающийся список) ---
     st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
-    st.markdown('<div class="sb-acc-label">Сменить аккаунт</div>', unsafe_allow_html=True)
-    for _a in _all_accounts:
-        _is_cur = _a['login'] == user['login']
-        _label = f"{_a['name']}  ✓" if _is_cur else _a['name']
-        if st.button(_label, key=f"sb_sw_{_a['login']}", use_container_width=True, disabled=_is_cur):
-            _sw_conn = get_db()
-            _sw_c = _sw_conn.cursor()
-            _sw_c.execute("""
-                SELECT u.id, u.login, u.brand_id, b.name as brand_name,
-                       b.logo_url, b.accent_color, b.site_url, b.catalog_url,
-                       b.about_url, b.delivery_url, b.contacts_url,
-                       b.vk_url, b.tg_url, b.footer_address,
-                       b.default_email, b.default_phone, b.default_city
-                FROM users u JOIN brands b ON u.brand_id = b.id
-                WHERE u.login = ?
-            """, (_a['login'],))
-            _sw_row = _sw_c.fetchone()
-            _sw_conn.close()
-            if _sw_row:
-                st.session_state.user          = dict(_sw_row)
-                st.session_state.authenticated = True
-                st.session_state.data          = {}
-                st.session_state.mode          = None
-                st.session_state.show_history  = False
-                st.query_params["u"] = _a['login']
-                st.rerun()
+    with st.expander("Сменить аккаунт"):
+        for _a in _all_accounts:
+            _is_cur = _a['login'] == user['login']
+            _label = f"{_a['name']}  ✓" if _is_cur else _a['name']
+            if st.button(_label, key=f"sb_sw_{_a['login']}", use_container_width=True, disabled=_is_cur):
+                _sw_conn = get_db()
+                _sw_c = _sw_conn.cursor()
+                _sw_c.execute("""
+                    SELECT u.id, u.login, u.brand_id, b.name as brand_name,
+                           b.logo_url, b.accent_color, b.site_url, b.catalog_url,
+                           b.about_url, b.delivery_url, b.contacts_url,
+                           b.vk_url, b.tg_url, b.footer_address,
+                           b.default_email, b.default_phone, b.default_city
+                    FROM users u JOIN brands b ON u.brand_id = b.id
+                    WHERE u.login = ?
+                """, (_a['login'],))
+                _sw_row = _sw_c.fetchone()
+                _sw_conn.close()
+                if _sw_row:
+                    st.session_state.user          = dict(_sw_row)
+                    st.session_state.authenticated = True
+                    st.session_state.data          = {}
+                    st.session_state.mode          = None
+                    st.session_state.show_history  = False
+                    st.query_params["u"] = _a['login']
+                    st.rerun()
 
     # Психологическая поддержка
     if st.session_state.cute_img and not st.session_state.show_history:
