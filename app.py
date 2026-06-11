@@ -340,12 +340,18 @@ base_styles = f"""
     /* Кнопка раскрытия свёрнутого сайдбара — всегда видима и поверх всего */
     [data-testid="stSidebarCollapsedControl"] {{
         visibility: visible !important;
-        display: block !important;
-        z-index: 1000 !important;
+        display: flex !important;
+        position: fixed !important;
+        top: 10px !important;
+        left: 10px !important;
+        z-index: 999999 !important;
+        opacity: 1 !important;
+        background: rgba(127,127,127,.2) !important;
+        transition: none !important; /* Убираем анимацию, чтобы не было задержек */
     }}
-    [data-testid="stSidebarCollapsedControl"] button {{
-        background: rgba(127,127,127,.12) !important;
-        border-radius: 8px !important;
+    [data-testid="stSidebarCollapsedControl"]:hover {{
+        opacity: 1 !important;
+        background: rgba(127,127,127,.4) !important;
     }}
     footer {{visibility: hidden;}}
     .block-container {{ padding-top: 1rem !important; padding-bottom: 0rem !important; }}
