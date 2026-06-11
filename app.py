@@ -718,31 +718,15 @@ _acc_c.execute("""
 _all_accounts = [dict(r) for r in _acc_c.fetchall()]
 _acc_conn.close()
 
+# Аббревиатуры брендов
+_abbr_map = {"stalmetural": "СМУ", "inmetprom": "ИМП", "metpromenergo": "МПЭ"}
+
 # Цвета дропдауна по теме
 _dd_bg     = "#1E2130" if _sidebar_dark else "#FFFFFF"
 _dd_border = "rgba(255,255,255,.12)" if _sidebar_dark else "rgba(0,0,0,.10)"
-_dd_shadow = "0 8px 32px rgba(0,0,0,.45)" if _sidebar_dark else "0 8px 32px rgba(0,0,0,.15)"
 _dd_txt    = "#F3F4F6" if _sidebar_dark else "#1D1D1F"
 _dd_sub    = "rgba(243,244,246,.45)" if _sidebar_dark else "rgba(29,29,31,.4)"
-_dd_row_hov= "rgba(255,255,255,.07)" if _sidebar_dark else "rgba(0,0,0,.05)"
-
-# Строим HTML строк аккаунтов
-_acc_rows_html = ""
-for _a in _all_accounts:
-    _is_cur = _a['login'] == user['login']
-    _av = _brand_avatars.get(_a['login'], B64_STALMETURAL)
-    _check_html = f'<span style="margin-left:auto;color:{_a["accent_color"]};font-size:15px;line-height:1;">✓</span>' if _is_cur else ""
-    _name_style = f'font-weight:600;color:{_a["accent_color"]}' if _is_cur else f'font-weight:500;color:{_dd_txt}'
-    _acc_rows_html += f"""
-    <div class="dd-acc-row" data-login="{_a['login']}"
-         style="display:flex;align-items:center;gap:10px;padding:9px 14px;
-         border-radius:9px;cursor:pointer;transition:background .12s;
-         {'background:'+_dd_row_hov+';' if _is_cur else ''}">
-        <img src="{_av}" style="width:30px;height:30px;border-radius:50%;
-             object-fit:cover;flex-shrink:0;border:2px solid {_a['accent_color']};">
-        <span style="font-size:13px;letter-spacing:-.1px;{_name_style};">{_a['name']}</span>
-        {_check_html}
-    </div>"""
+_dd_hov    = "rgba(255,255,255,.07)" if _sidebar_dark else "rgba(0,0,0,.05)"
 
 _top_l, _top_theme, _top_acc = st.columns([10, 1, 1])
 
@@ -753,58 +737,88 @@ with _top_theme:
         st.rerun()
 
 with _top_acc:
-    # Кнопка — короткое имя бренда (первые 3 буквы)
-    _btn_label = user['brand_name'][:3].upper()
+    # Кнопка — аббревиатура бренда (СМУ / ИМП / МПЭ)
+    _btn_label = _abbr_map.get(user['login'], user['brand_name'][:3].upper())
     if st.button(_btn_label, key="acc_menu_btn"):
         st.session_state.show_account_menu = not st.session_state.show_account_menu
         st.rerun()
 
-# Дропдаун — рендерим под верхней панелью если открыт
+# Дропдаун — компактная панель из реальных кнопок (не ломает раскладку)
 if st.session_state.show_account_menu:
     st.markdown(f"""
     <style>
-    .dd-acc-row:hover {{ background: {_dd_row_hov} !important; }}
+    .st-key-dd_panel {{
+        background: {_dd_bg};
+        border: 1px solid {_dd_border};
+        border-radius: 14px;
+        padding: 8px;
+        box-shadow: 0 8px 28px rgba(0,0,0,.18);
+    }}
+    .st-key-dd_panel .stButton > button {{
+        height: 42px !important;
+        min-height: 42px !important;
+        border-radius: 9px !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        transform: none !important;
+        justify-content: flex-start !important;
+        text-align: left !important;
+        padding: 0 12px !important;
+        margin: 0 !important;
+    }}
+    .st-key-dd_panel .stButton > button p {{
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        color: {_dd_txt} !important;
+    }}
+    .st-key-dd_panel .stButton > button:hover {{
+        background: {_dd_hov} !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }}
+    .st-key-dd_panel .stButton > button:hover p {{ color: {_dd_txt} !important; }}
     </style>
-    <div style="position:relative; z-index:999; display:flex; justify-content:flex-end; margin-top:-8px;">
-        <div style="width:240px; background:{_dd_bg}; border:1px solid {_dd_border};
-             border-radius:14px; box-shadow:{_dd_shadow}; padding:10px 6px 8px; overflow:hidden;">
-            <div style="font-size:10px; font-weight:600; letter-spacing:1.3px; text-transform:uppercase;
-                 color:{_dd_sub}; padding:0 10px 8px;">Сменить аккаунт</div>
-            <div style="height:1px; background:{_dd_border}; margin:0 6px 8px;"></div>
-            {_acc_rows_html}
-        </div>
-    </div>
     """, unsafe_allow_html=True)
 
-    # Кнопки переключения аккаунтов
-    for _a in _all_accounts:
-        if _a['login'] != user['login']:
-            if st.button(_a['name'], key=f"dd_sw_{_a['login']}"):
-                _sw_conn = get_db()
-                _sw_c = _sw_conn.cursor()
-                _sw_c.execute("""
-                    SELECT u.id, u.login, u.brand_id, b.name as brand_name,
-                           b.logo_url, b.accent_color, b.site_url, b.catalog_url,
-                           b.about_url, b.delivery_url, b.contacts_url,
-                           b.vk_url, b.tg_url, b.footer_address,
-                           b.default_email, b.default_phone, b.default_city
-                    FROM users u JOIN brands b ON u.brand_id = b.id
-                    WHERE u.login = ?
-                """, (_a['login'],))
-                _sw_row = _sw_c.fetchone()
-                _sw_conn.close()
-                if _sw_row:
-                    st.session_state.user              = dict(_sw_row)
-                    st.session_state.authenticated     = True
-                    st.session_state.data              = {}
-                    st.session_state.mode              = None
-                    st.session_state.show_history      = False
-                    st.session_state.show_account_menu = False
-                    st.query_params["u"] = _a['login']
-                    st.rerun()
-    if st.button("Закрыть", key="dd_close"):
-        st.session_state.show_account_menu = False
-        st.rerun()
+    _, _dd_col = st.columns([10, 2])
+    with _dd_col:
+        with st.container(key="dd_panel"):
+            st.markdown(
+                f'<div style="font-size:10px;font-weight:600;letter-spacing:1.3px;'
+                f'text-transform:uppercase;color:{_dd_sub};padding:4px 12px 8px;">'
+                f'Сменить аккаунт</div>', unsafe_allow_html=True)
+
+            for _a in _all_accounts:
+                _is_cur = _a['login'] == user['login']
+                _label = f"{_a['name']}  ✓" if _is_cur else _a['name']
+                if st.button(_label, key=f"dd_sw_{_a['login']}", use_container_width=True):
+                    if not _is_cur:
+                        _sw_conn = get_db()
+                        _sw_c = _sw_conn.cursor()
+                        _sw_c.execute("""
+                            SELECT u.id, u.login, u.brand_id, b.name as brand_name,
+                                   b.logo_url, b.accent_color, b.site_url, b.catalog_url,
+                                   b.about_url, b.delivery_url, b.contacts_url,
+                                   b.vk_url, b.tg_url, b.footer_address,
+                                   b.default_email, b.default_phone, b.default_city
+                            FROM users u JOIN brands b ON u.brand_id = b.id
+                            WHERE u.login = ?
+                        """, (_a['login'],))
+                        _sw_row = _sw_c.fetchone()
+                        _sw_conn.close()
+                        if _sw_row:
+                            st.session_state.user              = dict(_sw_row)
+                            st.session_state.authenticated     = True
+                            st.session_state.data              = {}
+                            st.session_state.mode              = None
+                            st.session_state.show_history      = False
+                            st.session_state.show_account_menu = False
+                            st.query_params["u"] = _a['login']
+                            st.rerun()
+                    else:
+                        st.session_state.show_account_menu = False
+                        st.rerun()
 
 # ==========================================
 # 8. ИСТОРИЯ ПРОЕКТОВ
@@ -911,7 +925,29 @@ else:
     mode = st.session_state.mode
     data = {}
 
-    st.title(f"Шаблон: {menu_items[mode]['title']}")
+    _title_col, _save_col = st.columns([5, 1])
+    with _title_col:
+        st.title(f"Шаблон: {menu_items[mode]['title']}")
+    with _save_col:
+        st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
+        with st.popover("Сохранить", use_container_width=True):
+            proj_name = st.text_input(
+                "Название проекта",
+                placeholder="Оставьте пустым для авто",
+                key="save_project_name"
+            )
+            if st.button("Сохранить проект", use_container_width=True, key="save_btn", type="primary"):
+                name = proj_name.strip() or f"{menu_items[mode]['title']} {datetime.now().strftime('%d.%m %H:%M')}"
+                save_project(
+                    brand_id      = brand['brand_id'],
+                    template_mode = mode,
+                    project_name  = name,
+                    data_dict     = {k: v for k, v in st.session_state.data.items()},
+                    gost_tags     = st.session_state.gost_tags,
+                    size_tags     = st.session_state.size_tags
+                )
+                st.success(f"Сохранено: «{name}»")
+
     tabs = st.tabs(["Контакты", "Баннер", "Тексты", "Блоки", "Эксперт"])
 
     # ---- ТАБ 0: КОНТАКТЫ ----
@@ -1360,44 +1396,24 @@ else:
         data['ALINA_BTN_LINK'] = cached_input("Ссылка для кнопки 'Рассчитать смету'", "ALINA_BTN_LINK", d_alink, d_alink) or d_alink
 
     # ==========================================
-    # 10. СОХРАНЕНИЕ И СБОРКА
+    # 10. СБОРКА HTML
     # ==========================================
     st.markdown('<div style="height:8px"></div>', unsafe_allow_html=True)
     st.write("---")
 
-    # Одна строка: поле названия + Сохранить + Собрать HTML
-    _sv_c1, _sv_c2, _sv_c3 = st.columns([3, 1, 2])
-    with _sv_c1:
-        proj_name = st.text_input(
-            "", placeholder="Название проекта (оставьте пустым для авто)",
-            key="save_project_name", label_visibility="collapsed"
-        )
-    with _sv_c2:
-        if st.button("Сохранить", use_container_width=True, key="save_btn"):
-            name = proj_name.strip() or f"{menu_items[mode]['title']} {datetime.now().strftime('%d.%m %H:%M')}"
-            save_project(
-                brand_id      = brand['brand_id'],
-                template_mode = mode,
-                project_name  = name,
-                data_dict     = {k: v for k, v in st.session_state.data.items()},
-                gost_tags     = st.session_state.gost_tags,
-                size_tags     = st.session_state.size_tags
-            )
-            st.success(f"Сохранено: «{name}»")
-    with _sv_c3:
-        if st.button("Собрать HTML", type="primary", use_container_width=True):
-            file_name = f"template_{mode}.html"
-            file_path = os.path.join("templates", file_name)
-            if not os.path.exists(file_path): file_path = file_name
-            try:
-                with open(file_path, "r", encoding="utf-8") as f:
-                    html = f.read()
-                for key, val in data.items():
-                    replacement = str(val) if val else ""
-                    html = html.replace(f"{{{{{key}}}}}", replacement)
-                st.success("Готово!")
-                components.html(html, height=800, scrolling=True)
-                with st.expander("Скопировать код"):
-                    st.code(html, language="html")
-            except Exception as e:
-                st.error(f"Файл шаблона `{file_name}` не найден или произошла ошибка! {e}")
+    if st.button("Собрать HTML", type="primary", use_container_width=True, key="build_btn"):
+        file_name = f"template_{mode}.html"
+        file_path = os.path.join("templates", file_name)
+        if not os.path.exists(file_path): file_path = file_name
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                html = f.read()
+            for key, val in data.items():
+                replacement = str(val) if val else ""
+                html = html.replace(f"{{{{{key}}}}}", replacement)
+            st.success("Готово!")
+            components.html(html, height=800, scrolling=True)
+            with st.expander("Скопировать код"):
+                st.code(html, language="html")
+        except Exception as e:
+            st.error(f"Файл шаблона `{file_name}` не найден или произошла ошибка! {e}")
