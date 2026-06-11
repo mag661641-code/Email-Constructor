@@ -699,34 +699,35 @@ with st.sidebar:
         st.session_state.show_history = not st.session_state.show_history
         st.rerun()
 
-    # --- Смена аккаунта (плавный раскрывающийся список) ---
-    st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
-    with st.expander("Сменить аккаунт"):
-        for _a in _all_accounts:
-            _is_cur = _a['login'] == user['login']
-            _label = f"{_a['name']}  ✓" if _is_cur else _a['name']
-            if st.button(_label, key=f"sb_sw_{_a['login']}", use_container_width=True, disabled=_is_cur):
-                _sw_conn = get_db()
-                _sw_c = _sw_conn.cursor()
-                _sw_c.execute("""
-                    SELECT u.id, u.login, u.brand_id, b.name as brand_name,
-                           b.logo_url, b.accent_color, b.site_url, b.catalog_url,
-                           b.about_url, b.delivery_url, b.contacts_url,
-                           b.vk_url, b.tg_url, b.footer_address,
-                           b.default_email, b.default_phone, b.default_city
-                    FROM users u JOIN brands b ON u.brand_id = b.id
-                    WHERE u.login = ?
-                """, (_a['login'],))
-                _sw_row = _sw_c.fetchone()
-                _sw_conn.close()
-                if _sw_row:
-                    st.session_state.user          = dict(_sw_row)
-                    st.session_state.authenticated = True
-                    st.session_state.data          = {}
-                    st.session_state.mode          = None
-                    st.session_state.show_history  = False
-                    st.query_params["u"] = _a['login']
-                    st.rerun()
+    # --- Смена аккаунта (только в главном меню, не внутри шаблона) ---
+    if st.session_state.mode is None and not st.session_state.show_history:
+        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+        with st.expander("Сменить аккаунт"):
+            for _a in _all_accounts:
+                _is_cur = _a['login'] == user['login']
+                _label = f"{_a['name']}  ✓" if _is_cur else _a['name']
+                if st.button(_label, key=f"sb_sw_{_a['login']}", use_container_width=True, disabled=_is_cur):
+                    _sw_conn = get_db()
+                    _sw_c = _sw_conn.cursor()
+                    _sw_c.execute("""
+                        SELECT u.id, u.login, u.brand_id, b.name as brand_name,
+                               b.logo_url, b.accent_color, b.site_url, b.catalog_url,
+                               b.about_url, b.delivery_url, b.contacts_url,
+                               b.vk_url, b.tg_url, b.footer_address,
+                               b.default_email, b.default_phone, b.default_city
+                        FROM users u JOIN brands b ON u.brand_id = b.id
+                        WHERE u.login = ?
+                    """, (_a['login'],))
+                    _sw_row = _sw_c.fetchone()
+                    _sw_conn.close()
+                    if _sw_row:
+                        st.session_state.user          = dict(_sw_row)
+                        st.session_state.authenticated = True
+                        st.session_state.data          = {}
+                        st.session_state.mode          = None
+                        st.session_state.show_history  = False
+                        st.query_params["u"] = _a['login']
+                        st.rerun()
 
     # Психологическая поддержка
     if st.session_state.cute_img and not st.session_state.show_history:
@@ -746,15 +747,16 @@ with st.sidebar:
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
-
-    if st.button("Выйти", key="sb_logout", use_container_width=True):
-        for k in ['authenticated', 'user', 'data', 'mode', 'cute_img',
-                  'gost_tags', 'size_tags', 'show_history']:
-            if k in st.session_state:
-                del st.session_state[k]
-        st.query_params.clear()
-        st.rerun()
+    # --- Выйти (только в главном меню, не внутри шаблона) ---
+    if st.session_state.mode is None and not st.session_state.show_history:
+        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+        if st.button("Выйти", key="sb_logout", use_container_width=True):
+            for k in ['authenticated', 'user', 'data', 'mode', 'cute_img',
+                      'gost_tags', 'size_tags', 'show_history']:
+                if k in st.session_state:
+                    del st.session_state[k]
+            st.query_params.clear()
+            st.rerun()
 
 # ==========================================
 # 7. ВЕРХНЯЯ ПАНЕЛЬ — кнопка темы
