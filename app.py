@@ -335,7 +335,18 @@ accent = st.session_state.user['accent_color'] if st.session_state.user else "#1
 base_styles = f"""
 <style>
     #MainMenu {{visibility: hidden;}}
-    header {{visibility: hidden; height: 0px !important;}}
+    header [data-testid="stToolbar"] {{ visibility: hidden; }}
+    header {{ background: transparent !important; }}
+    /* Кнопка раскрытия свёрнутого сайдбара — всегда видима и поверх всего */
+    [data-testid="stSidebarCollapsedControl"] {{
+        visibility: visible !important;
+        display: block !important;
+        z-index: 1000 !important;
+    }}
+    [data-testid="stSidebarCollapsedControl"] button {{
+        background: rgba(127,127,127,.12) !important;
+        border-radius: 8px !important;
+    }}
     footer {{visibility: hidden;}}
     .block-container {{ padding-top: 1rem !important; padding-bottom: 0rem !important; }}
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
@@ -882,7 +893,7 @@ else:
         with st.popover("Сохранить", use_container_width=True):
             proj_name = st.text_input(
                 "Название проекта",
-                placeholder="Оставьте пустым для авто",
+                placeholder="Шаблон 11.06.26",
                 key="save_project_name"
             )
             if st.button("Сохранить проект", use_container_width=True, key="save_btn", type="primary"):
