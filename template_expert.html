@@ -979,7 +979,7 @@ height="auto"></a></div>
               </tr>
             </tbody>
           </table>
-          <table class="row row-15" align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;background-color:#fff">
+<table class="row row-15" align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;background-color:#fff">
             <tbody>
               <tr>
                 <td>
@@ -991,7 +991,8 @@ height="auto"></a></div>
                           <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0">
                             <tbody>
                               <tr>
-                                <td class="column column-1" width="50%" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;background-color:#e9edf6;vertical-align:top;border-radius:20px">
+                                <!-- ИСПРАВЛЕНО: width="50%" заменено на width="285" -->
+                                <td class="column column-1" width="285" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;background-color:#e9edf6;vertical-align:top;border-radius:20px">
                                   <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0">
                                     <tr>
                                       <td class="col-pad" style="padding-bottom:15px">
@@ -1016,6 +1017,7 @@ style="display:block;height:auto;border:0;width:100%;border-radius:20px 20px 0 0
                                         </table>
                                         <table class="text_block block-3" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;word-break:break-word">
                                           <tr>
+                                            <!-- ИСПРАВЛЕНО: Убран padding-bottom, чтобы было как во второй карточке -->
                                             <td class="pad" style="padding-top:5px;padding-left:20px;padding-right:20px">
                                               <div style="font-family:sans-serif">
                                                 <div class style="font-size:14px;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;mso-line-height-alt:16.8px;color:#555;line-height:1.2">
@@ -1030,7 +1032,8 @@ style="display:block;height:auto;border:0;width:100%;border-radius:20px 20px 0 0
                                             <td class="pad" style="padding-top:5px;padding-left:20px;padding-right:20px">
                                               <div style="font-family:sans-serif">
                                                 <div class style="font-size:14px;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;mso-line-height-alt:16.8px;color:#555;line-height:1.2">
-                                                  <p style="margin:0;font-size:14px;text-align:right;mso-line-height-alt:16.8px">{{SHIP_1_DATE}}</p>
+                                                  <!-- ИСПРАВЛЕНО: Добавлен white-space: nowrap -->
+                                                  <p style="margin:0;font-size:14px;text-align:right;white-space:nowrap;mso-line-height-alt:16.8px">{{SHIP_1_DATE}}</p>
                                                 </div>
                                               </div>
                                             </td>
@@ -1040,10 +1043,12 @@ style="display:block;height:auto;border:0;width:100%;border-radius:20px 20px 0 0
                                     </tr>
                                   </table>
                                 </td>
-                                <td class="column gap" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;vertical-align:top">
+                                <!-- ИСПРАВЛЕНО: Добавлено width="20" -->
+                                <td class="column gap" width="20" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;vertical-align:top">
                                   <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;width:20px;height:20px" width="20" height="20"></table>
                                 </td>
-                                <td class="column column-2" width="50%" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;background-color:#e9edf6;vertical-align:top;border-radius:20px">
+                                <!-- ИСПРАВЛЕНО: width="50%" заменено на width="285" -->
+                                <td class="column column-2" width="285" style="mso-table-lspace:0;mso-table-rspace:0;font-weight:400;text-align:left;background-color:#e9edf6;vertical-align:top;border-radius:20px">
                                   <table class="image_block block-1" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0">
                                     <tr>
                                       <td class="pad" style="width:100%" align="center">
@@ -1065,7 +1070,8 @@ style="display:block;height:auto;border:0;width:100%;border-radius:20px 20px 0 0
                                   </table>
                                   <table class="text_block block-3" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0;mso-table-rspace:0;word-break:break-word">
                                     <tr>
-                                      <td class="pad" style="padding-top:5px;padding-bottom:15px;padding-left:20px;padding-right:20px">
+                                      <!-- ИСПРАВЛЕНО: Убран padding-bottom:15px, который ломал выравнивание -->
+                                      <td class="pad" style="padding-top:5px;padding-left:20px;padding-right:20px">
                                         <div style="font-family:sans-serif">
                                           <div class style="font-size:14px;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;mso-line-height-alt:16.8px;color:#555;line-height:1.2">
                                             <p style="margin:0;font-size:14px;mso-line-height-alt:16.8px">{{SHIP_2_DESC}}</p>
@@ -1079,7 +1085,8 @@ style="display:block;height:auto;border:0;width:100%;border-radius:20px 20px 0 0
                                       <td class="pad" style="padding-top:5px;padding-left:20px;padding-right:20px">
                                         <div style="font-family:sans-serif">
                                           <div class style="font-size:14px;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;mso-line-height-alt:16.8px;color:#555;line-height:1.2">
-                                            <p style="margin:0;font-size:14px;text-align:right;mso-line-height-alt:16.8px">{{SHIP_2_DATE}}</p>
+                                            <!-- ИСПРАВЛЕНО: Добавлен white-space: nowrap -->
+                                            <p style="margin:0;font-size:14px;text-align:right;white-space:nowrap;mso-line-height-alt:16.8px">{{SHIP_2_DATE}}</p>
                                           </div>
                                         </div>
                                       </td>
