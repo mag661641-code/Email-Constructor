@@ -332,12 +332,16 @@ if not st.session_state.authenticated:
 # ==========================================
 accent = st.session_state.user['accent_color'] if st.session_state.user else "#1e69da"
 
+# Цвет иконки-стрелки сайдбара (контрастный к фону темы)
+_arrow_color = "#F5F5F7" if st.session_state.theme == "dark" else "#1D1D1F"
+_arrow_bg    = "rgba(255,255,255,.10)" if st.session_state.theme == "dark" else "rgba(0,0,0,.06)"
+
 base_styles = f"""
 <style>
     #MainMenu {{visibility: hidden;}}
     header [data-testid="stToolbar"] {{ visibility: hidden; }}
     header {{ background: transparent !important; }}
-    /* Кнопка раскрытия свёрнутого сайдбара — ВСЕГДА видима, без ховера и затуханий */
+    /* === Стрелка раскрытия (когда сайдбар СВЁРНУТ) — всегда видима === */
     [data-testid="stSidebarCollapsedControl"] {{
         visibility: visible !important;
         display: block !important;
@@ -353,14 +357,28 @@ base_styles = f"""
         opacity: 1 !important;
         visibility: visible !important;
         transition: none !important;
-        background: rgba(127,127,127,.14) !important;
+        background: {_arrow_bg} !important;
         border-radius: 8px !important;
         width: 34px !important;
         height: 34px !important;
     }}
-    [data-testid="stSidebarCollapsedControl"] button svg {{
+    /* === Стрелка сворачивания (когда сайдбар ОТКРЫТ) — всегда видима === */
+    [data-testid="stSidebarCollapseButton"],
+    [data-testid="stSidebarHeader"] button,
+    section[data-testid="stSidebar"] button[kind="headerNoPadding"] {{
         opacity: 1 !important;
         visibility: visible !important;
+        transition: none !important;
+    }}
+    /* Цвет самой иконки-стрелки (обе кнопки) — контраст к теме */
+    [data-testid="stSidebarCollapsedControl"] svg,
+    [data-testid="stSidebarCollapseButton"] svg,
+    [data-testid="stSidebarHeader"] button svg,
+    section[data-testid="stSidebar"] button[kind="headerNoPadding"] svg {{
+        opacity: 1 !important;
+        visibility: visible !important;
+        fill: {_arrow_color} !important;
+        color: {_arrow_color} !important;
     }}
     footer {{visibility: hidden;}}
     .block-container {{ padding-top: 1rem !important; padding-bottom: 0rem !important; }}
