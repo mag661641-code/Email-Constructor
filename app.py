@@ -961,7 +961,7 @@ else:
         st.markdown("---")
 
         if mode == "promo":
-            d_ht = "НА КВАДРАТ\nЧУГУННЫЙ" # Добавили перенос в значение по умолчанию
+            d_ht = "НА КВАДРАТ ЧУГУННЫЙ" # Добавили перенос в значение по умолчанию
             raw_ht = cached_input("Заголовок на баннере (Enter для переноса)", f"{mode}_HERO_TITLE", d_ht, d_ht, area=True, height=75) or d_ht
             # Меняем невидимые переносы строки на тег <br> для HTML
             data['HERO_TITLE'] = raw_ht.replace('\n', '<br>') 
