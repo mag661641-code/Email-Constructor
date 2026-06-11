@@ -961,8 +961,11 @@ else:
         st.markdown("---")
 
         if mode == "promo":
-            d_ht = "НА КВАДРАТ ЧУГУННЫЙ"
-            data['HERO_TITLE'] = cached_input("Заголовок на баннере", f"{mode}_HERO_TITLE", d_ht, d_ht) or d_ht
+            d_ht = "НА КВАДРАТ\nЧУГУННЫЙ" # Добавили перенос в значение по умолчанию
+            raw_ht = cached_input("Заголовок на баннере (Enter для переноса)", f"{mode}_HERO_TITLE", d_ht, d_ht, area=True, height=75) or d_ht
+            # Меняем невидимые переносы строки на тег <br> для HTML
+            data['HERO_TITLE'] = raw_ht.replace('\n', '<br>') 
+            
             d_dl = "СКИДКА 10%"
             data['DISCOUNT_LABEL'] = cached_input("Метка скидки", f"{mode}_DISCOUNT_LABEL", d_dl, d_dl) or d_dl
         elif mode == "stock":
