@@ -334,6 +334,7 @@ accent = st.session_state.user['accent_color'] if st.session_state.user else "#1
 
 base_styles = f"""
 <style>
+    /* Прячем стандартное меню Streamlit (если нужно) */
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
    /* 1. Находим кнопку, когда сайдбар РАЗВЕРНУТ (она внутри панели) */
@@ -343,17 +344,21 @@ base_styles = f"""
         left: 10px !important;
         z-index: 999999 !important;
     }}
-    /* Кнопка раскрытия свёрнутого сайдбара — всегда видима и поверх всего */
+    /* 1. Сдвигаем кнопку сайдбара чуть вправо, чтобы не перекрывать Share */
     [data-testid="stSidebarCollapsedControl"] {{
         position: fixed !important;
         top: 10px !important;
-        left: 10px !important;
+        left: 50px !important;  /* Сдвинули вправо на 50px */
         z-index: 999999 !important;
         visibility: visible !important;
         display: block !important;
         background: rgba(127,127,127,.2) !important;
         border-radius: 8px !important;
+        width: 30px !important;
+        height: 30px !important;
     }}
+    .stApp {{ overflow-x: hidden; }}
+</style>
     [data-testid="stSidebarCollapsedControl"] > button {{
         opacity: 1 !important;
     }}
