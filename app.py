@@ -334,36 +334,35 @@ accent = st.session_state.user['accent_color'] if st.session_state.user else "#1
 
 base_styles = f"""
 <style>
-    /* Прячем стандартное меню Streamlit (если нужно) */
     #MainMenu {{visibility: hidden;}}
-    footer {{visibility: hidden;}}
-   /* 1. Находим кнопку, когда сайдбар РАЗВЕРНУТ (она внутри панели) */
-    button[kind="header"] {{
-        position: fixed !important;
-        top: 10px !important;
-        left: 10px !important;
-        z-index: 999999 !important;
-    }}
-    /* 1. Сдвигаем кнопку сайдбара чуть вправо, чтобы не перекрывать Share */
+    header [data-testid="stToolbar"] {{ visibility: hidden; }}
+    header {{ background: transparent !important; }}
+    /* Кнопка раскрытия свёрнутого сайдбара — ВСЕГДА видима, без ховера и затуханий */
     [data-testid="stSidebarCollapsedControl"] {{
-        position: fixed !important;
-        top: 10px !important;
-        left: 50px !important;  /* Сдвинули вправо на 50px */
-        z-index: 999999 !important;
         visibility: visible !important;
         display: block !important;
-        background: rgba(127,127,127,.2) !important;
-        border-radius: 8px !important;
-        width: 30px !important;
-        height: 30px !important;
-    }}
-    .stApp {{ overflow-x: hidden; }}
-</style>
-    [data-testid="stSidebarCollapsedControl"] > button {{
         opacity: 1 !important;
+        position: fixed !important;
+        top: 10px !important;
+        left: 12px !important;
+        z-index: 999999 !important;
+        transition: none !important;
+        pointer-events: auto !important;
     }}
-    
-
+    [data-testid="stSidebarCollapsedControl"] button {{
+        opacity: 1 !important;
+        visibility: visible !important;
+        transition: none !important;
+        background: rgba(127,127,127,.14) !important;
+        border-radius: 8px !important;
+        width: 34px !important;
+        height: 34px !important;
+    }}
+    [data-testid="stSidebarCollapsedControl"] button svg {{
+        opacity: 1 !important;
+        visibility: visible !important;
+    }}
+    footer {{visibility: hidden;}}
     .block-container {{ padding-top: 1rem !important; padding-bottom: 0rem !important; }}
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
     html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
@@ -909,7 +908,7 @@ else:
         with st.popover("Сохранить", use_container_width=True):
             proj_name = st.text_input(
                 "Название проекта",
-                placeholder="Шаблон 11.06.26",
+                placeholder="Оставьте пустым для авто",
                 key="save_project_name"
             )
             if st.button("Сохранить проект", use_container_width=True, key="save_btn", type="primary"):
