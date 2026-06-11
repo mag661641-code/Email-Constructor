@@ -605,6 +605,8 @@ def set_mode(name):
     st.session_state.mode = name
     if name:
         st.session_state.cute_img = get_cute_gif()
+    else:
+        st.session_state.cute_img = None  # <-- Добавили эту строку
 
 def cached_input(label, key, default="", placeholder="", col=None, area=False, height=100):
     current = st.session_state.data.get(key, "")
@@ -748,7 +750,7 @@ with st.sidebar:
                         st.rerun()
 
     # Психологическая поддержка
-    if st.session_state.cute_img and not st.session_state.show_history:
+    if st.session_state.mode is not None and st.session_state.cute_img and not st.session_state.show_history:
         st.markdown(f'<div class="sb-divider"></div>', unsafe_allow_html=True)
         st.markdown(f"""
         <div style="border-radius:14px; overflow:hidden; position:relative;">
