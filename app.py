@@ -1182,7 +1182,25 @@ else:
                     d_s_i = "https://img.hiteml.com/stock.jpg"
                     data[f'STOCK_{i}_IMG']  = cached_input("URL картинки", f"{mode}_stock_{i}_img",  d_s_i, d_s_i, col=col3) or d_s_i
                     data[f'STOCK_{i}_LINK'] = cached_input("Ссылка",       f"{mode}_stock_{i}_link", data.get('LINK_CATALOG',''), data.get('LINK_CATALOG',''), col=col4) or data.get('LINK_CATALOG','')
+
+            with st.expander("3. Наши отгрузки (2 кейса)"):
+                d_ship_sec_t = "Наши отгрузки"
+                data['SHIP_SECTION_TITLE'] = cached_input("Заголовок раздела", f"{mode}_ship_section_title", d_ship_sec_t, d_ship_sec_t) or d_ship_sec_t
+                for i in range(1, 3):
+                    st.markdown(f"**Отгрузка №{i}**")
+                    col1, col2 = st.columns(2)
+                    d_sh_t = f"Труба №{i}"
+                    data[f'SHIP_{i}_TITLE'] = cached_input("Название товара", f"{mode}_ship_t_{i}",  d_sh_t, d_sh_t, col=col1) or d_sh_t
+                    d_sh_date = "12.06.2024"
+                    data[f'SHIP_{i}_DATE']  = cached_input("Дата",            f"{mode}_ship_dt_{i}", d_sh_date, d_sh_date, col=col2) or d_sh_date
+                    d_sh_d = "Описание процесса отгрузки или логистики"
+                    data[f'SHIP_{i}_DESC']  = cached_input("Описание",        f"{mode}_ship_d_{i}", d_sh_d, d_sh_d) or d_sh_d
+                    
+                    col3, col4 = st.columns(2)
+                    data[f'SHIP_{i}_IMG']   = cached_input("URL фото",        f"{mode}_ship_i_{i}", "", "https://...", col=col3) or ""
+                    data[f'SHIP_{i}_LINK']  = cached_input("Ссылка",          f"{mode}_ship_l_{i}", data.get('LINK_CATALOG',''), data.get('LINK_CATALOG',''), col=col4) or data.get('LINK_CATALOG','')
                     st.markdown("---")
+
 
         elif mode == "stock":
             st.subheader("Настройка технических блоков и товаров")
