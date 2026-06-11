@@ -417,6 +417,19 @@ if st.session_state.theme == "light":
     ul[role="listbox"] {{ background-color: #FFFFFF !important; }}
     ul[role="listbox"] li {{ color: #111827 !important; background-color: transparent !important; }}
     ul[role="listbox"] li:hover, ul[role="listbox"] li[aria-selected="true"] {{ background-color: #F3F4F6 !important; color: {accent} !important; }}
+    /* Popover «Сохранить» — светлая тема */
+    [data-testid="stPopover"] > div > button {{
+        background-color: #FFFFFF !important;
+        border: 1px solid #D1D5DB !important;
+        color: #111827 !important;
+    }}
+    [data-testid="stPopover"] > div > button:hover {{ background-color: #E5E7EB !important; color: #111827 !important; border-color: #9CA3AF !important; }}
+    [data-testid="stPopover"] > div > button p {{ color: #111827 !important; }}
+    div[data-testid="stPopoverBody"], [data-testid="stPopover"] [data-baseweb="popover"] > div {{
+        background-color: #FFFFFF !important; border: 1px solid #D1D5DB !important;
+        border-radius: 12px !important; padding: 18px !important;
+        box-shadow: 0 8px 28px rgba(0,0,0,.15) !important;
+    }}
     </style>"""
 else:
     theme_css = f"""<style>
@@ -477,6 +490,19 @@ else:
     ul[role="listbox"] {{ background-color: #1F2937 !important; }}
     ul[role="listbox"] li {{ color: #F3F4F6 !important; background-color: transparent !important; }}
     ul[role="listbox"] li:hover, ul[role="listbox"] li[aria-selected="true"] {{ background-color: #374151 !important; color: #60a5fa !important; }}
+    /* Popover «Сохранить» — тёмная тема */
+    [data-testid="stPopover"] > div > button {{
+        background-color: #1A1C24 !important;
+        border: 1px solid #3e4452 !important;
+        color: #F3F4F6 !important;
+    }}
+    [data-testid="stPopover"] > div > button:hover {{ background-color: #2D3140 !important; color: #F3F4F6 !important; border-color: #5a627a !important; }}
+    [data-testid="stPopover"] > div > button p {{ color: #F3F4F6 !important; }}
+    div[data-testid="stPopoverBody"], [data-testid="stPopover"] [data-baseweb="popover"] > div {{
+        background-color: #1E2130 !important; border: 1px solid #374151 !important;
+        border-radius: 12px !important; padding: 18px !important;
+        box-shadow: 0 8px 28px rgba(0,0,0,.45) !important;
+    }}
     </style>"""
 
 st.markdown(base_styles, unsafe_allow_html=True)
@@ -586,8 +612,20 @@ _sb_bg      = "#161922" if _sidebar_dark else "#F5F5F7"
 _sb_txt     = "#F5F5F7" if _sidebar_dark else "#1D1D1F"
 _sb_sub     = "rgba(245,245,247,.45)" if _sidebar_dark else "rgba(29,29,31,.4)"
 _sb_btn_bg  = "rgba(255,255,255,.07)" if _sidebar_dark else "rgba(0,0,0,.06)"
-_sb_btn_hov = accent
+_sb_btn_hover    = "#2D3140" if _sidebar_dark else "#E5E7EB"
+_sb_btn_hover_bd = "#5a627a" if _sidebar_dark else "#9CA3AF"
 _sb_div     = "rgba(255,255,255,.10)" if _sidebar_dark else "rgba(0,0,0,.08)"
+
+# Загружаем все аккаунты (нужны и в сайдбаре)
+_acc_conn = get_db()
+_acc_c = _acc_conn.cursor()
+_acc_c.execute("""
+    SELECT u.login, b.name, b.accent_color
+    FROM users u JOIN brands b ON u.brand_id = b.id
+    ORDER BY b.name
+""")
+_all_accounts = [dict(r) for r in _acc_c.fetchall()]
+_acc_conn.close()
 
 with st.sidebar:
     # --- Шапка бренда ---
@@ -613,12 +651,14 @@ with st.sidebar:
         box-shadow: none !important;
         transform: none !important;
         white-space: nowrap !important;
+        transition: background .18s ease, border-color .18s ease !important;
     }}
     section[data-testid="stSidebar"] .stButton > button:hover {{
-        background: {accent} !important;
-        color: #fff !important;
-        border-color: {accent} !important;
+        background: {_sb_btn_hover} !important;
+        color: {_sb_txt} !important;
+        border-color: {_sb_btn_hover_bd} !important;
     }}
+    section[data-testid="stSidebar"] .stButton > button:hover p {{ color: {_sb_txt} !important; }}
     /* Кнопка Выйти — особый стиль */
     section[data-testid="stSidebar"] .stButton:last-of-type > button {{
         background: transparent !important;
@@ -635,19 +675,7 @@ with st.sidebar:
     .sb-brand-name  {{ font-size:20px; font-weight:700; letter-spacing:-.4px; color:{_sb_txt}; line-height:1.2; }}
     .sb-brand-login {{ font-size:12px; color:{_sb_sub}; margin-top:2px; }}
     .sb-divider     {{ height:1px; background:{_sb_div}; margin:14px 0; border:none; }}
-    /* Кнопки переключения аккаунта — прозрачные, поверх HTML-строки */
-    [data-testid="stSidebar"] [data-testid^="stButton-sw_acc_"] > button,
-    section[data-testid="stSidebar"] div[data-testid="element-container"]:has(button[kind="secondary"][data-testid*="sw_acc"]) button {{
-        opacity: 0 !important;
-        position: absolute !important;
-        top: -36px !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 36px !important;
-        margin: 0 !important;
-        cursor: pointer !important;
-        z-index: 10 !important;
-    }}
+    .sb-acc-label   {{ font-size:10px; font-weight:600; letter-spacing:1.3px; text-transform:uppercase; color:{_sb_sub}; margin:0 4px 8px; }}
     </style>
     <div class="sb-brand-block">
         <div class="sb-brand-label">Бренд</div>
@@ -666,6 +694,35 @@ with st.sidebar:
     if st.button(hist_label, key="sb_hist", use_container_width=True):
         st.session_state.show_history = not st.session_state.show_history
         st.rerun()
+
+    # --- Смена аккаунта (в сайдбаре, без слетающей верстки) ---
+    st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="sb-acc-label">Сменить аккаунт</div>', unsafe_allow_html=True)
+    for _a in _all_accounts:
+        _is_cur = _a['login'] == user['login']
+        _label = f"{_a['name']}  ✓" if _is_cur else _a['name']
+        if st.button(_label, key=f"sb_sw_{_a['login']}", use_container_width=True, disabled=_is_cur):
+            _sw_conn = get_db()
+            _sw_c = _sw_conn.cursor()
+            _sw_c.execute("""
+                SELECT u.id, u.login, u.brand_id, b.name as brand_name,
+                       b.logo_url, b.accent_color, b.site_url, b.catalog_url,
+                       b.about_url, b.delivery_url, b.contacts_url,
+                       b.vk_url, b.tg_url, b.footer_address,
+                       b.default_email, b.default_phone, b.default_city
+                FROM users u JOIN brands b ON u.brand_id = b.id
+                WHERE u.login = ?
+            """, (_a['login'],))
+            _sw_row = _sw_c.fetchone()
+            _sw_conn.close()
+            if _sw_row:
+                st.session_state.user          = dict(_sw_row)
+                st.session_state.authenticated = True
+                st.session_state.data          = {}
+                st.session_state.mode          = None
+                st.session_state.show_history  = False
+                st.query_params["u"] = _a['login']
+                st.rerun()
 
     # Психологическая поддержка
     if st.session_state.cute_img and not st.session_state.show_history:
@@ -696,129 +753,15 @@ with st.sidebar:
         st.rerun()
 
 # ==========================================
-# 7. ВЕРХНЯЯ ПАНЕЛЬ — аватарка+дропдаун и тема
+# 7. ВЕРХНЯЯ ПАНЕЛЬ — кнопка темы
 # ==========================================
-
-# Подбираем base64 аватарку текущего бренда
-_brand_avatars = {
-    "stalmetural":   B64_STALMETURAL,
-    "inmetprom":     B64_INMETPROM,
-    "metpromenergo": B64_METPROMENERGO,
-}
-_cur_avatar = _brand_avatars.get(user['login'], B64_STALMETURAL)
-
-# Загружаем все аккаунты для дропдауна
-_acc_conn = get_db()
-_acc_c = _acc_conn.cursor()
-_acc_c.execute("""
-    SELECT u.login, b.name, b.accent_color
-    FROM users u JOIN brands b ON u.brand_id = b.id
-    ORDER BY b.name
-""")
-_all_accounts = [dict(r) for r in _acc_c.fetchall()]
-_acc_conn.close()
-
-# Аббревиатуры брендов
-_abbr_map = {"stalmetural": "СМУ", "inmetprom": "ИМП", "metpromenergo": "МПЭ"}
-
-# Цвета дропдауна по теме
-_dd_bg     = "#1E2130" if _sidebar_dark else "#FFFFFF"
-_dd_border = "rgba(255,255,255,.12)" if _sidebar_dark else "rgba(0,0,0,.10)"
-_dd_txt    = "#F3F4F6" if _sidebar_dark else "#1D1D1F"
-_dd_sub    = "rgba(243,244,246,.45)" if _sidebar_dark else "rgba(29,29,31,.4)"
-_dd_hov    = "rgba(255,255,255,.07)" if _sidebar_dark else "rgba(0,0,0,.05)"
-
-_top_l, _top_theme, _top_acc = st.columns([10, 1, 1])
+_top_l, _top_theme = st.columns([12, 1])
 
 with _top_theme:
     _theme_icon = "☀" if st.session_state.theme == "dark" else "☾"
     if st.button(_theme_icon, key="theme_btn_top"):
         st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
         st.rerun()
-
-with _top_acc:
-    # Кнопка — аббревиатура бренда (СМУ / ИМП / МПЭ)
-    _btn_label = _abbr_map.get(user['login'], user['brand_name'][:3].upper())
-    if st.button(_btn_label, key="acc_menu_btn"):
-        st.session_state.show_account_menu = not st.session_state.show_account_menu
-        st.rerun()
-
-# Дропдаун — компактная панель из реальных кнопок (не ломает раскладку)
-if st.session_state.show_account_menu:
-    st.markdown(f"""
-    <style>
-    .st-key-dd_panel {{
-        background: {_dd_bg};
-        border: 1px solid {_dd_border};
-        border-radius: 14px;
-        padding: 8px;
-        box-shadow: 0 8px 28px rgba(0,0,0,.18);
-    }}
-    .st-key-dd_panel .stButton > button {{
-        height: 42px !important;
-        min-height: 42px !important;
-        border-radius: 9px !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        transform: none !important;
-        justify-content: flex-start !important;
-        text-align: left !important;
-        padding: 0 12px !important;
-        margin: 0 !important;
-    }}
-    .st-key-dd_panel .stButton > button p {{
-        font-size: 13px !important;
-        font-weight: 500 !important;
-        color: {_dd_txt} !important;
-    }}
-    .st-key-dd_panel .stButton > button:hover {{
-        background: {_dd_hov} !important;
-        transform: none !important;
-        box-shadow: none !important;
-    }}
-    .st-key-dd_panel .stButton > button:hover p {{ color: {_dd_txt} !important; }}
-    </style>
-    """, unsafe_allow_html=True)
-
-    _, _dd_col = st.columns([10, 2])
-    with _dd_col:
-        with st.container(key="dd_panel"):
-            st.markdown(
-                f'<div style="font-size:10px;font-weight:600;letter-spacing:1.3px;'
-                f'text-transform:uppercase;color:{_dd_sub};padding:4px 12px 8px;">'
-                f'Сменить аккаунт</div>', unsafe_allow_html=True)
-
-            for _a in _all_accounts:
-                _is_cur = _a['login'] == user['login']
-                _label = f"{_a['name']}  ✓" if _is_cur else _a['name']
-                if st.button(_label, key=f"dd_sw_{_a['login']}", use_container_width=True):
-                    if not _is_cur:
-                        _sw_conn = get_db()
-                        _sw_c = _sw_conn.cursor()
-                        _sw_c.execute("""
-                            SELECT u.id, u.login, u.brand_id, b.name as brand_name,
-                                   b.logo_url, b.accent_color, b.site_url, b.catalog_url,
-                                   b.about_url, b.delivery_url, b.contacts_url,
-                                   b.vk_url, b.tg_url, b.footer_address,
-                                   b.default_email, b.default_phone, b.default_city
-                            FROM users u JOIN brands b ON u.brand_id = b.id
-                            WHERE u.login = ?
-                        """, (_a['login'],))
-                        _sw_row = _sw_c.fetchone()
-                        _sw_conn.close()
-                        if _sw_row:
-                            st.session_state.user              = dict(_sw_row)
-                            st.session_state.authenticated     = True
-                            st.session_state.data              = {}
-                            st.session_state.mode              = None
-                            st.session_state.show_history      = False
-                            st.session_state.show_account_menu = False
-                            st.query_params["u"] = _a['login']
-                            st.rerun()
-                    else:
-                        st.session_state.show_account_menu = False
-                        st.rerun()
 
 # ==========================================
 # 8. ИСТОРИЯ ПРОЕКТОВ
