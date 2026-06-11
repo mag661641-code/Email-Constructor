@@ -335,25 +335,30 @@ accent = st.session_state.user['accent_color'] if st.session_state.user else "#1
 base_styles = f"""
 <style>
     #MainMenu {{visibility: hidden;}}
-    header [data-testid="stToolbar"] {{ visibility: hidden; }}
-    header {{ background: transparent !important; }}
-    /* Кнопка раскрытия свёрнутого сайдбара — всегда видима и поверх всего */
-    [data-testid="stSidebarCollapsedControl"] {{
-        visibility: visible !important;
-        display: flex !important;
+    footer {{visibility: hidden;}}
+   /* 1. Находим кнопку, когда сайдбар РАЗВЕРНУТ (она внутри панели) */
+    button[kind="header"] {{
         position: fixed !important;
         top: 10px !important;
         left: 10px !important;
         z-index: 999999 !important;
-        opacity: 1 !important;
+    }}
+    /* Кнопка раскрытия свёрнутого сайдбара — всегда видима и поверх всего */
+    [data-testid="stSidebarCollapsedControl"] {{
+        position: fixed !important;
+        top: 10px !important;
+        left: 10px !important;
+        z-index: 999999 !important;
+        visibility: visible !important;
+        display: block !important;
         background: rgba(127,127,127,.2) !important;
-        transition: none !important; /* Убираем анимацию, чтобы не было задержек */
+        border-radius: 8px !important;
     }}
-    [data-testid="stSidebarCollapsedControl"]:hover {{
+    [data-testid="stSidebarCollapsedControl"] > button {{
         opacity: 1 !important;
-        background: rgba(127,127,127,.4) !important;
     }}
-    footer {{visibility: hidden;}}
+    
+
     .block-container {{ padding-top: 1rem !important; padding-bottom: 0rem !important; }}
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
     html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
