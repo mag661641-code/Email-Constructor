@@ -997,7 +997,7 @@ else:
         """, unsafe_allow_html=True)
 
         if mode == "promo":
-            st.subheader("📝 Главная статья")
+            st.subheader("Главная статья")
             title_def = "Снижаем стоимость на партию"
             data['TEXT_TITLE'] = cached_input("Заголовок статьи", f"{mode}_TEXT_TITLE", title_def, title_def) or title_def
             pre_def = "Мы открываем **спецпредложение**..."
@@ -1011,14 +1011,17 @@ else:
             t_post_raw = cached_input("Текст ПОСЛЕ ссылки", f"{mode}_TEXT_POST", post_def, post_def, area=True, height=80) or post_def
             data['TEXT_BODY'] = f'{process_text_to_html(t_pre_raw)} <a href="{a_link}" style="text-decoration:none; color:{accent}; font-weight:bold;">{a_word}</a> {process_text_to_html(t_post_raw)}'
             st.markdown("---")
-            st.subheader("📎 Блок P.S.")
+            st.subheader("Блок P.S.")
             ps_c = st.columns(3)
             n1 = cached_input("Товар 1", f"{mode}_PS_N1", "профнастил", "профнастил", col=ps_c[0]) or "профнастил"
             n2 = cached_input("Товар 2", f"{mode}_PS_N2", "втулки", "втулки", col=ps_c[1]) or "втулки"
             n3 = cached_input("Товар 3", f"{mode}_PS_N3", "услуги", "услуги", col=ps_c[2]) or "услуги"
+            ps_l = st.columns(3)
+            l1 = cached_input("Ссылка на товар 1", f"{mode}_PS_L1", data['LINK_CATALOG'], data['LINK_CATALOG'], col=ps_l[0]) or data['LINK_CATALOG']
+            l2 = cached_input("Ссылка на товар 2", f"{mode}_PS_L2", data['LINK_CATALOG'], data['LINK_CATALOG'], col=ps_l[1]) or data['LINK_CATALOG']
+            l3 = cached_input("Ссылка на товар 3", f"{mode}_PS_L3", data['LINK_CATALOG'], data['LINK_CATALOG'], col=ps_l[2]) or data['LINK_CATALOG']
             ls = f"color:{accent}; text-decoration:none; font-weight:bold;"
-            data['PS_BLOCK'] = f'P.S. Также в наличии <a href="{data["LINK_CATALOG"]}" style="{ls}">{n1}</a>, <a href="{data["LINK_CATALOG"]}" style="{ls}">{n2}</a> и <a href="{data["LINK_CATALOG"]}" style="{ls}">{n3}</a>. Напишите нам в ответ на это письмо – подберем решение.'
-
+            data['PS_BLOCK'] = f'P.S. Также в наличии <a href="{l1}" style="{ls}">{n1}</a>, <a href="{l2}" style="{ls}">{n2}</a> и <a href="{l3}" style="{ls}">{n3}</a>. Напишите нам в ответ на это письмо – подберем решение.'
         elif mode == "expert":
             st.subheader("Основная статья блога")
             d_title = "Выбираем трубу без переплат"
@@ -1102,7 +1105,8 @@ else:
                     d_p = "39 500₽/т"
                     data[f'PROD_{i}_PRICE'] = cached_input("Цена", f"{mode}_prod_{i}_price", d_p, d_p, col=col2) or d_p
                     d_desc = "ГОСТ 8639-82, сталь 3пс"
-                    data[f'PROD_{i}_DESC'] = cached_input("Описание", f"{mode}_prod_{i}_desc", d_desc, d_desc, area=True, height=70) or d_desc
+                    _raw_prod_d = cached_input("Описание", f"{mode}_prod_{i}_desc", d_desc, d_desc, area=True, height=70) or d_desc
+                    data[f'PROD_{i}_DESC'] = process_text_to_html(_raw_prod_d)
                     col3, col4 = st.columns(2)
                     d_img = "https://img.hiteml.com/example.jpg"
                     data[f'PROD_{i}_IMG']  = cached_input("URL картинки", f"{mode}_prod_{i}_img",  d_img, d_img, col=col3) or d_img
@@ -1120,7 +1124,8 @@ else:
                     d_sv_t = "Резка в размер"
                     data[f'SERV_{i}_TITLE'] = cached_input("Название услуги", f"{mode}_serv_{i}_title", d_sv_t, d_sv_t, col=col1) or d_sv_t
                     d_sv_d = "Точность до 1 мм"
-                    data[f'SERV_{i}_DESC']  = cached_input("Краткое описание", f"{mode}_serv_{i}_desc",  d_sv_d, d_sv_d, col=col2) or d_sv_d
+                    _raw_serv_d = cached_input("Краткое описание", f"{mode}_serv_{i}_desc",  d_sv_d, d_sv_d, col=col2) or d_sv_d
+                    data[f'SERV_{i}_DESC'] = process_text_to_html(_raw_serv_d)
                     col3, col4 = st.columns(2)
                     d_sv_i = "https://img.hiteml.com/service.jpg"
                     data[f'SERV_{i}_IMG']  = cached_input("URL картинки", f"{mode}_serv_{i}_img",  d_sv_i, d_sv_i, col=col3) or d_sv_i
@@ -1156,7 +1161,8 @@ else:
                     d_s_p = "50 000₽/т"
                     data[f'STOCK_{i}_PRICE'] = cached_input("Цена", f"{mode}_stock_{i}_price", d_s_p, d_s_p, col=col2) or d_s_p
                     d_s_d = "В наличии 20 тонн"
-                    data[f'STOCK_{i}_DESC'] = cached_input("Описание", f"{mode}_stock_{i}_desc", d_s_d, d_s_d) or d_s_d
+                    _raw_stock_d = cached_input("Описание", f"{mode}_stock_{i}_desc", d_s_d, d_s_d) or d_s_d
+                    data[f'STOCK_{i}_DESC'] = process_text_to_html(_raw_stock_d)
                     col3, col4 = st.columns(2)
                     d_s_i = "https://img.hiteml.com/stock.jpg"
                     data[f'STOCK_{i}_IMG']  = cached_input("URL картинки", f"{mode}_stock_{i}_img",  d_s_i, d_s_i, col=col3) or d_s_i
@@ -1173,7 +1179,8 @@ else:
                     d_sh_date = "12.06.2024"
                     data[f'SHIP_{i}_DATE']  = cached_input("Дата",            f"{mode}_ship_dt_{i}", d_sh_date, d_sh_date, col=col2) or d_sh_date
                     d_sh_d = "Описание процесса отгрузки или логистики"
-                    data[f'SHIP_{i}_DESC']  = cached_input("Описание",        f"{mode}_ship_d_{i}", d_sh_d, d_sh_d) or d_sh_d
+                    _raw_ship_d = cached_input("Описание",        f"{mode}_ship_d_{i}", d_sh_d, d_sh_d) or d_sh_d
+                    data[f'SHIP_{i}_DESC'] = process_text_to_html(_raw_ship_d)
                     
                     col3, col4 = st.columns(2)
                     data[f'SHIP_{i}_IMG']   = cached_input("URL фото",        f"{mode}_ship_i_{i}", "", "https://...", col=col3) or ""
@@ -1258,7 +1265,8 @@ else:
                     st.markdown(f"**Товар №{i}**")
                     d_t, d_d, d_p = f"Товар {i}", "ГОСТ, марка стали", "50 000₽"
                     data[f'T_{i}'] = cached_input("Название",    f"{mode}_also_t_{i}", d_t, d_t) or d_t
-                    data[f'D_{i}'] = cached_input("Описание",    f"{mode}_also_d_{i}", d_d, d_d) or d_d
+                    _raw_also_d = cached_input("Описание",    f"{mode}_also_d_{i}", d_d, d_d) or d_d
+                    data[f'D_{i}'] = process_text_to_html(_raw_also_d)
                     data[f'P_{i}'] = cached_input("Цена",        f"{mode}_also_p_{i}", d_p, d_p) or d_p
                     data[f'I_{i}'] = cached_input("URL картинки",f"{mode}_also_i_{i}", "", "https://...") or ""
                     data[f'L_{i}'] = cached_input("Ссылка",      f"{mode}_also_l_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
@@ -1268,7 +1276,8 @@ else:
                     st.markdown(f"**Кейс №{i}**")
                     d_ct, d_cd, d_cdt = "Партия труб", "Отгружено 20 тонн", "15.05.2024"
                     data[f'CASE_TITLE_{i}'] = cached_input("Заголовок кейса", f"{mode}_case_title_{i}", d_ct, d_ct) or d_ct
-                    data[f'CASE_DESC_{i}']  = cached_input("Описание кейса",  f"{mode}_case_desc_{i}",  d_cd, d_cd) or d_cd
+                    _raw_cd = cached_input("Описание кейса",  f"{mode}_case_desc_{i}",  d_cd, d_cd) or d_cd
+                    data[f'CASE_DESC_{i}'] = process_text_to_html(_raw_cd)
                     data[f'CASE_DATE_{i}']  = cached_input("Дата",            f"{mode}_case_date_{i}",  d_cdt, d_cdt) or d_cdt
                     data[f'CASE_IMG_{i}']   = cached_input("URL фото",        f"{mode}_case_img_{i}",   "", "https://...") or ""
 
@@ -1284,7 +1293,8 @@ else:
                     data[f'P_{i}']     = cached_input("Цена со скидкой",f"{mode}_p_{i}",  d_p,  d_p,  col=col2) or d_p
                     data[f'OLD_P_{i}'] = cached_input("Старая цена",    f"{mode}_op_{i}", d_op, d_op, col=col3) or d_op
                     d_d = "ГОСТ 16523-97"
-                    data[f'D_{i}'] = cached_input("Описание",    f"{mode}_d_{i}", d_d, d_d) or d_d
+                    _raw_d = cached_input("Описание",    f"{mode}_d_{i}", d_d, d_d) or d_d
+                    data[f'D_{i}'] = process_text_to_html(_raw_d)
                     data[f'I_{i}'] = cached_input("URL картинки",f"{mode}_i_{i}", "", "https://...") or ""
                     data[f'L_{i}'] = cached_input("Ссылка",      f"{mode}_l_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
                     st.markdown("---")
@@ -1295,7 +1305,8 @@ else:
                     d_sm_t, d_sm_p, d_sm_d = "Сетка цинк", "305₽/т", "ГОСТ 23279-2012"
                     data[f'SMALL_T_{i}'] = cached_input("Название",  f"{mode}_sm_t_{i}",   d_sm_t, d_sm_t) or d_sm_t
                     data[f'SMALL_P_{i}'] = cached_input("Цена",      f"{mode}_sm_p_{i}",   d_sm_p, d_sm_p) or d_sm_p
-                    data[f'SMALL_D_{i}'] = cached_input("Описание",  f"{mode}_sm_d_{i}",   d_sm_d, d_sm_d) or d_sm_d
+                    _raw_sm_d = cached_input("Описание",  f"{mode}_sm_d_{i}",   d_sm_d, d_sm_d) or d_sm_d
+                    data[f'SMALL_D_{i}'] = process_text_to_html(_raw_sm_d)
                     data[f'SMALL_I_{i}'] = cached_input("URL фото",  f"{mode}_sm_img_{i}", "", "https://...") or ""
                     data[f'SMALL_L_{i}'] = cached_input("Ссылка",    f"{mode}_sm_link_{i}",data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
                     st.markdown("---")
@@ -1308,7 +1319,8 @@ else:
                     d_ct_t = "Трубный прокат"
                     data[f'CAT_TITLE_{i}'] = cached_input("Заголовок", f"{mode}_cat_title_{i}", d_ct_t, d_ct_t) or d_ct_t
                     d_ct_d = "Огромный выбор диаметров и стенок"
-                    data[f'CAT_DESC_{i}']  = cached_input("Описание",  f"{mode}_cat_desc_{i}",  d_ct_d, d_ct_d, area=True, height=80) or d_ct_d
+                    _raw_cat_d = cached_input("Описание",  f"{mode}_cat_desc_{i}",  d_ct_d, d_ct_d, area=True, height=80) or d_ct_d
+                    data[f'CAT_DESC_{i}'] = process_text_to_html(_raw_cat_d)
                     data[f'CAT_IMG_{i}']   = cached_input("URL картинки",f"{mode}_cat_img_{i}", "", "https://...") or ""
                     data[f'CAT_LINK_{i}']  = cached_input("Ссылка",    f"{mode}_cat_link_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
                     st.markdown("---")
@@ -1324,7 +1336,8 @@ else:
                     d_c_date = "10.06.2024"
                     data[f'CASE_DATE_{i}']  = cached_input("Дата",                    f"{mode}_case_date_{i}",  d_c_date,  d_c_date,  col=col_k2) or d_c_date
                     d_c_desc = "Укомплектовали и доставили заказ на объект"
-                    data[f'CASE_DESC_{i}']  = cached_input("Описание (что отгрузили)",f"{mode}_case_desc_{i}",  d_c_desc,  d_c_desc) or d_c_desc
+                    _raw_case_d = cached_input("Описание (что отгрузили)",f"{mode}_case_desc_{i}",  d_c_desc,  d_c_desc) or d_c_desc
+                    data[f'CASE_DESC_{i}'] = process_text_to_html(_raw_case_d)
                     data[f'CASE_IMG_{i}']   = cached_input("URL фото отгрузки",       f"{mode}_case_img_{i}",   "", "https://...") or ""
                     st.markdown("---")
 
@@ -1338,7 +1351,8 @@ else:
                     st.markdown(f"**Услуга №{i}**")
                     d_sv_t, d_sv_d = "Лазерная резка", "Точность до микрона"
                     data[f'T_{i}'] = cached_input("Название",    f"{mode}_sv_t_{i}", d_sv_t, d_sv_t) or d_sv_t
-                    data[f'D_{i}'] = cached_input("Описание",    f"{mode}_sv_d_{i}", d_sv_d, d_sv_d) or d_sv_d
+                    _raw_sv_d = cached_input("Описание",    f"{mode}_sv_d_{i}", d_sv_d, d_sv_d) or d_sv_d
+                    data[f'D_{i}'] = process_text_to_html(_raw_sv_d)
                     data[f'I_{i}'] = cached_input("URL картинки",f"{mode}_sv_i_{i}", "", "https://...") or ""
                     data[f'L_{i}'] = cached_input("Ссылка",      f"{mode}_sv_l_{i}", data.get('LINK_CATALOG',''), data.get('LINK_CATALOG','')) or data.get('LINK_CATALOG','')
                     st.markdown("---")
@@ -1372,7 +1386,8 @@ else:
                     d_sh_date = "12.06.2024"
                     data[f'SHIP_DATE_{i}'] = cached_input("Дата",            f"{mode}_sh_dt_{i}", d_sh_date, d_sh_date, col=col2) or d_sh_date
                     d_sh_d = "Описание процесса отгрузки или логистики"
-                    data[f'SHIP_D_{i}'] = cached_input("Описание",       f"{mode}_sh_d_{i}", d_sh_d, d_sh_d) or d_sh_d
+                    _raw_sh_d = cached_input("Описание",       f"{mode}_sh_d_{i}", d_sh_d, d_sh_d) or d_sh_d
+                    data[f'SHIP_D_{i}'] = process_text_to_html(_raw_sh_d)
                     data[f'SHIP_I_{i}'] = cached_input("URL фото отгрузки",f"{mode}_sh_i_{i}", "", "https://...") or ""
                     st.markdown("---")
 
