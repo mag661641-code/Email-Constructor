@@ -1264,12 +1264,13 @@ else:
                 for i in range(1, 4):
                     st.markdown(f"**Товар №{i}**")
                     d_t, d_d, d_p = f"Товар {i}", "ГОСТ, марка стали", "50 000₽"
-                    data[f'T_{i}'] = cached_input("Название",    f"{mode}_also_t_{i}", d_t, d_t) or d_t
+                    # Изменены ключи словаря data
+                    data[f'SMALL_T_{i}'] = cached_input("Название",    f"{mode}_also_t_{i}", d_t, d_t) or d_t
                     _raw_also_d = cached_input("Описание",    f"{mode}_also_d_{i}", d_d, d_d) or d_d
-                    data[f'D_{i}'] = process_text_to_html(_raw_also_d)
-                    data[f'P_{i}'] = cached_input("Цена",        f"{mode}_also_p_{i}", d_p, d_p) or d_p
-                    data[f'I_{i}'] = cached_input("URL картинки",f"{mode}_also_i_{i}", "", "https://...") or ""
-                    data[f'L_{i}'] = cached_input("Ссылка",      f"{mode}_also_l_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
+                    data[f'SMALL_D_{i}'] = process_text_to_html(_raw_also_d)
+                    data[f'SMALL_P_{i}'] = cached_input("Цена",        f"{mode}_also_p_{i}", d_p, d_p) or d_p
+                    data[f'SMALL_I_{i}'] = cached_input("URL картинки",f"{mode}_also_i_{i}", "", "https://...") or ""
+                    data[f'SMALL_L_{i}'] = cached_input("Ссылка",      f"{mode}_also_l_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
 
             with st.expander("3. Наши отгрузки (2 кейса)"):
                 for i in range(1, 3):
