@@ -2802,26 +2802,22 @@ else:
             _ctor_keys   = [b['key'] for b in _ctor_blocks]
 
             # ── Текущая сборка ──────────────────────────────────────────────
-            _n_ctor = len(_ctor_blocks)
-            _ctor_pill = (f'<span style="font-size:13px;font-weight:600;color:{_bacc};'
-                          f'background:{_pill_bg};padding:5px 16px;border-radius:20px">'
-                          f'{_n_ctor} блоков</span>' if _n_ctor else
-                          f'<span style="font-size:13px;color:{_bsub}">пусто</span>')
+
             st.markdown(
-                f'<div style="display:flex;align-items:center;justify-content:space-between;'
-                f'margin:20px 0 16px;padding:14px 18px;background:{_card_bg};'
-                f'border-radius:16px;box-shadow:{_card_sh}">'
-                f'<div style="display:flex;align-items:center;gap:10px">'
-                f'<div style="width:4px;height:24px;background:{_bacc};border-radius:2px"></div>'
-                f'<span style="font-size:20px;font-weight:700;color:{_btxt}">Конструктор письма</span>'
-                f'</div>{_ctor_pill}</div>', unsafe_allow_html=True)
+                f'<div style="display:flex;align-items:center;gap:10px;margin:20px 0 6px">'
+                f'<div style="background:{_bacc};color:#fff;font-size:13px;font-weight:700;'
+                f'width:24px;height:24px;border-radius:50%;display:flex;align-items:center;'
+                f'justify-content:center;flex-shrink:0">1</div>'
+                f'<span style="font-size:18px;font-weight:700;color:{_btxt}">Сборка письма</span>'
+                f'<span style="font-size:12px;color:{_bsub};margin-left:4px">— выбранные блоки в нужном порядке</span>'
+                f'</div>', unsafe_allow_html=True)
 
             if not _ctor_blocks:
                 st.markdown(
                     f'<div style="background:{_card_bg};border-radius:14px;padding:20px 18px;'
                     f'box-shadow:{_card_sh};margin:4px 0 16px;text-align:center;'
                     f'color:{_bsub};font-size:14px">'
-                    f'Добавь блоки снизу — они выстроятся здесь в нужном порядке</div>',
+                    f'Здесь появятся блоки, которые ты выберешь ниже&nbsp;&nbsp;↓</div>',
                     unsafe_allow_html=True)
             else:
                 if not _is_dark_blk:
@@ -2893,14 +2889,12 @@ else:
 
             # ── Доступные блоки для добавления ──────────────────────────────
             st.markdown(
-                f'<div style="display:flex;align-items:center;justify-content:space-between;'
-                f'margin:20px 0 16px;padding:14px 18px;background:{_card_bg};'
-                f'border-radius:16px;box-shadow:{_card_sh}">'
-                f'<div style="display:flex;align-items:center;gap:10px">'
-                f'<div style="width:4px;height:24px;background:{_bacc};border-radius:2px"></div>'
-                f'<span style="font-size:20px;font-weight:700;color:{_btxt}">Добавить блок</span>'
-                f'</div>'
-                f'<span style="font-size:12px;color:{_bsub}">нажми ＋ → блок встанет в конец сборки</span>'
+                f'<div style="display:flex;align-items:center;gap:10px;margin:28px 0 6px">'
+                f'<div style="background:{_bacc};color:#fff;font-size:13px;font-weight:700;'
+                f'width:24px;height:24px;border-radius:50%;display:flex;align-items:center;'
+                f'justify-content:center;flex-shrink:0">2</div>'
+                f'<span style="font-size:18px;font-weight:700;color:{_btxt}">Доступные блоки</span>'
+                f'<span style="font-size:12px;color:{_bsub};margin-left:4px">— нажми ＋ чтобы добавить в сборку</span>'
                 f'</div>', unsafe_allow_html=True)
 
             if not _is_dark_blk:
