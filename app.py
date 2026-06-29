@@ -2820,46 +2820,45 @@ else:
                     f'Здесь появятся блоки, которые ты выберешь ниже&nbsp;&nbsp;↓</div>',
                     unsafe_allow_html=True)
             else:
-                _btn_bg  = _card_bg
-                _btn_txt = _btxt
                 _btn_div = "#4a4d70" if _is_dark_blk else "#d8dce8"
+                _btn_hov = "rgba(255,255,255,0.08)" if _is_dark_blk else "rgba(0,0,0,0.06)"
                 st.markdown(f"""<style>
-                /* Колонки с кнопками — единый фон с карточкой */
+                /* Вся строка блока — единая карточка */
+                [data-testid="stHorizontalBlock"]:has(div[class*="st-key-ctor_up"]) {{
+                    gap: 0 !important;
+                    background: {_card_bg} !important;
+                    border-radius: 14px !important;
+                    box-shadow: {_card_sh} !important;
+                    overflow: hidden !important;
+                    margin: 4px 0 !important;
+                    padding: 0 !important;
+                    align-items: stretch !important;
+                }}
+                /* Колонки с кнопками — separator слева */
+                [data-testid="stHorizontalBlock"]:has(div[class*="st-key-ctor_up"])
                 [data-testid="column"]:has(div[class*="st-key-ctor_up"]),
+                [data-testid="stHorizontalBlock"]:has(div[class*="st-key-ctor_up"])
                 [data-testid="column"]:has(div[class*="st-key-ctor_dn"]),
+                [data-testid="stHorizontalBlock"]:has(div[class*="st-key-ctor_up"])
                 [data-testid="column"]:has(div[class*="st-key-ctor_rm"]) {{
-                    background: {_btn_bg} !important;
                     display: flex !important;
                     align-items: center !important;
                     justify-content: center !important;
-                    padding: 3px 4px !important;
-                    margin: 3px 0 !important;
-                    box-shadow: {_card_sh} !important;
-                }}
-                [data-testid="column"]:has(div[class*="st-key-ctor_up"]) {{
-                    border-radius: 0 !important;
+                    padding: 4px 2px !important;
                     border-left: 1px solid {_btn_div} !important;
                 }}
-                [data-testid="column"]:has(div[class*="st-key-ctor_dn"]) {{
-                    border-radius: 0 !important;
-                    border-left: 1px solid {_btn_div} !important;
-                }}
-                [data-testid="column"]:has(div[class*="st-key-ctor_rm"]) {{
-                    border-radius: 0 14px 14px 0 !important;
-                    border-left: 1px solid {_btn_div} !important;
-                }}
-                /* Сами кнопки — прозрачные иконки */
+                /* Кнопки ↑ ↓ ✕ — прозрачные иконки */
                 div[class*="st-key-ctor_up"] button,
                 div[class*="st-key-ctor_dn"] button,
                 div[class*="st-key-ctor_rm"] button {{
-                    height: 28px !important;
-                    min-height: 28px !important;
-                    width: 32px !important;
+                    height: 32px !important;
+                    min-height: 32px !important;
+                    width: 34px !important;
                     padding: 0 !important;
                     font-size: 15px !important;
                     border-radius: 6px !important;
                     background-color: transparent !important;
-                    color: {_btn_txt} !important;
+                    color: {_btxt} !important;
                     border: none !important;
                     box-shadow: none !important;
                     transform: none !important;
@@ -2867,24 +2866,21 @@ else:
                 div[class*="st-key-ctor_up"] button:hover,
                 div[class*="st-key-ctor_dn"] button:hover,
                 div[class*="st-key-ctor_rm"] button:hover {{
-                    background-color: {"rgba(0,0,0,0.06)" if not _is_dark_blk else "rgba(255,255,255,0.08)"} !important;
+                    background-color: {_btn_hov} !important;
                 }}
                 div[class*="st-key-ctor_up"] button p,
                 div[class*="st-key-ctor_dn"] button p,
-                div[class*="st-key-ctor_rm"] button p {{
-                    color: {_btn_txt} !important;
-                    font-size: 15px !important;
-                }}
-                /* Кнопки + в доступных блоках — нейтральные */
+                div[class*="st-key-ctor_rm"] button p {{ color: {_btxt} !important; font-size: 15px !important; }}
+                /* Кнопки + — нейтральные, высота как у блока */
                 div[class*="st-key-ctor_add"] button {{
-                    height: 30px !important;
-                    min-height: 30px !important;
-                    width: 36px !important;
+                    height: 100% !important;
+                    min-height: 46px !important;
+                    width: 44px !important;
                     padding: 0 !important;
-                    font-size: 18px !important;
-                    font-weight: 500 !important;
-                    border-radius: 8px !important;
-                    background-color: transparent !important;
+                    font-size: 20px !important;
+                    font-weight: 400 !important;
+                    border-radius: 10px !important;
+                    background-color: {_card_bg} !important;
                     color: {_bsub} !important;
                     border: 1.5px solid {_btn_div} !important;
                     box-shadow: none !important;
@@ -2893,41 +2889,38 @@ else:
                 div[class*="st-key-ctor_add"] button:hover {{
                     color: {_bacc} !important;
                     border-color: {_bacc} !important;
-                    background-color: transparent !important;
                 }}
                 div[class*="st-key-ctor_add"] button p,
-                div[class*="st-key-ctor_add"] button span {{ color: inherit !important; }}
+                div[class*="st-key-ctor_add"] button span {{ color: inherit !important; font-size: 20px !important; }}
                 </style>""", unsafe_allow_html=True)
 
                 for _ci, _cb in enumerate(_ctor_blocks):
                     _cc1, _cc2, _cc3, _cc4 = st.columns([10, 1, 1, 1], gap="small")
                     with _cc1:
                         st.markdown(
-                            f'<div style="background:{_card_bg};border-radius:14px 0 0 14px;'
-                            f'padding:13px 18px;box-shadow:{_card_sh};margin:3px 0;'
+                            f'<div style="padding:13px 18px;'
                             f'display:flex;align-items:center;gap:12px">'
                             f'<span style="color:{_bacc};font-size:15px;font-weight:700;'
                             f'min-width:22px;text-align:center">{_ci+1}</span>'
-                            f'<div style="flex:1">'
                             f'<p style="margin:0;font-size:15px;font-weight:600;color:{_btxt}">'
-                            f'{_cb["name"]}</p></div></div>', unsafe_allow_html=True)
+                            f'{_cb["name"]}</p></div>', unsafe_allow_html=True)
                     with _cc2:
                         if st.button("↑", key=f"ctor_up_{_ci}",
                                      disabled=(_ci == 0)):
                             _ctor_blocks[_ci], _ctor_blocks[_ci-1] = _ctor_blocks[_ci-1], _ctor_blocks[_ci]
                             st.session_state['constructor_blocks'] = _ctor_blocks
-                            st.rerun(scope="app")
+                            st.rerun()
                     with _cc3:
                         if st.button("↓", key=f"ctor_dn_{_ci}",
                                      disabled=(_ci == len(_ctor_blocks)-1)):
                             _ctor_blocks[_ci], _ctor_blocks[_ci+1] = _ctor_blocks[_ci+1], _ctor_blocks[_ci]
                             st.session_state['constructor_blocks'] = _ctor_blocks
-                            st.rerun(scope="app")
+                            st.rerun()
                     with _cc4:
                         if st.button("✕", key=f"ctor_rm_{_ci}"):
                             _ctor_blocks.pop(_ci)
                             st.session_state['constructor_blocks'] = _ctor_blocks
-                            st.rerun(scope="app")
+                            st.rerun()
 
                     # Редактируемые поля блока
                     _bfields = BLOCK_FIELDS.get(_cb['key'], [])
