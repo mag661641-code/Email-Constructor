@@ -2820,24 +2820,31 @@ else:
                     f'Здесь появятся блоки, которые ты выберешь ниже&nbsp;&nbsp;↓</div>',
                     unsafe_allow_html=True)
             else:
-                if not _is_dark_blk:
-                    st.markdown("""<style>
-                    div[class*="st-key-ctor_up"] button,
-                    div[class*="st-key-ctor_dn"] button,
-                    div[class*="st-key-ctor_rm"] button {
-                        background-color: #f7f9fb !important;
-                        color: #191c1e !important;
-                        box-shadow: 3px 3px 6px rgba(163,177,198,0.4),
-                                    -3px -3px 6px rgba(255,255,255,0.85) !important;
-                        border: none !important;
-                    }
-                    div[class*="st-key-ctor_up"] button p,
-                    div[class*="st-key-ctor_dn"] button p,
-                    div[class*="st-key-ctor_rm"] button p { color: #191c1e !important; }
-                    </style>""", unsafe_allow_html=True)
+                st.markdown(f"""<style>
+                div[class*="st-key-ctor_up"] button,
+                div[class*="st-key-ctor_dn"] button,
+                div[class*="st-key-ctor_rm"] button {{
+                    height: 28px !important;
+                    min-height: 28px !important;
+                    padding: 0 6px !important;
+                    font-size: 13px !important;
+                    border-radius: 8px !important;
+                    background-color: {"#f7f9fb" if not _is_dark_blk else "#252840"} !important;
+                    color: {"#191c1e" if not _is_dark_blk else "#d8daf0"} !important;
+                    box-shadow: {"2px 2px 5px rgba(163,177,198,0.4),-2px -2px 5px rgba(255,255,255,0.85)" if not _is_dark_blk else "2px 2px 5px rgba(0,0,0,0.35),-2px -2px 4px rgba(255,255,255,0.04)"} !important;
+                    border: none !important;
+                    transform: none !important;
+                }}
+                div[class*="st-key-ctor_up"] button p,
+                div[class*="st-key-ctor_dn"] button p,
+                div[class*="st-key-ctor_rm"] button p {{
+                    color: {"#191c1e" if not _is_dark_blk else "#d8daf0"} !important;
+                    font-size: 13px !important;
+                }}
+                </style>""", unsafe_allow_html=True)
 
                 for _ci, _cb in enumerate(_ctor_blocks):
-                    _cc1, _cc2, _cc3, _cc4 = st.columns([7, 1, 1, 1], gap="small")
+                    _cc1, _cc2, _cc3, _cc4 = st.columns([10, 1, 1, 1], gap="small")
                     with _cc1:
                         st.markdown(
                             f'<div style="background:{_card_bg};border-radius:14px;'
@@ -2897,29 +2904,30 @@ else:
                 f'<span style="font-size:12px;color:{_bsub};margin-left:4px">— нажми ＋ чтобы добавить в сборку</span>'
                 f'</div>', unsafe_allow_html=True)
 
-            if not _is_dark_blk:
-                st.markdown("""<style>
-                div[class*="st-key-ctor_add"] button {
-                    background-color: #f7f9fb !important;
-                    color: #191c1e !important;
-                    box-shadow: 4px 4px 8px rgba(163,177,198,0.45),
-                                -4px -4px 8px rgba(255,255,255,0.9) !important;
-                    border: none !important;
-                }
-                div[class*="st-key-ctor_add"] button p,
-                div[class*="st-key-ctor_add"] button span { color: #191c1e !important; }
-                div[class*="st-key-ctor_add"] button:hover {
-                    box-shadow: 6px 6px 12px rgba(163,177,198,0.55),
-                                -6px -6px 12px rgba(255,255,255,1.0) !important;
-                    transform: translateY(-1px) !important;
-                }
-                </style>""", unsafe_allow_html=True)
+            st.markdown(f"""<style>
+            div[class*="st-key-ctor_add"] button {{
+                height: 32px !important;
+                min-height: 32px !important;
+                padding: 0 10px !important;
+                font-size: 18px !important;
+                font-weight: 700 !important;
+                border-radius: 10px !important;
+                background-color: {_bacc} !important;
+                color: #ffffff !important;
+                border: none !important;
+                box-shadow: none !important;
+                transform: none !important;
+            }}
+            div[class*="st-key-ctor_add"] button p,
+            div[class*="st-key-ctor_add"] button span {{ color: #ffffff !important; }}
+            div[class*="st-key-ctor_add"] button:hover {{ filter: brightness(1.1) !important; transform: none !important; }}
+            </style>""", unsafe_allow_html=True)
 
             _lib_all = load_block_library()
             _lib_imp = [b for b in _lib_all if 'inmetprom' in b['source']]
             for _blk in _lib_imp:
                 _already = _blk['key'] in _ctor_keys
-                _lc1, _lc2 = st.columns([6, 1], gap="small")
+                _lc1, _lc2 = st.columns([10, 1], gap="small")
                 with _lc1:
                     st.markdown(
                         f'<div style="background:{_card_bg};border-radius:14px;'
@@ -2933,7 +2941,6 @@ else:
                         f'{_blk["desc"]}</p>'
                         f'</div></div>', unsafe_allow_html=True)
                 with _lc2:
-                    st.markdown("<div style='height:22px'></div>", unsafe_allow_html=True)
                     if st.button("＋", key=f"ctor_add_{_blk['key']}", use_container_width=True,
                                  help="Добавить в сборку", disabled=_already):
                         _ctor_blocks.append({"key": _blk['key'], "name": _blk['name'], "html": _blk['html']})
