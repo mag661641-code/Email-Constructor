@@ -1854,7 +1854,9 @@ else:
     # ==========================================
     mode = st.session_state.mode
     menu_items = get_menu_items(brand['brand_name'])
-    data = {}
+    if 'data' not in st.session_state:
+        st.session_state.data = {}
+    data = st.session_state.data
 
     _title_col, _save_col = st.columns([5, 1])
     with _title_col:
@@ -1916,10 +1918,22 @@ else:
                     st.rerun()
     # ──────────────────────────────────────────────────────────────────────────
 
-    tabs = st.tabs(["Бренд", "Контакты", "Баннер", "Тексты", "Блоки", "Эксперт"])
+    # ==========================================
+# FRAGMENT FUNCTIONS FOR EACH TAB
+# (each tab rerenders independently on interaction)
+# ==========================================
 
-    # ---- ТАБ 0: БРЕНД ----
-    with tabs[0]:
+    @st.fragment
+    def _tab_brand():
+        brand = st.session_state.user
+        mode = st.session_state.mode
+        accent = brand['accent_color'] if brand else '#1e69da'
+        data = st.session_state.data
+        template_variant = st.session_state.get('template_variant', 'default')
+        _is_stalmetural = (brand.get('template_slug', '') == 'stalmetural')
+        _is_imp = (template_variant == 'inmetprom')
+        _ = accent  # suppress unused warning
+
         # ── CSS секций бренда ─────────────────────────────────
         st.markdown("""<style>
         .sk-card {
@@ -2109,7 +2123,7 @@ else:
             st.session_state.user['hero_bg_img']      = _new_hero
             st.session_state.user['footer_bg_img']    = _new_footer_img
             st.success("Настройки бренда сохранены!")
-            st.rerun()
+            st.rerun(scope="app")
 
         # ── Дополнительные настройки ──────────────────────────
         st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
@@ -2155,7 +2169,7 @@ else:
                 st.session_state.user['default_phone'] = _edit_phone
                 st.session_state.user['default_city']  = _edit_city
                 st.success("Данные бренда сохранены!")
-                st.rerun()
+                st.rerun(scope="app")
 
         with st.expander("Удалить бренд"):
             st.warning(f"Вы собираетесь удалить бренд **{brand.get('brand_name','')}** и все его данные (проекты, шаблоны контактов, пользователей). Это действие необратимо.")
@@ -2173,10 +2187,21 @@ else:
                 if st.query_params.get("u","") == user['login']:
                     st.query_params["u"] = ""
                 st.success("Бренд удалён.")
-                st.rerun()
+                st.rerun(scope="app")
 
-    # ---- ТАБ 1: КОНТАКТЫ ----
-    with tabs[1]:
+
+
+    @st.fragment
+    def _tab_contacts():
+        brand = st.session_state.user
+        mode = st.session_state.mode
+        accent = brand['accent_color'] if brand else '#1e69da'
+        data = st.session_state.data
+        template_variant = st.session_state.get('template_variant', 'default')
+        _is_stalmetural = (brand.get('template_slug', '') == 'stalmetural')
+        _is_imp = (template_variant == 'inmetprom')
+        _ = accent  # suppress unused warning
+
         c1, c2 = st.columns(2)
 
         d_email = brand['default_email']
@@ -2235,13 +2260,13 @@ else:
             # Дополнительные подстановки для ИнМетПром
             data['LOGO_URL']          = brand.get('logo_data') or brand.get('logo_url', '')
             data['LOGO_FOOTER_URL']   = brand.get('logo_data') or brand.get('logo_url', '')
-     
+
         # Ссылка Оплата
             col_pay1, col_pay2 = st.columns(2)
             d_pay = brand['site_url'].rstrip('/') + '/oplata/'
             data['LINK_PAYMENT'] = cached_input(
                 "Ссылка 'Оплата'", "IMP_LINK_PAYMENT", d_pay, d_pay, col=col_pay1) or d_pay
-     
+
         # Ссылка Контакты / Консультация
             d_cont = brand['contacts_url']
             data['LINK_CONTACTS'] = cached_input(
@@ -2249,8 +2274,19 @@ else:
 
         data['UnsubscribeUrl'], data['webversion'], data['email'] = "{{UnsubscribeUrl}}", "{{webversion}}", "{{email}}"
 
-    # ---- ТАБ 2: БАННЕР ----
-    with tabs[2]:
+
+
+    @st.fragment
+    def _tab_banner():
+        brand = st.session_state.user
+        mode = st.session_state.mode
+        accent = brand['accent_color'] if brand else '#1e69da'
+        data = st.session_state.data
+        template_variant = st.session_state.get('template_variant', 'default')
+        _is_stalmetural = (brand.get('template_slug', '') == 'stalmetural')
+        _is_imp = (template_variant == 'inmetprom')
+        _ = accent  # suppress unused warning
+
         _vars = TEMPLATE_VARIANTS.get(mode, [("default", "Стандарт", "", None)])
         _effective_mode = 'promo' if mode == 'promo_inmetprom' else mode
 
@@ -2320,7 +2356,7 @@ else:
             )
             if _sel != st.session_state.template_variant:
                 st.session_state.template_variant = _sel
-                st.rerun()
+                st.rerun(scope="app")
             template_variant = _sel
             st.markdown("---")
 
@@ -2372,7 +2408,7 @@ else:
                     key="banner_hdr_radio", label_visibility="collapsed", horizontal=True)
                 if _hdr_new != _hdr_cur:
                     st.session_state.header_style = _hdr_new
-                    st.rerun()
+                    st.rerun(scope="app")
             else:
                 st.caption("Зафиксировано в дизайне бренда" if _locked else "Шапка встроена в дизайн баннера для этого шаблона")
         with _sc2:
@@ -2397,7 +2433,7 @@ else:
                     key="banner_ftr_radio", label_visibility="collapsed", horizontal=True)
                 if _ftr_new != _ftr_cur:
                     st.session_state.footer_style = _ftr_new
-                    st.rerun()
+                    st.rerun(scope="app")
             else:
                 st.caption("Зафиксировано в дизайне бренда" if _locked else "Футер встроен в дизайн для этого шаблона")
 
@@ -2518,8 +2554,19 @@ else:
             d_ht = "МЕТАЛЛОПРОКАТ ОТ ПРОИЗВОДИТЕЛЯ"
             data['HERO_TITLE'] = cached_input("Заголовок баннера", f"{mode}_HERO_TITLE", d_ht, d_ht) or d_ht
 
-    # ---- ТАБ 3: ТЕКСТЫ ----
-    with tabs[3]:
+
+
+    @st.fragment
+    def _tab_texts():
+        brand = st.session_state.user
+        mode = st.session_state.mode
+        accent = brand['accent_color'] if brand else '#1e69da'
+        data = st.session_state.data
+        template_variant = st.session_state.get('template_variant', 'default')
+        _is_stalmetural = (brand.get('template_slug', '') == 'stalmetural')
+        _is_imp = (template_variant == 'inmetprom')
+        _ = accent  # suppress unused warning
+
         st.markdown(f"""
         <div style="background-color:{accent}33; padding:10px; border-radius:5px; border:1px solid {accent}; margin-bottom:15px;">
             <strong>Как оформлять текст:</strong><br>
@@ -2695,8 +2742,19 @@ else:
             d_tl = brand['contacts_url']
             data['TEXT_BTN_LINK'] = cached_input("Ссылка для кнопки", f"{mode}_TEXT_BTN_LINK", d_tl, d_tl) or d_tl
 
-    # ---- ТАБ 4: БЛОКИ ----
-    with tabs[4]:
+
+
+    @st.fragment
+    def _tab_blocks():
+        brand = st.session_state.user
+        mode = st.session_state.mode
+        accent = brand['accent_color'] if brand else '#1e69da'
+        data = st.session_state.data
+        template_variant = st.session_state.get('template_variant', 'default')
+        _is_stalmetural = (brand.get('template_slug', '') == 'stalmetural')
+        _is_imp = (template_variant == 'inmetprom')
+        _ = accent  # suppress unused warning
+
         _eff_mode_blocks = 'promo' if mode == 'promo_inmetprom' else mode
         _tv_blocks = st.session_state.get('template_variant', 'default')
         _mode_block_map = OPTIONAL_BLOCKS.get(mode, OPTIONAL_BLOCKS.get(_eff_mode_blocks, {}))
@@ -2797,20 +2855,20 @@ else:
                                      disabled=(_ci == 0)):
                             _ctor_blocks[_ci], _ctor_blocks[_ci-1] = _ctor_blocks[_ci-1], _ctor_blocks[_ci]
                             st.session_state['constructor_blocks'] = _ctor_blocks
-                            st.rerun()
+                            st.rerun(scope="app")
                     with _cc3:
                         st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
                         if st.button("↓", key=f"ctor_dn_{_ci}", use_container_width=True,
                                      disabled=(_ci == len(_ctor_blocks)-1)):
                             _ctor_blocks[_ci], _ctor_blocks[_ci+1] = _ctor_blocks[_ci+1], _ctor_blocks[_ci]
                             st.session_state['constructor_blocks'] = _ctor_blocks
-                            st.rerun()
+                            st.rerun(scope="app")
                     with _cc4:
                         st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
                         if st.button("✕", key=f"ctor_rm_{_ci}", use_container_width=True):
                             _ctor_blocks.pop(_ci)
                             st.session_state['constructor_blocks'] = _ctor_blocks
-                            st.rerun()
+                            st.rerun(scope="app")
 
                     # Редактируемые поля блока
                     _bfields = BLOCK_FIELDS.get(_cb['key'], [])
@@ -2829,7 +2887,7 @@ else:
 
                 if st.button("🧹 Очистить всё", key="ctor_clear"):
                     st.session_state['constructor_blocks'] = []
-                    st.rerun()
+                    st.rerun(scope="app")
 
             st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
 
@@ -2882,7 +2940,7 @@ else:
                                  help="Добавить в сборку", disabled=_already):
                         _ctor_blocks.append({"key": _blk['key'], "name": _blk['name'], "html": _blk['html']})
                         st.session_state['constructor_blocks'] = _ctor_blocks
-                        st.rerun()
+                        st.rerun(scope="app")
 
             st.markdown("---")
 
@@ -2980,7 +3038,7 @@ else:
                                 st.session_state.block_custom_html = _bch_ins
                                 st.session_state['custom_html_CUSTOM'] = _blk['html']
                                 st.session_state.custom_html_slot = 'CUSTOM'
-                                st.rerun()
+                                st.rerun(scope="app")
                 else:
                     st.caption("Блоки из шаблонов не найдены")
 
@@ -3219,7 +3277,7 @@ else:
                     d_sh_d = "Описание процесса отгрузки или логистики"
                     _raw_ship_d = cached_input("Описание",        f"{mode}_ship_d_{i}", d_sh_d, d_sh_d) or d_sh_d
                     data[f'SHIP_{i}_DESC'] = process_text_to_html(_raw_ship_d)
-                    
+
                     col3, col4 = st.columns(2)
                     data[f'SHIP_{i}_IMG']   = image_input("Фото", f"{mode}_ship_i_{i}", "", "", col=col3) or ""
                     data[f'SHIP_{i}_LINK']  = cached_input("Ссылка",          f"{mode}_ship_l_{i}", data.get('LINK_CATALOG',''), data.get('LINK_CATALOG',''), col=col4) or data.get('LINK_CATALOG','')
@@ -3278,7 +3336,7 @@ else:
                     if gost_preset != "Своя настройка":
                         if st.button("↺ Загрузить стандарты для выбранного типа", key="load_gost"):
                             st.session_state.gost_tags = GOST_PRESETS[gost_preset].copy()
-                            st.rerun()
+                            st.rerun(scope="app")
                     if st.session_state.gost_tags:
                         st.markdown("**Текущие стандарты** (кликните на ячейку с ✕ , чтобы удалить):")
                         cols_g = st.columns(4)
@@ -3289,7 +3347,7 @@ else:
                                     tags_to_remove_g.append(tag)
                         for t in tags_to_remove_g:
                             st.session_state.gost_tags.remove(t)
-                            st.rerun()
+                            st.rerun(scope="app")
                     else:
                         st.info("Список стандартов пуст. Добавьте вручную ниже.")
                     col_g1, col_g2 = st.columns([3, 1])
@@ -3297,7 +3355,7 @@ else:
                     if col_g2.button("＋ Добавить", key="add_gost_btn", use_container_width=True):
                         if new_gost.strip() and new_gost.strip() not in st.session_state.gost_tags:
                             st.session_state.gost_tags.append(new_gost.strip())
-                            st.rerun()
+                            st.rerun(scope="app")
                     data['GOST_BLOCK'] = make_badges(st.session_state.gost_tags, font_size="11px", padding="3px 8px")
 
                     st.markdown("---")
@@ -3306,7 +3364,7 @@ else:
                     if size_preset != "Своя настройка":
                         if st.button("↺ Загрузить размеры для выбранного типа", key="load_size"):
                             st.session_state.size_tags = SIZE_PRESETS[size_preset].copy()
-                            st.rerun()
+                            st.rerun(scope="app")
                     if st.session_state.size_tags:
                         st.markdown("**Текущие размеры** (кликните на ячейку с ✕ , чтобы удалить):")
                         cols_s = st.columns(5)
@@ -3317,7 +3375,7 @@ else:
                                     tags_to_remove_s.append(tag)
                         for t in tags_to_remove_s:
                             st.session_state.size_tags.remove(t)
-                            st.rerun()
+                            st.rerun(scope="app")
                     else:
                         st.info("Список размеров пуст. Добавьте вручную ниже.")
                     col_s1, col_s2 = st.columns([3, 1])
@@ -3325,7 +3383,7 @@ else:
                     if col_s2.button("＋ Добавить", key="add_size_btn", use_container_width=True):
                         if new_size.strip() and new_size.strip() not in st.session_state.size_tags:
                             st.session_state.size_tags.append(new_size.strip())
-                            st.rerun()
+                            st.rerun(scope="app")
                     data['SIZE_BLOCK'] = make_badges(st.session_state.size_tags, font_size="12px", padding="4px 10px")
 
                     st.markdown("---")
@@ -3475,7 +3533,7 @@ else:
 
         elif mode == "promo_inmetprom":
             st.subheader("Товарные блоки и дополнительные секции")
-     
+
             # ---- 1. Акционные позиции (3 товара) ----
             with st.expander("1. Акционные позиции со склада (3 товара)", expanded=True):
                 defaults_t  = ["Арматура 10 мм", "Арматура 12 мм", "Арматура 8 мм"]
@@ -3507,7 +3565,7 @@ else:
                     data[f'L_{i}'] = cached_input(
                         "Ссылка на товар", f"IMP_l_{i}", defaults_l[i-1], defaults_l[i-1], col=col5) or defaults_l[i-1]
                     st.markdown("---")
-     
+
             # ---- 2. Что отгрузили на этой неделе (2 кейса) ----
             with st.expander("2. Что отгрузили на этой неделе (2 кейса)"):
                 defaults_ct   = ["Труба электросварная", "Гайки"]
@@ -3535,7 +3593,7 @@ else:
                     data[f'CASE_IMG_{i}'] = image_input(
                         "Фото отгрузки", f"IMP_case_img_{i}", "", "", col=col_k3) or ""
                     st.markdown("---")
-     
+
             # ---- 3. Почему выбирают нас ----
             with st.expander("3. Почему выбирают нас (Регион)"):
                 st.info("Дизайн и текст этого блока зафиксированы. Вы можете изменить только регион (например: РФ, СНГ и тд).")
@@ -3543,18 +3601,51 @@ else:
                 data['REGION'] = cached_input(
                     "Регион складов", "IMP_REGION",
                     d_region, d_region) or d_region
-     
+
 
         else:
             st.info("Блоки для данного шаблона настраиваются индивидуально. Перейдите в другой шаблон.")
 
-    # ---- ТАБ 5: ЭКСПЕРТ ----
-    with tabs[5]:
+
+
+    @st.fragment
+    def _tab_expert():
+        brand = st.session_state.user
+        mode = st.session_state.mode
+        accent = brand['accent_color'] if brand else '#1e69da'
+        data = st.session_state.data
+        template_variant = st.session_state.get('template_variant', 'default')
+        _is_stalmetural = (brand.get('template_slug', '') == 'stalmetural')
+        _is_imp = (template_variant == 'inmetprom')
+        _ = accent  # suppress unused warning
+
         st.info("Блок менеджера зафиксирован в дизайне. Здесь меняется только ссылка кнопки.")
         d_alink = brand['contacts_url']
         data['ALINA_BTN_LINK'] = cached_input("Ссылка для кнопки 'Рассчитать смету'", "ALINA_BTN_LINK", d_alink, d_alink) or d_alink
 
-    # ==========================================
+        # ==========================================
+
+
+    tabs = st.tabs(["Бренд", "Контакты", "Баннер", "Тексты", "Блоки", "Эксперт"])
+
+    # ---- ТАБ 0: БРЕНД ----
+    with tabs[0]:
+        _tab_brand()
+    # ---- ТАБ 1: КОНТАКТЫ ----
+    with tabs[1]:
+        _tab_contacts()
+    # ---- ТАБ 2: БАННЕР ----
+    with tabs[2]:
+        _tab_banner()
+    # ---- ТАБ 3: ТЕКСТЫ ----
+    with tabs[3]:
+        _tab_texts()
+    # ---- ТАБ 4: БЛОКИ ----
+    with tabs[4]:
+        _tab_blocks()
+    # ---- ТАБ 5: ЭКСПЕРТ ----
+    with tabs[5]:
+        _tab_expert()
     # 10. СБОРКА HTML
     # ==========================================
     st.markdown('<div style="height:8px"></div>', unsafe_allow_html=True)
@@ -3603,14 +3694,14 @@ else:
                     _parts.append(_bhtml)
                 _blocks_html = "\n".join(_parts)
                 html = _prefix + _blocks_html + _suffix
-                for key, val in data.items():
+                for key, val in st.session_state.data.items():
                     replacement = str(val) if val else ""
                     html = html.replace(f"{{{{{key}}}}}", replacement)
                 st.success(f"Готово! (конструктор · {len(_ctor_build)} блоков)")
             elif _full_html:
                 # Полная замена — используем код пользователя как есть, только подставляем переменные
                 html = _full_html
-                for key, val in data.items():
+                for key, val in st.session_state.data.items():
                     replacement = str(val) if val else ""
                     html = html.replace(f"{{{{{key}}}}}", replacement)
                 st.success("Готово! (полный шаблон из вкладки «Блоки»)")
@@ -3626,7 +3717,7 @@ else:
                 _bv = st.session_state.get('block_visibility', {})
                 _hidden = [blk for blk, visible in _bv.items() if not visible]
                 html = apply_block_visibility(html, _hidden, block_custom_html=_bch_build)
-                for key, val in data.items():
+                for key, val in st.session_state.data.items():
                     replacement = str(val) if val else ""
                     html = html.replace(f"{{{{{key}}}}}", replacement)
                 st.success("Готово!")
