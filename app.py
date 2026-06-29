@@ -2826,8 +2826,11 @@ else:
                 div[class*="st-key-ctor_rm"] button {{
                     height: 28px !important;
                     min-height: 28px !important;
-                    padding: 0 6px !important;
-                    font-size: 13px !important;
+                    width: 36px !important;
+                    min-width: 36px !important;
+                    max-width: 36px !important;
+                    padding: 0 !important;
+                    font-size: 14px !important;
                     border-radius: 8px !important;
                     background-color: {"#f7f9fb" if not _is_dark_blk else "#252840"} !important;
                     color: {"#191c1e" if not _is_dark_blk else "#d8daf0"} !important;
@@ -2839,8 +2842,26 @@ else:
                 div[class*="st-key-ctor_dn"] button p,
                 div[class*="st-key-ctor_rm"] button p {{
                     color: {"#191c1e" if not _is_dark_blk else "#d8daf0"} !important;
-                    font-size: 13px !important;
+                    font-size: 14px !important;
                 }}
+                div[class*="st-key-ctor_add"] button {{
+                    height: 32px !important;
+                    min-height: 32px !important;
+                    width: 36px !important;
+                    min-width: 36px !important;
+                    max-width: 36px !important;
+                    padding: 0 !important;
+                    font-size: 18px !important;
+                    font-weight: 700 !important;
+                    border-radius: 10px !important;
+                    background-color: {_bacc} !important;
+                    color: #ffffff !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                    transform: none !important;
+                }}
+                div[class*="st-key-ctor_add"] button p,
+                div[class*="st-key-ctor_add"] button span {{ color: #ffffff !important; }}
                 </style>""", unsafe_allow_html=True)
 
                 for _ci, _cb in enumerate(_ctor_blocks):
@@ -2856,19 +2877,19 @@ else:
                             f'<p style="margin:0;font-size:15px;font-weight:600;color:{_btxt}">'
                             f'{_cb["name"]}</p></div></div>', unsafe_allow_html=True)
                     with _cc2:
-                        if st.button("↑", key=f"ctor_up_{_ci}", use_container_width=True,
+                        if st.button("↑", key=f"ctor_up_{_ci}",
                                      disabled=(_ci == 0)):
                             _ctor_blocks[_ci], _ctor_blocks[_ci-1] = _ctor_blocks[_ci-1], _ctor_blocks[_ci]
                             st.session_state['constructor_blocks'] = _ctor_blocks
                             st.rerun(scope="app")
                     with _cc3:
-                        if st.button("↓", key=f"ctor_dn_{_ci}", use_container_width=True,
+                        if st.button("↓", key=f"ctor_dn_{_ci}",
                                      disabled=(_ci == len(_ctor_blocks)-1)):
                             _ctor_blocks[_ci], _ctor_blocks[_ci+1] = _ctor_blocks[_ci+1], _ctor_blocks[_ci]
                             st.session_state['constructor_blocks'] = _ctor_blocks
                             st.rerun(scope="app")
                     with _cc4:
-                        if st.button("✕", key=f"ctor_rm_{_ci}", use_container_width=True):
+                        if st.button("✕", key=f"ctor_rm_{_ci}"):
                             _ctor_blocks.pop(_ci)
                             st.session_state['constructor_blocks'] = _ctor_blocks
                             st.rerun(scope="app")
@@ -2904,25 +2925,6 @@ else:
                 f'<span style="font-size:12px;color:{_bsub};margin-left:4px">— нажми ＋ чтобы добавить в сборку</span>'
                 f'</div>', unsafe_allow_html=True)
 
-            st.markdown(f"""<style>
-            div[class*="st-key-ctor_add"] button {{
-                height: 32px !important;
-                min-height: 32px !important;
-                padding: 0 10px !important;
-                font-size: 18px !important;
-                font-weight: 700 !important;
-                border-radius: 10px !important;
-                background-color: {_bacc} !important;
-                color: #ffffff !important;
-                border: none !important;
-                box-shadow: none !important;
-                transform: none !important;
-            }}
-            div[class*="st-key-ctor_add"] button p,
-            div[class*="st-key-ctor_add"] button span {{ color: #ffffff !important; }}
-            div[class*="st-key-ctor_add"] button:hover {{ filter: brightness(1.1) !important; transform: none !important; }}
-            </style>""", unsafe_allow_html=True)
-
             _lib_all = load_block_library()
             _lib_imp = [b for b in _lib_all if 'inmetprom' in b['source']]
             for _blk in _lib_imp:
@@ -2941,7 +2943,7 @@ else:
                         f'{_blk["desc"]}</p>'
                         f'</div></div>', unsafe_allow_html=True)
                 with _lc2:
-                    if st.button("＋", key=f"ctor_add_{_blk['key']}", use_container_width=True,
+                    if st.button("＋", key=f"ctor_add_{_blk['key']}",
                                  help="Добавить в сборку", disabled=_already):
                         _ctor_blocks.append({"key": _blk['key'], "name": _blk['name'], "html": _blk['html']})
                         st.session_state['constructor_blocks'] = _ctor_blocks
