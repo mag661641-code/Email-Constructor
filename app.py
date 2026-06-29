@@ -2968,23 +2968,6 @@ else:
                 _bch      = st.session_state.get('block_custom_html', {})
                 _has_code = any(_bch.get(sid, '').strip() for sid, _ in _slots)
 
-                _any_active_str = (f'<span style="font-size:12px;font-weight:600;color:{_bacc};'
-                                   f'background:{_pill_bg};padding:5px 14px;border-radius:20px">'
-                                   f'активно</span>' if _has_code else '')
-                st.markdown(
-                    f'<div style="background:{_code_hdr};border-radius:16px 16px 0 0;'
-                    f'padding:14px 20px;display:flex;align-items:center;justify-content:space-between;'
-                    f'margin-top:4px">'
-                    f'<div style="display:flex;align-items:center;gap:10px">'
-                    f'<span style="font-size:18px;color:{_bacc}">&lt;/&gt;</span>'
-                    f'<span style="font-size:20px;font-weight:700;color:{_code_txt}">Свой HTML</span>'
-                    f'</div>{_any_active_str}</div>',
-                    unsafe_allow_html=True)
-
-                st.markdown(
-                    f'<div style="background:{_code_bg};border-radius:0 0 16px 16px;'
-                    f'padding:16px 18px 18px;margin-bottom:8px">', unsafe_allow_html=True)
-
                 _sel_label = st.selectbox(
                     "Куда вставить:",
                     options=_slot_labels,
@@ -3009,8 +2992,6 @@ else:
                     height=240,
                     key=f"custom_html_imp_{_sel_slot_id}",
                     placeholder=_ph)
-
-                st.markdown('</div>', unsafe_allow_html=True)
 
                 if _custom and _custom.strip():
                     _bch[_sel_slot_id] = _custom
