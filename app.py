@@ -2864,14 +2864,9 @@ else:
                 div[class*="st-key-ctor_rm"] button p {{
                     color: inherit !important; font-size: 16px !important;
                 }}
-                /* Скрытые Streamlit-кнопки (визуал — в HTML выше) */
+                /* Скрытые Streamlit-кнопки (визуал — в HTML выше, JS .click() работает на display:none) */
                 [data-testid="stHorizontalBlock"]:has(div[class*="st-key-ctor_up"]) {{
-                    position: absolute !important;
-                    visibility: hidden !important;
-                    height: 0 !important;
-                    overflow: hidden !important;
-                    margin: 0 !important;
-                    padding: 0 !important;
+                    display: none !important;
                 }}
                 /* Настройки — без верхнего отступа, прилегают к карточке */
                 div[class*="st-key-ctor_settings"] {{
