@@ -2821,77 +2821,57 @@ else:
                     unsafe_allow_html=True)
             else:
                 _btn_div = "#4a4d70" if _is_dark_blk else "#d8dce8"
-                _btn_hov = "rgba(255,255,255,0.08)" if _is_dark_blk else "rgba(0,0,0,0.06)"
-                st.markdown(f"""<style>
-                /* Вся строка блока — единая карточка */
-                [data-testid="stHorizontalBlock"]:has(div[class*="st-key-ctor_up"]) {{
-                    gap: 0 !important;
-                    background: {_card_bg} !important;
-                    border-radius: 14px !important;
-                    box-shadow: {_card_sh} !important;
-                    overflow: hidden !important;
-                    margin: 4px 0 !important;
-                    padding: 0 !important;
-                    align-items: stretch !important;
-                }}
-                /* Колонки с кнопками — separator слева */
-                [data-testid="stHorizontalBlock"]:has(div[class*="st-key-ctor_up"])
-                [data-testid="column"]:has(div[class*="st-key-ctor_up"]),
-                [data-testid="stHorizontalBlock"]:has(div[class*="st-key-ctor_up"])
-                [data-testid="column"]:has(div[class*="st-key-ctor_dn"]),
-                [data-testid="stHorizontalBlock"]:has(div[class*="st-key-ctor_up"])
-                [data-testid="column"]:has(div[class*="st-key-ctor_rm"]) {{
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    padding: 4px 2px !important;
-                    border-left: 1px solid {_btn_div} !important;
-                }}
-                /* Кнопки ↑ ↓ ✕ — прозрачные иконки */
-                div[class*="st-key-ctor_up"] button,
-                div[class*="st-key-ctor_dn"] button,
-                div[class*="st-key-ctor_rm"] button {{
-                    height: 32px !important;
-                    min-height: 32px !important;
-                    width: 34px !important;
-                    padding: 0 !important;
-                    font-size: 15px !important;
-                    border-radius: 6px !important;
-                    background-color: transparent !important;
-                    color: {_btxt} !important;
-                    border: none !important;
-                    box-shadow: none !important;
-                    transform: none !important;
-                }}
-                div[class*="st-key-ctor_up"] button:hover,
-                div[class*="st-key-ctor_dn"] button:hover,
-                div[class*="st-key-ctor_rm"] button:hover {{
-                    background-color: {_btn_hov} !important;
-                }}
-                div[class*="st-key-ctor_up"] button p,
-                div[class*="st-key-ctor_dn"] button p,
-                div[class*="st-key-ctor_rm"] button p {{ color: {_btxt} !important; font-size: 15px !important; }}
-                /* Кнопки + — нейтральные, высота как у блока */
-                div[class*="st-key-ctor_add"] button {{
-                    height: 100% !important;
-                    min-height: 46px !important;
-                    width: 44px !important;
-                    padding: 0 !important;
-                    font-size: 20px !important;
-                    font-weight: 400 !important;
+                _icon_btn = f"""
+                    height: 46px !important; min-height: 46px !important;
+                    width: 44px !important; padding: 0 !important;
+                    font-size: 16px !important; font-weight: 400 !important;
                     border-radius: 10px !important;
                     background-color: {_card_bg} !important;
                     color: {_bsub} !important;
                     border: 1.5px solid {_btn_div} !important;
-                    box-shadow: none !important;
-                    transform: none !important;
+                    box-shadow: none !important; transform: none !important;
+                    cursor: pointer !important;
+                """
+                st.markdown(f"""<style>
+                /* ↑ ↓ ✕ — отдельные кнопки, стиль как у + */
+                div[class*="st-key-ctor_up"] button,
+                div[class*="st-key-ctor_dn"] button,
+                div[class*="st-key-ctor_rm"] button {{ {_icon_btn} }}
+                div[class*="st-key-ctor_up"] button:hover,
+                div[class*="st-key-ctor_dn"] button:hover,
+                div[class*="st-key-ctor_rm"] button:hover {{
+                    color: {_btxt} !important; border-color: {_btxt} !important;
                 }}
+                div[class*="st-key-ctor_up"] button:disabled,
+                div[class*="st-key-ctor_dn"] button:disabled,
+                div[class*="st-key-ctor_rm"] button:disabled {{
+                    opacity: 0.3 !important; cursor: default !important;
+                }}
+                div[class*="st-key-ctor_up"] button p,
+                div[class*="st-key-ctor_dn"] button p,
+                div[class*="st-key-ctor_rm"] button p {{
+                    color: inherit !important; font-size: 16px !important;
+                }}
+                /* + кнопки — нейтральные, без красного */
+                div[class*="st-key-ctor_add"] button {{ {_icon_btn} cursor: pointer !important; }}
                 div[class*="st-key-ctor_add"] button:hover {{
-                    color: {_bacc} !important;
-                    border-color: {_bacc} !important;
+                    color: {_bacc} !important; border-color: {_bacc} !important;
+                    background-color: {_card_bg} !important;
+                }}
+                div[class*="st-key-ctor_add"] button:disabled {{
+                    opacity: 0.4 !important; cursor: default !important;
                 }}
                 div[class*="st-key-ctor_add"] button p,
-                div[class*="st-key-ctor_add"] button span {{ color: inherit !important; font-size: 20px !important; }}
+                div[class*="st-key-ctor_add"] button span {{
+                    color: inherit !important; font-size: 20px !important;
+                }}
+                /* Колонки со стрелками — выровнять по центру */
+                [data-testid="column"]:has(div[class*="st-key-ctor_up"]),
+                [data-testid="column"]:has(div[class*="st-key-ctor_dn"]),
+                [data-testid="column"]:has(div[class*="st-key-ctor_rm"]) {{
+                    display: flex !important; align-items: center !important;
+                    justify-content: center !important;
+                }}
                 </style>""", unsafe_allow_html=True)
 
                 for _ci, _cb in enumerate(_ctor_blocks):
@@ -2899,12 +2879,13 @@ else:
                     with _cc1:
                         _cb_desc = _cb.get('desc', '')
                         st.markdown(
-                            f'<div style="padding:14px 18px;display:flex;align-items:center;gap:14px">'
+                            f'<div style="background:{_card_bg};border-radius:14px;'
+                            f'padding:14px 18px;box-shadow:{_card_sh};margin:4px 0;'
+                            f'display:flex;align-items:center;gap:14px">'
                             f'<span style="color:{_bacc};font-size:13px;font-weight:700;'
                             f'min-width:18px;text-align:center;flex-shrink:0">{_ci+1}</span>'
                             f'<div style="flex:1;min-width:0">'
-                            f'<p style="margin:0;font-size:15px;font-weight:600;color:{_btxt};'
-                            f'white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{_cb["name"]}</p>'
+                            f'<p style="margin:0;font-size:15px;font-weight:600;color:{_btxt}">{_cb["name"]}</p>'
                             + (f'<p style="margin:3px 0 0;font-size:12px;color:{_bsub}">{_cb_desc}</p>' if _cb_desc else '')
                             + f'</div></div>', unsafe_allow_html=True)
                     with _cc2:
@@ -2942,14 +2923,16 @@ else:
 
                 st.markdown(f"""<style>
                 div[class*="st-key-ctor_clear"] button {{
-                    height:26px!important;min-height:26px!important;
-                    padding:0 10px!important;font-size:11px!important;
-                    border-radius:8px!important;border:1px solid {_btn_div}!important;
+                    height:20px!important;min-height:20px!important;
+                    padding:0 8px!important;font-size:11px!important;
+                    border-radius:6px!important;border:1px solid {_btn_div}!important;
                     background:transparent!important;color:{_bsub}!important;
                     box-shadow:none!important;transform:none!important;
+                    cursor:pointer!important;
                 }}
                 div[class*="st-key-ctor_clear"] button:hover {{
                     border-color:#e53935!important;color:#e53935!important;
+                    background:transparent!important;
                 }}
                 div[class*="st-key-ctor_clear"] button p {{color:inherit!important;font-size:11px!important;}}
                 </style>""", unsafe_allow_html=True)
