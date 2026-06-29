@@ -2924,12 +2924,13 @@ else:
                         f'<p style="margin:3px 0 0;font-size:12px;color:{_bsub}">{_cb_desc}</p>'
                     ) if _cb_desc else ''
 
-                    # Атрибуты неактивных кнопок
-                    _up_attr = 'disabled style="opacity:0.22;cursor:default"' if _is_first else \
-                               f'onclick="document.querySelector(\'.st-key-ctor_up_{_ci} button\').click()"'
-                    _dn_attr = 'disabled style="opacity:0.22;cursor:default"' if _is_last else \
-                               f'onclick="document.querySelector(\'.st-key-ctor_dn_{_ci} button\').click()"'
-                    _rm_attr = f'onclick="document.querySelector(\'.st-key-ctor_rm_{_ci} button\').click()"'
+                    # Стили с учётом активности (disabled — opacity, иначе полный стиль + onclick)
+                    _bs_dis = _bs + "opacity:0.22;cursor:default;"
+                    _up_btn = f'<button disabled style="{_bs_dis}">↑</button>' if _is_first else \
+                              f'<button onclick="document.querySelector(\'.st-key-ctor_up_{_ci} button\').click()" style="{_bs}">↑</button>'
+                    _dn_btn = f'<button disabled style="{_bs_dis}">↓</button>' if _is_last else \
+                              f'<button onclick="document.querySelector(\'.st-key-ctor_dn_{_ci} button\').click()" style="{_bs}">↓</button>'
+                    _rm_btn = f'<button onclick="document.querySelector(\'.st-key-ctor_rm_{_ci} button\').click()" style="{_bs_rm}">×</button>'
 
                     # Визуальная строка: карточка + кнопки как единый flex
                     st.markdown(f'''
@@ -2944,9 +2945,7 @@ else:
                           {_desc_html}{_hint_html}
                         </div>
                       </div>
-                      <button {_up_attr} style="{_bs}">↑</button>
-                      <button {_dn_attr} style="{_bs}">↓</button>
-                      <button {_rm_attr} style="{_bs_rm}">×</button>
+                      {_up_btn}{_dn_btn}{_rm_btn}
                     </div>
                     ''', unsafe_allow_html=True)
 
