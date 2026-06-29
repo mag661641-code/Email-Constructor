@@ -2833,22 +2833,26 @@ else:
                     cursor: pointer !important;
                 """
                 st.markdown(f"""<style>
-                /* ↑ ↓ ✕ — отдельные кнопки, стиль как у + */
+                /* ↑ ↓ — отдельные кнопки, стиль как у + */
                 div[class*="st-key-ctor_up"] button,
-                div[class*="st-key-ctor_dn"] button,
-                div[class*="st-key-ctor_rm"] button {{ {_icon_btn} }}
+                div[class*="st-key-ctor_dn"] button {{ {_icon_btn} }}
                 div[class*="st-key-ctor_up"] button:hover,
-                div[class*="st-key-ctor_dn"] button:hover,
-                div[class*="st-key-ctor_rm"] button:hover {{
+                div[class*="st-key-ctor_dn"] button:hover {{
                     color: {_btxt} !important; border-color: {_btxt} !important;
                 }}
                 div[class*="st-key-ctor_up"] button:disabled,
-                div[class*="st-key-ctor_dn"] button:disabled,
-                div[class*="st-key-ctor_rm"] button:disabled {{
+                div[class*="st-key-ctor_dn"] button:disabled {{
                     opacity: 0.3 !important; cursor: default !important;
                 }}
                 div[class*="st-key-ctor_up"] button p,
-                div[class*="st-key-ctor_dn"] button p,
+                div[class*="st-key-ctor_dn"] button p {{
+                    color: inherit !important; font-size: 16px !important;
+                }}
+                /* ✕ — серый, стиль как у + */
+                div[class*="st-key-ctor_rm"] button {{ {_icon_btn} color: #999999 !important; }}
+                div[class*="st-key-ctor_rm"] button:hover {{
+                    color: #666666 !important; border-color: #aaaaaa !important;
+                }}
                 div[class*="st-key-ctor_rm"] button p {{
                     color: inherit !important; font-size: 16px !important;
                 }}
@@ -2923,8 +2927,8 @@ else:
 
                 st.markdown(f"""<style>
                 div[class*="st-key-ctor_clear"] button {{
-                    height:20px!important;min-height:20px!important;
-                    padding:0 8px!important;font-size:11px!important;
+                    height:28px!important;min-height:28px!important;
+                    padding:0 10px!important;font-size:13px!important;
                     border-radius:6px!important;border:1px solid {_btn_div}!important;
                     background:transparent!important;color:{_bsub}!important;
                     box-shadow:none!important;transform:none!important;
@@ -2934,7 +2938,7 @@ else:
                     border-color:#e53935!important;color:#e53935!important;
                     background:transparent!important;
                 }}
-                div[class*="st-key-ctor_clear"] button p {{color:inherit!important;font-size:11px!important;}}
+                div[class*="st-key-ctor_clear"] button p {{color:inherit!important;font-size:13px!important;}}
                 </style>""", unsafe_allow_html=True)
                 if st.button("Очистить всё", key="ctor_clear"):
                     st.session_state['constructor_blocks'] = []
@@ -2971,7 +2975,7 @@ else:
                         f'</div></div>', unsafe_allow_html=True)
                 with _lc2:
                     if st.button("＋", key=f"ctor_add_{_blk['key']}",
-                                 help="Добавить в сборку", disabled=_already):
+                                 disabled=_already):
                         _ctor_blocks.append({"key": _blk['key'], "name": _blk['name'], "desc": _blk.get('desc', ''), "html": _blk['html']})
                         st.session_state['constructor_blocks'] = _ctor_blocks
                         st.rerun(scope="app")
