@@ -2864,13 +2864,19 @@ else:
                 div[class*="st-key-ctor_rm"] button p {{
                     color: inherit !important; font-size: 16px !important;
                 }}
-                /* Колонки со стрелками — убрать лишний padding */
-                [data-testid="column"]:has(div[class*="st-key-ctor_up"]),
-                [data-testid="column"]:has(div[class*="st-key-ctor_dn"]),
-                [data-testid="column"]:has(div[class*="st-key-ctor_rm"]) {{
-                    display: flex !important; align-items: center !important;
-                    justify-content: center !important; flex: 0 0 auto !important;
-                    min-width: 50px !important; max-width: 50px !important;
+                /* Скрытые Streamlit-кнопки (визуал — в HTML выше) */
+                [data-testid="stHorizontalBlock"]:has(div[class*="st-key-ctor_up"]) {{
+                    position: absolute !important;
+                    visibility: hidden !important;
+                    height: 0 !important;
+                    overflow: hidden !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }}
+                /* Настройки — без верхнего отступа, прилегают к карточке */
+                div[class*="st-key-ctor_settings"] {{
+                    margin-top: 0 !important;
+                    padding-top: 0 !important;
                 }}
                 /* + кнопки — нейтральные */
                 div[class*="st-key-ctor_add"] button {{ {_icon_btn} cursor: pointer !important; }}
@@ -2899,40 +2905,75 @@ else:
                 }}
                 </style>""", unsafe_allow_html=True)
 
+                # Стиль HTML-кнопок управления (визуальные, вызывают скрытые Streamlit-кнопки)
+                _bs = (
+                    f"width:44px;height:100%;min-height:54px;flex-shrink:0;"
+                    f"border:1.5px solid {_btn_div};background:{_card_bg};"
+                    f"border-radius:10px;cursor:pointer;font-size:16px;color:{_bsub};"
+                    f"display:flex;align-items:center;justify-content:center;padding:0;"
+                )
+                _bs_rm = _bs + "color:#999999;"
+
                 for _ci, _cb in enumerate(_ctor_blocks):
-                    _cc1, _cc2, _cc3, _cc4 = st.columns([10, 1, 1, 1], gap="small")
-                    with _cc1:
-                        _cb_desc = _cb.get('desc', '')
-                        st.markdown(
-                            f'<div style="background:{_card_bg};border-radius:14px;'
-                            f'padding:14px 18px;box-shadow:{_card_sh};margin:4px 0;'
-                            f'display:flex;align-items:center;gap:14px">'
-                            f'<span style="color:{_bacc};font-size:13px;font-weight:700;'
-                            f'min-width:18px;text-align:center;flex-shrink:0">{_ci+1}</span>'
-                            f'<div style="flex:1;min-width:0">'
-                            f'<p style="margin:0;font-size:15px;font-weight:600;color:{_btxt}">{_cb["name"]}</p>'
-                            + (f'<p style="margin:3px 0 0;font-size:12px;color:{_bsub}">{_cb_desc}</p>' if _cb_desc else '')
-                            + f'</div></div>', unsafe_allow_html=True)
-                    with _cc2:
-                        if st.button("↑", key=f"ctor_up_{_ci}",
-                                     disabled=(_ci == 0)):
+                    _cb_desc = _cb.get('desc', '')
+                    _bfields = BLOCK_FIELDS.get(_cb['key'], [])
+                    _is_first = _ci == 0
+                    _is_last  = _ci == len(_ctor_blocks) - 1
+
+                    # Подсказка внутри карточки если нет настроек
+                    _hint_html = (
+                        f'<p style="margin:4px 0 0;font-size:11px;color:{_bsub}">'
+                        f'Использует данные из вкладки «Текст»</p>'
+                    ) if not _bfields else ''
+                    _desc_html = (
+                        f'<p style="margin:3px 0 0;font-size:12px;color:{_bsub}">{_cb_desc}</p>'
+                    ) if _cb_desc else ''
+
+                    # Атрибуты неактивных кнопок
+                    _up_attr = 'disabled style="opacity:0.22;cursor:default"' if _is_first else \
+                               f'onclick="document.querySelector(\'.st-key-ctor_up_{_ci} button\').click()"'
+                    _dn_attr = 'disabled style="opacity:0.22;cursor:default"' if _is_last else \
+                               f'onclick="document.querySelector(\'.st-key-ctor_dn_{_ci} button\').click()"'
+                    _rm_attr = f'onclick="document.querySelector(\'.st-key-ctor_rm_{_ci} button\').click()"'
+
+                    # Визуальная строка: карточка + кнопки как единый flex
+                    st.markdown(f'''
+                    <div style="display:flex;align-items:stretch;gap:6px;margin:4px 0">
+                      <div style="flex:1;background:{_card_bg};border-radius:14px;
+                                  padding:14px 18px;box-shadow:{_card_sh};
+                                  display:flex;align-items:center;gap:14px">
+                        <span style="color:{_bacc};font-size:13px;font-weight:700;
+                                     min-width:18px;text-align:center;flex-shrink:0">{_ci+1}</span>
+                        <div>
+                          <p style="margin:0;font-size:15px;font-weight:600;color:{_btxt}">{_cb["name"]}</p>
+                          {_desc_html}{_hint_html}
+                        </div>
+                      </div>
+                      <button {_up_attr} style="{_bs}">↑</button>
+                      <button {_dn_attr} style="{_bs}">↓</button>
+                      <button {_rm_attr} style="{_bs_rm}">×</button>
+                    </div>
+                    ''', unsafe_allow_html=True)
+
+                    # Скрытые реальные Streamlit-кнопки (триггерятся из HTML выше)
+                    _hc1, _hc2, _hc3, _ = st.columns([1, 1, 1, 20])
+                    with _hc1:
+                        if st.button("↑", key=f"ctor_up_{_ci}", disabled=_is_first):
                             _ctor_blocks[_ci], _ctor_blocks[_ci-1] = _ctor_blocks[_ci-1], _ctor_blocks[_ci]
                             st.session_state['constructor_blocks'] = _ctor_blocks
                             st.rerun()
-                    with _cc3:
-                        if st.button("↓", key=f"ctor_dn_{_ci}",
-                                     disabled=(_ci == len(_ctor_blocks)-1)):
+                    with _hc2:
+                        if st.button("↓", key=f"ctor_dn_{_ci}", disabled=_is_last):
                             _ctor_blocks[_ci], _ctor_blocks[_ci+1] = _ctor_blocks[_ci+1], _ctor_blocks[_ci]
                             st.session_state['constructor_blocks'] = _ctor_blocks
                             st.rerun()
-                    with _cc4:
+                    with _hc3:
                         if st.button("✕", key=f"ctor_rm_{_ci}"):
                             _ctor_blocks.pop(_ci)
                             st.session_state['constructor_blocks'] = _ctor_blocks
                             st.rerun()
 
-                    # Редактируемые поля блока
-                    _bfields = BLOCK_FIELDS.get(_cb['key'], [])
+                    # Настройки блока — прямо под карточкой без отступа
                     if _bfields:
                         with st.container(key=f"ctor_settings_{_ci}"):
                             with st.expander(f"Настройки: {_cb['name']}"):
@@ -2944,11 +2985,6 @@ else:
                                         st.text_area(_bf['label'], key=_fkey, height=80)
                                     else:
                                         st.text_input(_bf['label'], key=_fkey)
-                    else:
-                        st.markdown(
-                            f'<p style="margin:4px 0 12px 6px;font-size:12px;color:{_bsub}">'
-                            f'Блок «{_cb["name"]}» использует данные из вкладки «Текст»</p>',
-                            unsafe_allow_html=True)
 
                 st.markdown(f"""<style>
                 div[class*="st-key-ctor_clear"] button {{
