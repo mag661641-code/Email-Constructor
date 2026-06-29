@@ -2946,80 +2946,78 @@ else:
                         st.session_state['constructor_blocks'] = _ctor_blocks
                         st.rerun(scope="app")
 
-                with st.expander("Свой HTML", expanded=False):
-                    _slots = [("CUSTOM", "Добавить блок перед футером")]
-                    for _si, _sl, _ in _opt_blocks:
-                        _slots.append((_si, f"Заменить «{_sl}»"))
-                    if _can_hdr:
-                        _slots.append(("HEADER", "Заменить шапку (лого, навигация)"))
-                    if _can_ftr:
-                        _slots.append(("FOOTER", "Заменить футер (контакты, адрес)"))
-                    _slots.append(("FULL", "Заменить весь шаблон целиком"))
-
-                    _slot_ids    = [s[0] for s in _slots]
-                    _slot_labels = [s[1] for s in _slots]
-                    _cur_slot = st.session_state.get('custom_html_slot', 'CUSTOM')
-                    if _cur_slot not in _slot_ids:
-                        _cur_slot = 'CUSTOM'
-
-                    _bch      = st.session_state.get('block_custom_html', {})
-                    _has_code = any(_bch.get(sid, '').strip() for sid, _ in _slots)
-
-                    _any_active_str = (f'<span style="font-size:12px;font-weight:600;color:{_bacc};'
-                                       f'background:{_pill_bg};padding:5px 14px;border-radius:20px">'
-                                       f'активно</span>' if _has_code else '')
-                    st.markdown(
-                        f'<div style="background:{_code_hdr};border-radius:16px 16px 0 0;'
-                        f'padding:14px 20px;display:flex;align-items:center;justify-content:space-between;'
-                        f'margin-top:4px">'
-                        f'<div style="display:flex;align-items:center;gap:10px">'
-                        f'<span style="font-size:18px;color:{_bacc}">&lt;/&gt;</span>'
-                        f'<span style="font-size:20px;font-weight:700;color:{_code_txt}">Свой HTML</span>'
-                        f'</div>{_any_active_str}</div>',
-                        unsafe_allow_html=True)
-
-                    st.markdown(
-                        f'<div style="background:{_code_bg};border-radius:0 0 16px 16px;'
-                        f'padding:16px 18px 18px;margin-bottom:8px">', unsafe_allow_html=True)
-
-                    _sel_label = st.selectbox(
-                        "Куда вставить:",
-                        options=_slot_labels,
-                        index=_slot_ids.index(_cur_slot),
-                        key="custom_slot_sel")
-                    _sel_slot_id = _slot_ids[_slot_labels.index(_sel_label)]
-                    st.session_state.custom_html_slot = _sel_slot_id
-
-                    if _sel_slot_id == "FULL":
-                        st.caption("⚠️ Весь шаблон заменяется. Переменные {{PHONE}}, {{EMAIL}} и др. всё равно подставятся")
-
-                    _cur_custom = _bch.get(_sel_slot_id, '')
-                    _ph = ("<table width='600' border='0' cellpadding='0' cellspacing='0'>\n"
-                           "  <tr><td style='padding:20px'>Ваш HTML здесь</td></tr>\n"
-                           "</table>" if _sel_slot_id != 'FULL' else
-                           "<!DOCTYPE html>\n<html>\n<head>...</head>\n<body>\n"
-                           "  <!-- полный шаблон -->\n</body>\n</html>")
-
-                    _custom = st.text_area(
-                        "HTML-код:",
-                        value=_cur_custom,
-                        height=240,
-                        key=f"custom_html_{_sel_slot_id}",
-                        placeholder=_ph)
-
-                    st.markdown('</div>', unsafe_allow_html=True)
-
-                    if _custom.strip():
-                        _bch[_sel_slot_id] = _custom
-                        st.caption(f"✓ Активно · {len(_custom)} символов")
-                    elif _sel_slot_id in _bch:
-                        del _bch[_sel_slot_id]
-                    st.session_state.block_custom_html = _bch
-
-                    st.markdown("---")
-
 
             st.markdown("---")
+
+            with st.expander("Свой HTML", expanded=False):
+                _slots = [("CUSTOM", "Добавить блок перед футером")]
+                for _si, _sl, _ in _opt_blocks:
+                    _slots.append((_si, f"Заменить «{_sl}»"))
+                if _can_hdr:
+                    _slots.append(("HEADER", "Заменить шапку (лого, навигация)"))
+                if _can_ftr:
+                    _slots.append(("FOOTER", "Заменить футер (контакты, адрес)"))
+                _slots.append(("FULL", "Заменить весь шаблон целиком"))
+
+                _slot_ids    = [s[0] for s in _slots]
+                _slot_labels = [s[1] for s in _slots]
+                _cur_slot = st.session_state.get('custom_html_slot', 'CUSTOM')
+                if _cur_slot not in _slot_ids:
+                    _cur_slot = 'CUSTOM'
+
+                _bch      = st.session_state.get('block_custom_html', {})
+                _has_code = any(_bch.get(sid, '').strip() for sid, _ in _slots)
+
+                _any_active_str = (f'<span style="font-size:12px;font-weight:600;color:{_bacc};'
+                                   f'background:{_pill_bg};padding:5px 14px;border-radius:20px">'
+                                   f'активно</span>' if _has_code else '')
+                st.markdown(
+                    f'<div style="background:{_code_hdr};border-radius:16px 16px 0 0;'
+                    f'padding:14px 20px;display:flex;align-items:center;justify-content:space-between;'
+                    f'margin-top:4px">'
+                    f'<div style="display:flex;align-items:center;gap:10px">'
+                    f'<span style="font-size:18px;color:{_bacc}">&lt;/&gt;</span>'
+                    f'<span style="font-size:20px;font-weight:700;color:{_code_txt}">Свой HTML</span>'
+                    f'</div>{_any_active_str}</div>',
+                    unsafe_allow_html=True)
+
+                st.markdown(
+                    f'<div style="background:{_code_bg};border-radius:0 0 16px 16px;'
+                    f'padding:16px 18px 18px;margin-bottom:8px">', unsafe_allow_html=True)
+
+                _sel_label = st.selectbox(
+                    "Куда вставить:",
+                    options=_slot_labels,
+                    index=_slot_ids.index(_cur_slot),
+                    key="custom_slot_sel_imp")
+                _sel_slot_id = _slot_ids[_slot_labels.index(_sel_label)]
+                st.session_state.custom_html_slot = _sel_slot_id
+
+                if _sel_slot_id == "FULL":
+                    st.caption("⚠️ Весь шаблон заменяется. Переменные {{PHONE}}, {{EMAIL}} и др. всё равно подставятся")
+
+                _cur_custom = _bch.get(_sel_slot_id, '')
+                _ph = ("<table width='600' border='0' cellpadding='0' cellspacing='0'>\n"
+                       "  <tr><td style='padding:20px'>Ваш HTML здесь</td></tr>\n"
+                       "</table>" if _sel_slot_id != 'FULL' else
+                       "<!DOCTYPE html>\n<html>\n<head>...</head>\n<body>\n"
+                       "  <!-- полный шаблон -->\n</body>\n</html>")
+
+                _custom = st.text_area(
+                    "HTML-код:",
+                    value=_cur_custom,
+                    height=240,
+                    key=f"custom_html_imp_{_sel_slot_id}",
+                    placeholder=_ph)
+
+                st.markdown('</div>', unsafe_allow_html=True)
+
+                if _custom and _custom.strip():
+                    _bch[_sel_slot_id] = _custom
+                    st.caption(f"✓ Активно · {len(_custom)} символов")
+                elif _sel_slot_id in _bch:
+                    del _bch[_sel_slot_id]
+                st.session_state.block_custom_html = _bch
 
         else:
             # ══════════════════════════════════════════════════════════════════
