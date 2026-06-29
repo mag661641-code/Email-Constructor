@@ -2832,7 +2832,14 @@ else:
                     box-shadow: none !important; transform: none !important;
                     cursor: pointer !important;
                 """
+                _set_bg = "#f3f5f8" if not _is_dark_blk else "#1e2035"
                 st.markdown(f"""<style>
+                /* Строка карточки+кнопок — минимальный gap */
+                [data-testid="stHorizontalBlock"]:has(div[class*="st-key-ctor_up"]) {{
+                    gap: 6px !important;
+                    align-items: center !important;
+                    margin: 4px 0 !important;
+                }}
                 /* ↑ ↓ — отдельные кнопки, стиль как у + */
                 div[class*="st-key-ctor_up"] button,
                 div[class*="st-key-ctor_dn"] button {{ {_icon_btn} }}
@@ -2842,7 +2849,8 @@ else:
                 }}
                 div[class*="st-key-ctor_up"] button:disabled,
                 div[class*="st-key-ctor_dn"] button:disabled {{
-                    opacity: 0.3 !important; cursor: default !important;
+                    opacity: 0.25 !important; cursor: default !important;
+                    pointer-events: none !important;
                 }}
                 div[class*="st-key-ctor_up"] button p,
                 div[class*="st-key-ctor_dn"] button p {{
@@ -2856,7 +2864,15 @@ else:
                 div[class*="st-key-ctor_rm"] button p {{
                     color: inherit !important; font-size: 16px !important;
                 }}
-                /* + кнопки — нейтральные, без красного */
+                /* Колонки со стрелками — убрать лишний padding */
+                [data-testid="column"]:has(div[class*="st-key-ctor_up"]),
+                [data-testid="column"]:has(div[class*="st-key-ctor_dn"]),
+                [data-testid="column"]:has(div[class*="st-key-ctor_rm"]) {{
+                    display: flex !important; align-items: center !important;
+                    justify-content: center !important; flex: 0 0 auto !important;
+                    min-width: 50px !important; max-width: 50px !important;
+                }}
+                /* + кнопки — нейтральные */
                 div[class*="st-key-ctor_add"] button {{ {_icon_btn} cursor: pointer !important; }}
                 div[class*="st-key-ctor_add"] button:hover {{
                     color: {_bacc} !important; border-color: {_bacc} !important;
@@ -2869,12 +2885,17 @@ else:
                 div[class*="st-key-ctor_add"] button span {{
                     color: inherit !important; font-size: 20px !important;
                 }}
-                /* Колонки со стрелками — выровнять по центру */
-                [data-testid="column"]:has(div[class*="st-key-ctor_up"]),
-                [data-testid="column"]:has(div[class*="st-key-ctor_dn"]),
-                [data-testid="column"]:has(div[class*="st-key-ctor_rm"]) {{
-                    display: flex !important; align-items: center !important;
-                    justify-content: center !important;
+                /* Секция настроек блока — визуально отделена */
+                div[class*="st-key-ctor_settings"] {{
+                    background: {_set_bg} !important;
+                    border-radius: 12px !important;
+                    border-left: 3px solid {_btn_div} !important;
+                    padding: 8px 12px !important;
+                    margin: 2px 0 10px 0 !important;
+                }}
+                /* Кнопка "Очистить всё" — отступ сверху */
+                div[class*="st-key-ctor_clear"] {{
+                    margin-top: 20px !important;
                 }}
                 </style>""", unsafe_allow_html=True)
 
@@ -2913,17 +2934,21 @@ else:
                     # Редактируемые поля блока
                     _bfields = BLOCK_FIELDS.get(_cb['key'], [])
                     if _bfields:
-                        with st.expander(f"Настройки: {_cb['name']}"):
-                            for _bf in _bfields:
-                                _fkey = f"bparam__{_cb['key']}__{_bf['key']}"
-                                if _fkey not in st.session_state:
-                                    st.session_state[_fkey] = _bf['default']
-                                if _bf['type'] == 'textarea':
-                                    st.text_area(_bf['label'], key=_fkey, height=80)
-                                else:
-                                    st.text_input(_bf['label'], key=_fkey)
+                        with st.container(key=f"ctor_settings_{_ci}"):
+                            with st.expander(f"Настройки: {_cb['name']}"):
+                                for _bf in _bfields:
+                                    _fkey = f"bparam__{_cb['key']}__{_bf['key']}"
+                                    if _fkey not in st.session_state:
+                                        st.session_state[_fkey] = _bf['default']
+                                    if _bf['type'] == 'textarea':
+                                        st.text_area(_bf['label'], key=_fkey, height=80)
+                                    else:
+                                        st.text_input(_bf['label'], key=_fkey)
                     else:
-                        st.caption(f"Блок «{_cb['name']}» использует данные из вкладки «Текст»")
+                        st.markdown(
+                            f'<p style="margin:4px 0 12px 6px;font-size:12px;color:{_bsub}">'
+                            f'Блок «{_cb["name"]}» использует данные из вкладки «Текст»</p>',
+                            unsafe_allow_html=True)
 
                 st.markdown(f"""<style>
                 div[class*="st-key-ctor_clear"] button {{
