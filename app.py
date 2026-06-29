@@ -2897,13 +2897,16 @@ else:
                 for _ci, _cb in enumerate(_ctor_blocks):
                     _cc1, _cc2, _cc3, _cc4 = st.columns([10, 1, 1, 1], gap="small")
                     with _cc1:
+                        _cb_desc = _cb.get('desc', '')
                         st.markdown(
-                            f'<div style="padding:13px 18px;'
-                            f'display:flex;align-items:center;gap:12px">'
-                            f'<span style="color:{_bacc};font-size:15px;font-weight:700;'
-                            f'min-width:22px;text-align:center">{_ci+1}</span>'
-                            f'<p style="margin:0;font-size:15px;font-weight:600;color:{_btxt}">'
-                            f'{_cb["name"]}</p></div>', unsafe_allow_html=True)
+                            f'<div style="padding:14px 18px;display:flex;align-items:center;gap:14px">'
+                            f'<span style="color:{_bacc};font-size:13px;font-weight:700;'
+                            f'min-width:18px;text-align:center;flex-shrink:0">{_ci+1}</span>'
+                            f'<div style="flex:1;min-width:0">'
+                            f'<p style="margin:0;font-size:15px;font-weight:600;color:{_btxt};'
+                            f'white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{_cb["name"]}</p>'
+                            + (f'<p style="margin:3px 0 0;font-size:12px;color:{_bsub}">{_cb_desc}</p>' if _cb_desc else '')
+                            + f'</div></div>', unsafe_allow_html=True)
                     with _cc2:
                         if st.button("↑", key=f"ctor_up_{_ci}",
                                      disabled=(_ci == 0)):
@@ -2937,7 +2940,20 @@ else:
                     else:
                         st.caption(f"Блок «{_cb['name']}» использует данные из вкладки «Текст»")
 
-                if st.button("🧹 Очистить всё", key="ctor_clear"):
+                st.markdown(f"""<style>
+                div[class*="st-key-ctor_clear"] button {{
+                    height:26px!important;min-height:26px!important;
+                    padding:0 10px!important;font-size:11px!important;
+                    border-radius:8px!important;border:1px solid {_btn_div}!important;
+                    background:transparent!important;color:{_bsub}!important;
+                    box-shadow:none!important;transform:none!important;
+                }}
+                div[class*="st-key-ctor_clear"] button:hover {{
+                    border-color:#e53935!important;color:#e53935!important;
+                }}
+                div[class*="st-key-ctor_clear"] button p {{color:inherit!important;font-size:11px!important;}}
+                </style>""", unsafe_allow_html=True)
+                if st.button("Очистить всё", key="ctor_clear"):
                     st.session_state['constructor_blocks'] = []
                     st.rerun(scope="app")
 
@@ -2973,7 +2989,7 @@ else:
                 with _lc2:
                     if st.button("＋", key=f"ctor_add_{_blk['key']}",
                                  help="Добавить в сборку", disabled=_already):
-                        _ctor_blocks.append({"key": _blk['key'], "name": _blk['name'], "html": _blk['html']})
+                        _ctor_blocks.append({"key": _blk['key'], "name": _blk['name'], "desc": _blk.get('desc', ''), "html": _blk['html']})
                         st.session_state['constructor_blocks'] = _ctor_blocks
                         st.rerun(scope="app")
 
