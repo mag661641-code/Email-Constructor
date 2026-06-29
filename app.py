@@ -2809,9 +2809,12 @@ else:
                           f'<span style="font-size:13px;color:{_bsub}">пусто</span>')
             st.markdown(
                 f'<div style="display:flex;align-items:center;justify-content:space-between;'
-                f'margin:4px 0 14px">'
+                f'margin:20px 0 16px;padding:14px 18px;background:{_card_bg};'
+                f'border-radius:16px;box-shadow:{_card_sh}">'
+                f'<div style="display:flex;align-items:center;gap:10px">'
+                f'<div style="width:4px;height:24px;background:{_bacc};border-radius:2px"></div>'
                 f'<span style="font-size:20px;font-weight:700;color:{_btxt}">Конструктор письма</span>'
-                f'{_ctor_pill}</div>', unsafe_allow_html=True)
+                f'</div>{_ctor_pill}</div>', unsafe_allow_html=True)
 
             if not _ctor_blocks:
                 st.markdown(
@@ -2850,21 +2853,18 @@ else:
                             f'<p style="margin:0;font-size:15px;font-weight:600;color:{_btxt}">'
                             f'{_cb["name"]}</p></div></div>', unsafe_allow_html=True)
                     with _cc2:
-                        st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
                         if st.button("↑", key=f"ctor_up_{_ci}", use_container_width=True,
                                      disabled=(_ci == 0)):
                             _ctor_blocks[_ci], _ctor_blocks[_ci-1] = _ctor_blocks[_ci-1], _ctor_blocks[_ci]
                             st.session_state['constructor_blocks'] = _ctor_blocks
                             st.rerun(scope="app")
                     with _cc3:
-                        st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
                         if st.button("↓", key=f"ctor_dn_{_ci}", use_container_width=True,
                                      disabled=(_ci == len(_ctor_blocks)-1)):
                             _ctor_blocks[_ci], _ctor_blocks[_ci+1] = _ctor_blocks[_ci+1], _ctor_blocks[_ci]
                             st.session_state['constructor_blocks'] = _ctor_blocks
                             st.rerun(scope="app")
                     with _cc4:
-                        st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
                         if st.button("✕", key=f"ctor_rm_{_ci}", use_container_width=True):
                             _ctor_blocks.pop(_ci)
                             st.session_state['constructor_blocks'] = _ctor_blocks
@@ -2894,8 +2894,12 @@ else:
             # ── Доступные блоки для добавления ──────────────────────────────
             st.markdown(
                 f'<div style="display:flex;align-items:center;justify-content:space-between;'
-                f'margin:4px 0 14px">'
+                f'margin:20px 0 16px;padding:14px 18px;background:{_card_bg};'
+                f'border-radius:16px;box-shadow:{_card_sh}">'
+                f'<div style="display:flex;align-items:center;gap:10px">'
+                f'<div style="width:4px;height:24px;background:{_bacc};border-radius:2px"></div>'
                 f'<span style="font-size:20px;font-weight:700;color:{_btxt}">Добавить блок</span>'
+                f'</div>'
                 f'<span style="font-size:12px;color:{_bsub}">нажми ＋ → блок встанет в конец сборки</span>'
                 f'</div>', unsafe_allow_html=True)
 
