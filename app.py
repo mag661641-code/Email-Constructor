@@ -2820,55 +2820,90 @@ else:
                     f'Здесь появятся блоки, которые ты выберешь ниже&nbsp;&nbsp;↓</div>',
                     unsafe_allow_html=True)
             else:
+                _btn_bg  = _card_bg
+                _btn_txt = _btxt
+                _btn_div = "#4a4d70" if _is_dark_blk else "#d8dce8"
                 st.markdown(f"""<style>
+                /* Колонки с кнопками — единый фон с карточкой */
+                [data-testid="column"]:has(div[class*="st-key-ctor_up"]),
+                [data-testid="column"]:has(div[class*="st-key-ctor_dn"]),
+                [data-testid="column"]:has(div[class*="st-key-ctor_rm"]) {{
+                    background: {_btn_bg} !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    padding: 3px 4px !important;
+                    margin: 3px 0 !important;
+                    box-shadow: {_card_sh} !important;
+                }}
+                [data-testid="column"]:has(div[class*="st-key-ctor_up"]) {{
+                    border-radius: 0 !important;
+                    border-left: 1px solid {_btn_div} !important;
+                }}
+                [data-testid="column"]:has(div[class*="st-key-ctor_dn"]) {{
+                    border-radius: 0 !important;
+                    border-left: 1px solid {_btn_div} !important;
+                }}
+                [data-testid="column"]:has(div[class*="st-key-ctor_rm"]) {{
+                    border-radius: 0 14px 14px 0 !important;
+                    border-left: 1px solid {_btn_div} !important;
+                }}
+                /* Сами кнопки — прозрачные иконки */
                 div[class*="st-key-ctor_up"] button,
                 div[class*="st-key-ctor_dn"] button,
                 div[class*="st-key-ctor_rm"] button {{
                     height: 28px !important;
                     min-height: 28px !important;
-                    width: 36px !important;
-                    min-width: 36px !important;
-                    max-width: 36px !important;
+                    width: 32px !important;
                     padding: 0 !important;
-                    font-size: 14px !important;
-                    border-radius: 8px !important;
-                    background-color: {"#f7f9fb" if not _is_dark_blk else "#252840"} !important;
-                    color: {"#191c1e" if not _is_dark_blk else "#d8daf0"} !important;
-                    box-shadow: {"2px 2px 5px rgba(163,177,198,0.4),-2px -2px 5px rgba(255,255,255,0.85)" if not _is_dark_blk else "2px 2px 5px rgba(0,0,0,0.35),-2px -2px 4px rgba(255,255,255,0.04)"} !important;
-                    border: none !important;
-                    transform: none !important;
-                }}
-                div[class*="st-key-ctor_up"] button p,
-                div[class*="st-key-ctor_dn"] button p,
-                div[class*="st-key-ctor_rm"] button p {{
-                    color: {"#191c1e" if not _is_dark_blk else "#d8daf0"} !important;
-                    font-size: 14px !important;
-                }}
-                div[class*="st-key-ctor_add"] button {{
-                    height: 32px !important;
-                    min-height: 32px !important;
-                    width: 36px !important;
-                    min-width: 36px !important;
-                    max-width: 36px !important;
-                    padding: 0 !important;
-                    font-size: 18px !important;
-                    font-weight: 700 !important;
-                    border-radius: 10px !important;
-                    background-color: {_bacc} !important;
-                    color: #ffffff !important;
+                    font-size: 15px !important;
+                    border-radius: 6px !important;
+                    background-color: transparent !important;
+                    color: {_btn_txt} !important;
                     border: none !important;
                     box-shadow: none !important;
                     transform: none !important;
                 }}
+                div[class*="st-key-ctor_up"] button:hover,
+                div[class*="st-key-ctor_dn"] button:hover,
+                div[class*="st-key-ctor_rm"] button:hover {{
+                    background-color: {"rgba(0,0,0,0.06)" if not _is_dark_blk else "rgba(255,255,255,0.08)"} !important;
+                }}
+                div[class*="st-key-ctor_up"] button p,
+                div[class*="st-key-ctor_dn"] button p,
+                div[class*="st-key-ctor_rm"] button p {{
+                    color: {_btn_txt} !important;
+                    font-size: 15px !important;
+                }}
+                /* Кнопки + в доступных блоках — нейтральные */
+                div[class*="st-key-ctor_add"] button {{
+                    height: 30px !important;
+                    min-height: 30px !important;
+                    width: 36px !important;
+                    padding: 0 !important;
+                    font-size: 18px !important;
+                    font-weight: 500 !important;
+                    border-radius: 8px !important;
+                    background-color: transparent !important;
+                    color: {_bsub} !important;
+                    border: 1.5px solid {_btn_div} !important;
+                    box-shadow: none !important;
+                    transform: none !important;
+                }}
+                div[class*="st-key-ctor_add"] button:hover {{
+                    color: {_bacc} !important;
+                    border-color: {_bacc} !important;
+                    background-color: transparent !important;
+                }}
                 div[class*="st-key-ctor_add"] button p,
-                div[class*="st-key-ctor_add"] button span {{ color: #ffffff !important; }}
+                div[class*="st-key-ctor_add"] button span {{ color: inherit !important; }}
                 </style>""", unsafe_allow_html=True)
 
                 for _ci, _cb in enumerate(_ctor_blocks):
                     _cc1, _cc2, _cc3, _cc4 = st.columns([10, 1, 1, 1], gap="small")
                     with _cc1:
                         st.markdown(
-                            f'<div style="background:{_card_bg};border-radius:14px;'
+                            f'<div style="background:{_card_bg};border-radius:14px 0 0 14px;'
                             f'padding:13px 18px;box-shadow:{_card_sh};margin:3px 0;'
                             f'display:flex;align-items:center;gap:12px">'
                             f'<span style="color:{_bacc};font-size:15px;font-weight:700;'
