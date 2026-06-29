@@ -2951,171 +2951,174 @@ else:
 
             # ── 1. Управление блоками ──────────────────────────────────────────
             if _opt_blocks and not _is_stalmetural:
-                _n_active = sum(1 for _bi, _, _ in _opt_blocks if _bv.get(_bi, True))
-                st.markdown(
-                    f'<div style="display:flex;align-items:center;justify-content:space-between;'
-                    f'margin:4px 0 16px">'
-                    f'<span style="font-size:20px;font-weight:700;color:{_btxt}">Управление блоками</span>'
-                    f'<span style="font-size:13px;font-weight:600;color:{_bacc};background:{_pill_bg};'
-                    f'padding:5px 16px;border-radius:20px">{_n_active} активных</span>'
-                    f'</div>', unsafe_allow_html=True)
+                with st.expander("Управление блоками", expanded=False):
+                    _n_active = sum(1 for _bi, _, _ in _opt_blocks if _bv.get(_bi, True))
+                    st.markdown(
+                        f'<div style="display:flex;align-items:center;justify-content:space-between;'
+                        f'margin:4px 0 16px">'
+                        f'<span style="font-size:20px;font-weight:700;color:{_btxt}">Управление блоками</span>'
+                        f'<span style="font-size:13px;font-weight:600;color:{_bacc};background:{_pill_bg};'
+                        f'padding:5px 16px;border-radius:20px">{_n_active} активных</span>'
+                        f'</div>', unsafe_allow_html=True)
 
-                for _blk_id, _blk_label, _blk_hint in _opt_blocks:
-                    _cur_vis = _bv.get(_blk_id, True)
-                    _bc1, _bc2 = st.columns([9, 1], gap="small")
-                    with _bc1:
-                        st.markdown(
-                            f'<div style="background:{_card_bg};border-radius:14px;'
-                            f'padding:14px 18px;box-shadow:{_card_sh};margin:4px 0;'
-                            f'display:flex;align-items:center;gap:14px">'
-                            f'<span style="color:{_bsub};font-size:18px;line-height:1;'
-                            f'letter-spacing:2px;cursor:grab">⠿</span>'
-                            f'<div style="flex:1">'
-                            f'<p style="margin:0;font-size:15px;font-weight:600;color:{_btxt}">'
-                            f'{_blk_label}</p>'
-                            f'<p style="margin:3px 0 0;font-size:12px;color:{_bsub}">{_blk_hint}</p>'
-                            f'</div></div>', unsafe_allow_html=True)
-                    with _bc2:
-                        st.markdown("<div style='height:22px'></div>", unsafe_allow_html=True)
-                        _new_vis = st.toggle("", value=_cur_vis, key=f"blk_vis_{_blk_id}",
-                                            label_visibility="collapsed")
-                    _bv[_blk_id] = _new_vis
-                st.session_state.block_visibility = _bv
-                st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
-
-            # ── 2. Библиотека блоков ───────────────────────────────────────────
-            if not _is_stalmetural:
-                st.markdown(
-                    f'<div style="display:flex;align-items:center;justify-content:space-between;'
-                    f'margin:4px 0 14px">'
-                    f'<span style="font-size:20px;font-weight:700;color:{_btxt}">Библиотека блоков</span>'
-                    f'<span style="font-size:12px;color:{_bsub}">нажми ＋ → блок встанет перед футером</span>'
-                    f'</div>', unsafe_allow_html=True)
-
-                if not _is_dark_blk:
-                    st.markdown("""<style>
-                    div[class*="st-key-lib_ins"] button {
-                        background-color: #f7f9fb !important;
-                        color: #191c1e !important;
-                        box-shadow: 4px 4px 8px rgba(163,177,198,0.45),
-                                    -4px -4px 8px rgba(255,255,255,0.9) !important;
-                        border: none !important;
-                    }
-                    div[class*="st-key-lib_ins"] button p,
-                    div[class*="st-key-lib_ins"] button span { color: #191c1e !important; }
-                    div[class*="st-key-lib_ins"] button:hover {
-                        box-shadow: 6px 6px 12px rgba(163,177,198,0.55),
-                                    -6px -6px 12px rgba(255,255,255,1.0) !important;
-                        transform: translateY(-1px) !important;
-                    }
-                    </style>""", unsafe_allow_html=True)
-
-                _lib_all = load_block_library()
-                if _lib_all:
-                    for _blk in _lib_all:
-                        _is_ins = _bch_now.get('CUSTOM', '').strip() == _blk['html'].strip()
-                        _lc1, _lc2 = st.columns([6, 1], gap="small")
-                        with _lc1:
+                    for _blk_id, _blk_label, _blk_hint in _opt_blocks:
+                        _cur_vis = _bv.get(_blk_id, True)
+                        _bc1, _bc2 = st.columns([9, 1], gap="small")
+                        with _bc1:
                             st.markdown(
                                 f'<div style="background:{_card_bg};border-radius:14px;'
                                 f'padding:14px 18px;box-shadow:{_card_sh};margin:4px 0;'
                                 f'display:flex;align-items:center;gap:14px">'
                                 f'<span style="color:{_bsub};font-size:18px;line-height:1;'
-                                f'letter-spacing:2px">⠿</span>'
+                                f'letter-spacing:2px;cursor:grab">⠿</span>'
                                 f'<div style="flex:1">'
-                                f'<p style="margin:0;font-size:15px;font-weight:600;color:'
-                                f'{_bacc if _is_ins else _btxt}">'
-                                f'{"✓ " if _is_ins else ""}{_blk["name"]}</p>'
-                                f'<p style="margin:3px 0 0;font-size:12px;color:{_bsub}">'
-                                f'{_blk["desc"]} · <em>{_blk["source"]}</em></p>'
+                                f'<p style="margin:0;font-size:15px;font-weight:600;color:{_btxt}">'
+                                f'{_blk_label}</p>'
+                                f'<p style="margin:3px 0 0;font-size:12px;color:{_bsub}">{_blk_hint}</p>'
                                 f'</div></div>', unsafe_allow_html=True)
-                        with _lc2:
+                        with _bc2:
                             st.markdown("<div style='height:22px'></div>", unsafe_allow_html=True)
-                            if st.button("＋", key=f"lib_ins_{_blk['key']}", use_container_width=True,
-                                         help="Вставить блок перед футером"):
-                                _bch_ins = st.session_state.get('block_custom_html', {})
-                                _bch_ins['CUSTOM'] = _blk['html']
-                                st.session_state.block_custom_html = _bch_ins
-                                st.session_state['custom_html_CUSTOM'] = _blk['html']
-                                st.session_state.custom_html_slot = 'CUSTOM'
-                                st.rerun(scope="app")
-                else:
-                    st.caption("Блоки из шаблонов не найдены")
+                            _new_vis = st.toggle("", value=_cur_vis, key=f"blk_vis_{_blk_id}",
+                                                label_visibility="collapsed")
+                        _bv[_blk_id] = _new_vis
+                    st.session_state.block_visibility = _bv
+                    st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
 
-                st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+            # ── 2. Библиотека блоков ───────────────────────────────────────────
+            if not _is_stalmetural:
+                with st.expander("Библиотека блоков", expanded=False):
+                    st.markdown(
+                        f'<div style="display:flex;align-items:center;justify-content:space-between;'
+                        f'margin:4px 0 14px">'
+                        f'<span style="font-size:20px;font-weight:700;color:{_btxt}">Библиотека блоков</span>'
+                        f'<span style="font-size:12px;color:{_bsub}">нажми ＋ → блок встанет перед футером</span>'
+                        f'</div>', unsafe_allow_html=True)
+
+                    if not _is_dark_blk:
+                        st.markdown("""<style>
+                        div[class*="st-key-lib_ins"] button {
+                            background-color: #f7f9fb !important;
+                            color: #191c1e !important;
+                            box-shadow: 4px 4px 8px rgba(163,177,198,0.45),
+                                        -4px -4px 8px rgba(255,255,255,0.9) !important;
+                            border: none !important;
+                        }
+                        div[class*="st-key-lib_ins"] button p,
+                        div[class*="st-key-lib_ins"] button span { color: #191c1e !important; }
+                        div[class*="st-key-lib_ins"] button:hover {
+                            box-shadow: 6px 6px 12px rgba(163,177,198,0.55),
+                                        -6px -6px 12px rgba(255,255,255,1.0) !important;
+                            transform: translateY(-1px) !important;
+                        }
+                        </style>""", unsafe_allow_html=True)
+
+                    _lib_all = load_block_library()
+                    if _lib_all:
+                        for _blk in _lib_all:
+                            _is_ins = _bch_now.get('CUSTOM', '').strip() == _blk['html'].strip()
+                            _lc1, _lc2 = st.columns([6, 1], gap="small")
+                            with _lc1:
+                                st.markdown(
+                                    f'<div style="background:{_card_bg};border-radius:14px;'
+                                    f'padding:14px 18px;box-shadow:{_card_sh};margin:4px 0;'
+                                    f'display:flex;align-items:center;gap:14px">'
+                                    f'<span style="color:{_bsub};font-size:18px;line-height:1;'
+                                    f'letter-spacing:2px">⠿</span>'
+                                    f'<div style="flex:1">'
+                                    f'<p style="margin:0;font-size:15px;font-weight:600;color:'
+                                    f'{_bacc if _is_ins else _btxt}">'
+                                    f'{"✓ " if _is_ins else ""}{_blk["name"]}</p>'
+                                    f'<p style="margin:3px 0 0;font-size:12px;color:{_bsub}">'
+                                    f'{_blk["desc"]} · <em>{_blk["source"]}</em></p>'
+                                    f'</div></div>', unsafe_allow_html=True)
+                            with _lc2:
+                                st.markdown("<div style='height:22px'></div>", unsafe_allow_html=True)
+                                if st.button("＋", key=f"lib_ins_{_blk['key']}", use_container_width=True,
+                                             help="Вставить блок перед футером"):
+                                    _bch_ins = st.session_state.get('block_custom_html', {})
+                                    _bch_ins['CUSTOM'] = _blk['html']
+                                    st.session_state.block_custom_html = _bch_ins
+                                    st.session_state['custom_html_CUSTOM'] = _blk['html']
+                                    st.session_state.custom_html_slot = 'CUSTOM'
+                                    st.rerun(scope="app")
+                    else:
+                        st.caption("Блоки из шаблонов не найдены")
+
+                    st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
 
             # ── 3. Свой HTML ───────────────────────────────────────────────────
             if not _is_stalmetural:
-                _slots = [("CUSTOM", "Добавить блок перед футером")]
-                for _si, _sl, _ in _opt_blocks:
-                    _slots.append((_si, f"Заменить «{_sl}»"))
-                if _can_hdr:
-                    _slots.append(("HEADER", "Заменить шапку (лого, навигация)"))
-                if _can_ftr:
-                    _slots.append(("FOOTER", "Заменить футер (контакты, адрес)"))
-                _slots.append(("FULL", "Заменить весь шаблон целиком"))
+                with st.expander("Свой HTML", expanded=False):
+                    _slots = [("CUSTOM", "Добавить блок перед футером")]
+                    for _si, _sl, _ in _opt_blocks:
+                        _slots.append((_si, f"Заменить «{_sl}»"))
+                    if _can_hdr:
+                        _slots.append(("HEADER", "Заменить шапку (лого, навигация)"))
+                    if _can_ftr:
+                        _slots.append(("FOOTER", "Заменить футер (контакты, адрес)"))
+                    _slots.append(("FULL", "Заменить весь шаблон целиком"))
 
-                _slot_ids    = [s[0] for s in _slots]
-                _slot_labels = [s[1] for s in _slots]
-                _cur_slot = st.session_state.get('custom_html_slot', 'CUSTOM')
-                if _cur_slot not in _slot_ids:
-                    _cur_slot = 'CUSTOM'
+                    _slot_ids    = [s[0] for s in _slots]
+                    _slot_labels = [s[1] for s in _slots]
+                    _cur_slot = st.session_state.get('custom_html_slot', 'CUSTOM')
+                    if _cur_slot not in _slot_ids:
+                        _cur_slot = 'CUSTOM'
 
-                _bch      = st.session_state.get('block_custom_html', {})
-                _has_code = any(_bch.get(sid, '').strip() for sid, _ in _slots)
+                    _bch      = st.session_state.get('block_custom_html', {})
+                    _has_code = any(_bch.get(sid, '').strip() for sid, _ in _slots)
 
-                _any_active_str = (f'<span style="font-size:12px;font-weight:600;color:{_bacc};'
-                                   f'background:{_pill_bg};padding:5px 14px;border-radius:20px">'
-                                   f'активно</span>' if _has_code else '')
-                st.markdown(
-                    f'<div style="background:{_code_hdr};border-radius:16px 16px 0 0;'
-                    f'padding:14px 20px;display:flex;align-items:center;justify-content:space-between;'
-                    f'margin-top:4px">'
-                    f'<div style="display:flex;align-items:center;gap:10px">'
-                    f'<span style="font-size:18px;color:{_bacc}">&lt;/&gt;</span>'
-                    f'<span style="font-size:20px;font-weight:700;color:{_code_txt}">Свой HTML</span>'
-                    f'</div>{_any_active_str}</div>',
-                    unsafe_allow_html=True)
+                    _any_active_str = (f'<span style="font-size:12px;font-weight:600;color:{_bacc};'
+                                       f'background:{_pill_bg};padding:5px 14px;border-radius:20px">'
+                                       f'активно</span>' if _has_code else '')
+                    st.markdown(
+                        f'<div style="background:{_code_hdr};border-radius:16px 16px 0 0;'
+                        f'padding:14px 20px;display:flex;align-items:center;justify-content:space-between;'
+                        f'margin-top:4px">'
+                        f'<div style="display:flex;align-items:center;gap:10px">'
+                        f'<span style="font-size:18px;color:{_bacc}">&lt;/&gt;</span>'
+                        f'<span style="font-size:20px;font-weight:700;color:{_code_txt}">Свой HTML</span>'
+                        f'</div>{_any_active_str}</div>',
+                        unsafe_allow_html=True)
 
-                st.markdown(
-                    f'<div style="background:{_code_bg};border-radius:0 0 16px 16px;'
-                    f'padding:16px 18px 18px;margin-bottom:8px">', unsafe_allow_html=True)
+                    st.markdown(
+                        f'<div style="background:{_code_bg};border-radius:0 0 16px 16px;'
+                        f'padding:16px 18px 18px;margin-bottom:8px">', unsafe_allow_html=True)
 
-                _sel_label = st.selectbox(
-                    "Куда вставить:",
-                    options=_slot_labels,
-                    index=_slot_ids.index(_cur_slot),
-                    key="custom_slot_sel")
-                _sel_slot_id = _slot_ids[_slot_labels.index(_sel_label)]
-                st.session_state.custom_html_slot = _sel_slot_id
+                    _sel_label = st.selectbox(
+                        "Куда вставить:",
+                        options=_slot_labels,
+                        index=_slot_ids.index(_cur_slot),
+                        key="custom_slot_sel")
+                    _sel_slot_id = _slot_ids[_slot_labels.index(_sel_label)]
+                    st.session_state.custom_html_slot = _sel_slot_id
 
-                if _sel_slot_id == "FULL":
-                    st.caption("⚠️ Весь шаблон заменяется. Переменные {{PHONE}}, {{EMAIL}} и др. всё равно подставятся")
+                    if _sel_slot_id == "FULL":
+                        st.caption("⚠️ Весь шаблон заменяется. Переменные {{PHONE}}, {{EMAIL}} и др. всё равно подставятся")
 
-                _cur_custom = _bch.get(_sel_slot_id, '')
-                _ph = ("<table width='600' border='0' cellpadding='0' cellspacing='0'>\n"
-                       "  <tr><td style='padding:20px'>Ваш HTML здесь</td></tr>\n"
-                       "</table>" if _sel_slot_id != 'FULL' else
-                       "<!DOCTYPE html>\n<html>\n<head>...</head>\n<body>\n"
-                       "  <!-- полный шаблон -->\n</body>\n</html>")
+                    _cur_custom = _bch.get(_sel_slot_id, '')
+                    _ph = ("<table width='600' border='0' cellpadding='0' cellspacing='0'>\n"
+                           "  <tr><td style='padding:20px'>Ваш HTML здесь</td></tr>\n"
+                           "</table>" if _sel_slot_id != 'FULL' else
+                           "<!DOCTYPE html>\n<html>\n<head>...</head>\n<body>\n"
+                           "  <!-- полный шаблон -->\n</body>\n</html>")
 
-                _custom = st.text_area(
-                    "HTML-код:",
-                    value=_cur_custom,
-                    height=240,
-                    key=f"custom_html_{_sel_slot_id}",
-                    placeholder=_ph)
+                    _custom = st.text_area(
+                        "HTML-код:",
+                        value=_cur_custom,
+                        height=240,
+                        key=f"custom_html_{_sel_slot_id}",
+                        placeholder=_ph)
 
-                st.markdown('</div>', unsafe_allow_html=True)
+                    st.markdown('</div>', unsafe_allow_html=True)
 
-                if _custom.strip():
-                    _bch[_sel_slot_id] = _custom
-                    st.caption(f"✓ Активно · {len(_custom)} символов")
-                elif _sel_slot_id in _bch:
-                    del _bch[_sel_slot_id]
-                st.session_state.block_custom_html = _bch
+                    if _custom.strip():
+                        _bch[_sel_slot_id] = _custom
+                        st.caption(f"✓ Активно · {len(_custom)} символов")
+                    elif _sel_slot_id in _bch:
+                        del _bch[_sel_slot_id]
+                    st.session_state.block_custom_html = _bch
 
-                st.markdown("---")
+                    st.markdown("---")
 
         if mode == "cases":
           if _tv_blocks == 'inmetprom':
