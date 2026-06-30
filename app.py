@@ -2016,7 +2016,12 @@ else:
             # ── Логотип ──────────────────────────
             _cur_logo = brand.get('logo_data') or brand.get('logo_url', '')
             if _cur_logo:
-                st.image(_cur_logo if _cur_logo.startswith('data:') else _cur_logo, width=160)
+                if _cur_logo.startswith('data:'):
+                    st.image(_cur_logo, width=160)
+                else:
+                    st.markdown(
+                        f'<img src="{_cur_logo}" width="160" style="max-height:80px;object-fit:contain;display:block;margin-bottom:8px">',
+                        unsafe_allow_html=True)
             _logo_up = st.file_uploader("Загрузить логотип", type=["png","jpg","jpeg","webp"],
                                          key="brand_logo_up")
             _new_logo = _cur_logo
@@ -3773,6 +3778,69 @@ else:
 
         # ==========================================
 
+
+    # ── Инициализация дефолтных значений из бренда (до табов, вне фрагментов) ──
+    # Гарантирует подстановку в HTML даже если пользователь не заходил на таб
+    _d = st.session_state.data
+    _b = brand
+    if 'BRAND_LOGO' not in _d:
+        _d['BRAND_LOGO']       = _b.get('logo_data') or _b.get('logo_url', '')
+    if 'LOGO_URL' not in _d:
+        _d['LOGO_URL']         = _b.get('logo_data') or _b.get('logo_url', '')
+    if 'LOGO_FOOTER_URL' not in _d:
+        _d['LOGO_FOOTER_URL']  = _b.get('logo_data') or _b.get('logo_url', '')
+    if 'ACCENT_COLOR' not in _d:
+        _d['ACCENT_COLOR']     = _b.get('accent_color', '#1e69da')
+    if 'ACCENT_COLOR_DARK' not in _d:
+        _d['ACCENT_COLOR_DARK']= _b.get('accent_color', '#1e69da')
+    if 'COLOR_SECONDARY' not in _d:
+        _d['COLOR_SECONDARY']  = _b.get('secondary_color', '#f6f7fc')
+    if 'HERO_BG_IMG' not in _d:
+        _d['HERO_BG_IMG']      = _b.get('hero_bg_img', '')
+    if 'FOOTER_BG_COLOR' not in _d:
+        _d['FOOTER_BG_COLOR']  = _b.get('footer_bg_color') or _b.get('accent_color', '#1e69da')
+    if 'FOOTER_BG_IMG' not in _d:
+        _d['FOOTER_BG_IMG']    = _b.get('footer_bg_img') or _b.get('hero_bg_img', '')
+    if 'EMAIL' not in _d:
+        _d['EMAIL']            = _b.get('default_email', '')
+    if 'PHONE' not in _d:
+        _d['PHONE']            = _b.get('default_phone', '')
+    if 'CITY_IN' not in _d:
+        _d['CITY_IN']          = _b.get('default_city', '')
+    if 'LINK_CATALOG' not in _d:
+        _d['LINK_CATALOG']     = _b.get('catalog_url', '')
+    if 'LINK_COMPANY' not in _d:
+        _d['LINK_COMPANY']     = _b.get('about_url', '')
+    if 'LINK_DELIVERY' not in _d:
+        _d['LINK_DELIVERY']    = _b.get('delivery_url', '')
+    if 'LINK_LOGO' not in _d:
+        _d['LINK_LOGO']        = _b.get('site_url', '')
+    if 'FOOTER_ADDRESS' not in _d:
+        _d['FOOTER_ADDRESS']   = _b.get('footer_address', '')
+    if 'BODY_TITLE_COLOR' not in _d:
+        _d['BODY_TITLE_COLOR'] = _b.get('body_title_color') or '#282824'
+    if 'BODY_TEXT_COLOR' not in _d:
+        _d['BODY_TEXT_COLOR']  = _b.get('body_text_color') or '#3d4858'
+    if 'CARD_TEXT_COLOR' not in _d:
+        _d['CARD_TEXT_COLOR']  = _b.get('card_text_color') or '#555555'
+    if 'FOOTER_TEXT_COLOR' not in _d:
+        _d['FOOTER_TEXT_COLOR']= _b.get('footer_text_color') or '#ffffff'
+    if 'HERO_TEXT_COLOR' not in _d:
+        _d['HERO_TEXT_COLOR']  = _b.get('hero_text_color') or '#ffffff'
+    if 'HERO_SUB_COLOR' not in _d:
+        _d['HERO_SUB_COLOR']   = _b.get('hero_sub_color') or '#cccccc'
+    if 'UnsubscribeUrl' not in _d:
+        _d['UnsubscribeUrl']   = '{{UnsubscribeUrl}}'
+    if 'webversion' not in _d:
+        _d['webversion']       = '{{webversion}}'
+    if 'email' not in _d:
+        _d['email']            = '{{email}}'
+    # Дефолты текстов для stock (отгрузка)
+    if mode == 'stock' and 'TEXT_TITLE' not in _d:
+        _d['TEXT_TITLE'] = 'Профильная труба всех типоразмеров'
+    if mode == 'stock' and 'TEXT_BODY' not in _d:
+        _d['TEXT_BODY']  = 'Обновили складской запас профильного проката. В наличии все позиции.'
+    # ─────────────────────────────────────────────────────────────────────────
 
     tabs = st.tabs(["Бренд", "Контакты", "Баннер", "Тексты", "Блоки", "Эксперт"])
 
