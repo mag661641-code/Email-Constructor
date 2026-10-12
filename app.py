@@ -30,7 +30,8 @@ def _get_db_url():
         st.error("DATABASE_URL не настроен. Добавьте его в Streamlit → Settings → Secrets.")
         st.stop()
     if "sslmode" not in url:
-        url += "?sslmode=require"
+        sep = "&" if "?" in url else "?"
+        url += f"{sep}sslmode=require"
     return url
 
 def get_db():
