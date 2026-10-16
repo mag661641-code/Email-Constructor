@@ -3605,21 +3605,7 @@ else:
                     data[f'SMALL_L_{i}'] = cached_input("Ссылка",    f"{mode}_sm_link_{i}",data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
                     st.markdown("---")
 
-            with st.expander("3. Категории товаров"):
-                d_sec_t = "Категории товаров"
-                data['CAT_SECTION_TITLE'] = cached_input("Заголовок раздела", f"{mode}_cat_section_title", d_sec_t, d_sec_t) or d_sec_t
-                for i in range(1, 3):
-                    st.markdown(f"**Категория №{i}**")
-                    d_ct_t = "Трубный прокат"
-                    data[f'CAT_TITLE_{i}'] = cached_input("Заголовок", f"{mode}_cat_title_{i}", d_ct_t, d_ct_t) or d_ct_t
-                    d_ct_d = "Огромный выбор диаметров и стенок"
-                    _raw_cat_d = cached_input("Описание",  f"{mode}_cat_desc_{i}",  d_ct_d, d_ct_d, area=True, height=80) or d_ct_d
-                    data[f'CAT_DESC_{i}'] = process_text_to_html(_raw_cat_d)
-                    data[f'CAT_IMG_{i}']   = image_input("Картинка", f"{mode}_cat_img_{i}", "", "") or ""
-                    data[f'CAT_LINK_{i}']  = cached_input("Ссылка",    f"{mode}_cat_link_{i}", data['LINK_CATALOG'], data['LINK_CATALOG']) or data['LINK_CATALOG']
-                    st.markdown("---")
-
-            with st.expander("4. Наши отгрузки за неделю"):
+            with st.expander("3. Наши отгрузки за неделю"):
                 d_sec_title = "Наши отгрузки"
                 data['CASE_SECTION_TITLE'] = cached_input("Заголовок раздела", f"{mode}_case_section_title", d_sec_title, d_sec_title) or d_sec_title
                 for i in range(1, 3):
